@@ -51,9 +51,9 @@ jobs:
       - name: Run installer (base module)
         shell: pwsh
         run: |
-          # CI에서 Clear-Host 실패 방지
+          # Prevent Clear-Host failure in CI
           function Clear-Host {}
-          # Claude native install PATH 추가
+          # Add Claude native install PATH
           $env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"
           Write-Host "Testing Windows installer..."
           $module = '${{ github.event.inputs.module }}'

@@ -22,7 +22,7 @@
     "args": [
       "run", "-i", "--rm",
       "-v", "{configDir}:/app/.google-workspace",
-      "ghcr.io/popup-jacob/google-workspace-mcp:latest"
+      "ghcr.io/popup-studio-ai/google-workspace-mcp:latest"
     ]
   },
 

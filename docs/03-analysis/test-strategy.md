@@ -854,7 +854,7 @@ describe('MCP Server - Error Handling', () => {
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       } catch (error: any) {
         return {
-          content: [{ type: 'text', text: `오류: ${error.message}` }],
+          content: [{ type: 'text', text: `Error: ${error.message}` }],
           isError: true,
         };
       }

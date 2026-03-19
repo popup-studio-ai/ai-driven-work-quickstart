@@ -1,20 +1,20 @@
 # ADW Comprehensive Improvement Plan
 
-> **Summary**: ADW 종합 분석(65.5%) 기반 보안/품질/호환성 전면 개선으로 Match Rate 90%+ 달성
+> **Summary**: Achieve Match Rate 90%+ through comprehensive improvements in security/quality/compatibility based on ADW comprehensive analysis (65.5%)
 >
 > **Project**: popup-claude (AI-Driven Work Installer)
-> **Version**: 2.2 (현재 master branch, commit 7b16685)
-> **Author**: CTO Team (8 에이전트 병렬 분석 + 코드 전수 검증)
+> **Version**: 2.2 (current master branch, commit 7b16685)
+> **Author**: CTO Team (8-agent parallel analysis + full codebase verification)
 > **Date**: 2026-02-13
 > **Status**: Draft
 > **References**:
-> - `docs/03-analysis/adw-comprehensive.analysis.md` (종합 분석)
-> - `docs/03-analysis/security-verification-report.md` (보안 검증 보고서)
-> - `docs/03-analysis/shared-utilities-design.md` (공유 유틸리티 상세 설계)
-> - `docs/03-analysis/adw-requirements-traceability-matrix.md` (요구사항 추적 매트릭스)
-> - `docs/03-analysis/gap-security-verification.md` (보안 검증 갭 분석)
-> - `docs/03-analysis/gap-shared-utilities.md` (공유 유틸리티 갭 분석)
-> - `docs/03-analysis/gap-requirements-traceability.md` (요구사항 추적 갭 분석)
+> - `docs/03-analysis/adw-comprehensive.analysis.md` (comprehensive analysis)
+> - `docs/03-analysis/security-verification-report.md` (security verification report)
+> - `docs/03-analysis/shared-utilities-design.md` (shared utilities detailed design)
+> - `docs/03-analysis/adw-requirements-traceability-matrix.md` (requirements traceability matrix)
+> - `docs/03-analysis/gap-security-verification.md` (security verification gap analysis)
+> - `docs/03-analysis/gap-shared-utilities.md` (shared utilities gap analysis)
+> - `docs/03-analysis/gap-requirements-traceability.md` (requirements traceability gap analysis)
 
 ---
 
@@ -22,24 +22,24 @@
 
 ### 1.1 Purpose
 
-ADW 종합 분석 보고서(Match Rate 65.5%)에서 도출된 **3건 Critical, 8건 High, 14건 Medium, 5건 Low 총 30건의 이슈**와 **9건의 코드 품질 문제**, **10건의 OS 호환성 문제**를 체계적으로 해결하여, "원클릭 AI Native 업무환경 구축"이라는 핵심 목표의 달성도를 90% 이상으로 끌어올린다.
+Systematically resolve **30 total issues (3 Critical, 8 High, 14 Medium, 5 Low)**, **9 code quality issues**, and **10 OS compatibility issues** identified in the ADW comprehensive analysis report (Match Rate 65.5%), raising the achievement level of the core goal -- "one-click AI Native work environment setup" -- to 90% or higher.
 
 ### 1.2 Background
 
-**현재 상태 (65.5%)**:
-| 영역 | 현재 점수 | 목표 점수 | 갭 |
+**Current State (65.5%)**:
+| Area | Current Score | Target Score | Gap |
 |------|:--------:|:--------:|:---:|
-| 원클릭 설치 | 72% | 92% | +20% |
-| MCP 통합 | 82% | 95% | +13% |
-| 보안 | 50% | 90% | **+40%** |
-| 크로스 플랫폼 | 60% | 85% | +25% |
-| 코드 품질 | 46% | 85% | **+39%** |
-| 문서화 | 75% | 90% | +15% |
+| One-click installation | 72% | 92% | +20% |
+| MCP integration | 82% | 95% | +13% |
+| Security | 50% | 90% | **+40%** |
+| Cross-platform | 60% | 85% | +25% |
+| Code quality | 46% | 85% | **+39%** |
+| Documentation | 75% | 90% | +15% |
 
-**핵심 문제 3가지**:
-1. **보안 취약점 다수** — 자격증명 평문 저장(Critical), OAuth CSRF 미방지(High), Drive 쿼리 인젝션(High)
-2. **테스트 0%** — 유닛/통합 테스트 완전 부재, CI 수동 트리거만 존재
-3. **Linux 미지원** — `osascript` 의존 JSON 파서로 Linux에서 모듈 로딩 불가
+**3 Key Problems**:
+1. **Multiple security vulnerabilities** -- Plaintext credential storage (Critical), OAuth CSRF not prevented (High), Drive query injection (High)
+2. **0% test coverage** -- Complete absence of unit/integration tests, only manual CI trigger exists
+3. **Linux not supported** -- Module loading fails on Linux due to `osascript`-dependent JSON parser
 
 ### 1.3 Related Documents
 
@@ -59,31 +59,31 @@ ADW 종합 분석 보고서(Match Rate 65.5%)에서 도출된 **3건 Critical, 8
 
 ### 2.1 In Scope
 
-- [x] **Sprint 1 (Critical Security)**: 자격증명 보안, 코드 인젝션 방지, CSRF 방지
-- [x] **Sprint 2 (Platform & Stability)**: Linux 호환성, 인스톨러 버그 수정, 원격 실행 수정
-- [x] **Sprint 3 (Quality & Testing)**: 테스트 프레임워크 도입, CI 자동화, 코드 품질 개선
-- [x] **Sprint 4 (Google MCP Hardening)**: Rate limiting, 타임존 동적화, 서비스 캐싱, MIME 처리
-- [x] **Sprint 5 (UX & Documentation)**: 설치 후 검증, 업데이트/제거 기능, 문서 동기화
+- [x] **Sprint 1 (Critical Security)**: Credential security, code injection prevention, CSRF prevention
+- [x] **Sprint 2 (Platform & Stability)**: Linux compatibility, installer bug fixes, remote execution fixes
+- [x] **Sprint 3 (Quality & Testing)**: Test framework adoption, CI automation, code quality improvements
+- [x] **Sprint 4 (Google MCP Hardening)**: Rate limiting, dynamic timezone, service caching, MIME handling
+- [x] **Sprint 5 (UX & Documentation)**: Post-installation verification, update/remove features, documentation sync
 
 ### 2.2 Out of Scope
 
-- 엔터프라이즈 관리 기능 (조직 단위 배포, 중앙 관리 콘솔)
-- 텔레메트리/익명 분석 수집 시스템
-- GitHub MCP 서버 신규 개발 (CLI→MCP 전환)
-- 오프라인/에어갭 설치 지원
-- GPG 서명 기반 스크립트 무결성 검증 — 인프라 별도 구축 필요 (SHA-256 체크섬 검증은 **In Scope**, FR-S1-11)
-- 서드파티 Docker 이미지 검증 (SEC-11) — 공급망 보안은 인프라 레벨
-- 구조적 로깅 프레임워크 (QA-05) — 단, **보안 이벤트 로깅**은 FR-S3-10으로 In Scope
-- CHANGELOG 자동 생성 (QA-09) — Sprint 5 이후 검토
+- Enterprise management features (organization-level deployment, centralized management console)
+- Telemetry/anonymous analytics collection system
+- GitHub MCP server new development (CLI-to-MCP conversion)
+- Offline/air-gapped installation support
+- GPG signature-based script integrity verification -- requires separate infrastructure setup (SHA-256 checksum verification is **In Scope**, FR-S1-11)
+- Third-party Docker image verification (SEC-11) -- supply chain security is at infrastructure level
+- Structured logging framework (QA-05) -- however, **security event logging** is In Scope as FR-S3-10
+- Automatic CHANGELOG generation (QA-09) -- to be reviewed after Sprint 5
 
-### 2.3 v2.2 변경사항 (v2.1 대비 In Scope 전환)
+### 2.3 v2.2 Changes (items moved to In Scope compared to v2.1)
 
-> v2.1에서 Out of Scope이었으나 갭 분석을 통해 In Scope으로 전환된 항목:
-> - SHA-256 체크섬 기반 원격 스크립트 무결성 검증 (FR-S1-11) ← SEC-01 대응
-> - 입력 검증 레이어 횡단 관심사 (FR-S1-12) ← OWASP A03 횡단 대응
-> - npm audit CI 통합 (FR-S3-09) ← 의존성 보안 자동 검증
-> - 보안 이벤트 로깅 (FR-S3-10) ← OWASP A09 대응
-> - Docker Desktop 버전 호환성 체크 (FR-S2-11) ← OS-06 대응
+> Items that were Out of Scope in v2.1 but moved to In Scope through gap analysis:
+> - SHA-256 checksum-based remote script integrity verification (FR-S1-11) -- SEC-01 response
+> - Input validation layer as cross-cutting concern (FR-S1-12) -- OWASP A03 cross-cutting response
+> - npm audit CI integration (FR-S3-09) -- automated dependency security verification
+> - Security event logging (FR-S3-10) -- OWASP A09 response
+> - Docker Desktop version compatibility check (FR-S2-11) -- OS-06 response
 
 ---
 
@@ -91,99 +91,99 @@ ADW 종합 분석 보고서(Match Rate 65.5%)에서 도출된 **3건 Critical, 8
 
 ### 3.1 Functional Requirements
 
-#### Sprint 1 — Critical Security (즉시)
+#### Sprint 1 — Critical Security (Immediate)
 
-| ID | Requirement | Priority | 공수(h) | 대상 파일 | 분석 근거 |
+| ID | Requirement | Priority | Effort(h) | Target File | Analysis Basis |
 |----|-------------|:--------:|:-------:|----------|----------|
-| FR-S1-01 | **OAuth state 파라미터 추가** — `generateAuthUrl()`에 `state` 토큰 생성, 콜백에서 state 검증 로직 구현 | **Critical** | 1-2 | `oauth.ts:113-118` | SEC-08: CSRF 공격 방지. `shared/oauth-helper.sh`는 이미 PKCE+state 구현 완료이므로 패턴 참조 가능 |
-| FR-S1-02 | **Drive API 쿼리 이스케이핑** — `drive_search`, `drive_list` 핸들러에서 사용자 입력의 작은따옴표 이스케이프 처리 | **Critical** | 2-3 | `drive.ts:18,59` | GWS-07: `name contains '${query}'` — 입력값에 `'`가 포함되면 쿼리 조작 가능. `query.replace(/'/g, "\\'")` 적용 |
-| FR-S1-03 | **osascript 템플릿 인젝션 방지** — `parse_json()` 함수에서 backtick 사용 대신 stdin 파이프 방식으로 변경 | **Critical** | 3-4 | `install.sh:29-39` | SEC-08a: 원격 JSON에 backtick/`${}` 포함 시 임의 JavaScript 실행. `echo "$json" \| osascript -l JavaScript -e "..."` 방식으로 변경 |
-| FR-S1-04 | **Atlassian API 토큰 보안 저장** — `.mcp.json`에 평문 대신 환경변수 참조 방식으로 변경 | **Critical** | 4-6 | `atlassian/install.sh:147-172` | SEC-02(Critical): `docker -e JIRA_API_TOKEN=$apiToken`이 설정 파일에 평문 기록됨. `.env` 파일 분리 + `.gitignore` 추가. 검증보고서에서 Critical 확인(3순위), Appendix A.1과 정합성 일치. `gap-security-verification.md` P-02 반영: 검증보고서 원본 위험도 Critical 유지 |
-| FR-S1-05 | **Figma 토큰 보안 저장** — `module.json`의 env 참조를 실제 환경변수에서 읽도록 변경, 설치 스크립트에서 `.env` 파일 생성 | **Low** | 0.5 | `figma/module.json:24`, `figma/install.sh` | SEC-03: ~~Critical~~ → **Informational** (CTO팀 검증 결과: `{accessToken}`은 템플릿 플레이스홀더이며 실제 토큰이 디스크에 기록되지 않음. 실제 install.sh는 Remote MCP 방식으로 전환 완료) |
-| FR-S1-06 | **Docker non-root 사용자 추가** — Dockerfile에 `RUN addgroup --system app && adduser --system --ingroup app app` + `USER app` 추가 | **High** | 2-3 | `google-workspace-mcp/Dockerfile` | SEC-05: 컨테이너 root 실행은 컨테이너 탈출 시 호스트 권한 획득 위험 |
-| FR-S1-07 | **token.json 파일 권한 설정** — `saveToken()` 함수에서 `fs.writeFileSync()` 후 `fs.chmodSync(TOKEN_PATH, 0o600)` 추가 | **High** | 1 | `oauth.ts:105-108` | SEC-04: 토큰 파일이 기본 권한(644)으로 생성되어 다른 사용자 읽기 가능 |
-| FR-S1-08 | **설정 디렉토리 권한 설정** — `ensureConfigDir()`에서 `fs.mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 })` 적용 | **High** | 0.5 | `oauth.ts:51-55` | SEC-14: 설정 디렉토리가 기본 권한으로 생성됨 |
-| FR-S1-09 | **Atlassian install.sh 변수 이스케이핑** — Node.js `-e` 블록에 사용자 입력을 환경변수로 전달 (`node -e "..." 대신 `URL=... node -e "process.env.URL"`) | **High** | 3-4 | `atlassian/install.sh:147-172` | SEC-12: 사용자 입력(URL, email, token)이 Node.js 코드 문자열에 직접 삽입되어 코드 인젝션 가능 |
-| FR-S1-10 | **Gmail 이메일 헤더 인젝션 방지** — `gmail_send` 핸들러에서 `to`, `cc`, `bcc` 필드의 개행문자(`\r\n`) 제거 | **Medium** | 2 | `gmail.ts` (send 핸들러) | GWS-08: 개행문자로 숨은 수신자 추가 가능 |
-| FR-S1-11 | **원격 스크립트 다운로드 무결성 검증** — `curl\|bash` 패턴을 `curl -o tmpfile + SHA-256 체크섬 검증 + source` 방식으로 변경. GitHub 리포지토리에 `checksums.json` 매니페스트 발행, `download_and_verify()` 함수 구현. install.sh 3곳 + install.ps1 1곳 대응. GPG 서명은 Out of Scope 유지 | **Critical** | 6-8 | `install.sh:101-117,350-351`, `install.ps1:336` | SEC-01(Critical): MITM 시 원격 코드 실행 가능. 보안 검증 보고서 1순위 대응 |
-| FR-S1-12 | **입력 검증 레이어 구축** — `src/utils/sanitize.ts` 공유 유틸리티 생성. `escapeDriveQuery()`, `sanitizeEmailHeader()`, `validateEmail()`, `validateDriveId()`, `validateMaxLength()` 등 횡단 관심사로 입력 검증 통합. FR-S1-02, FR-S1-10의 개별 검증을 재사용 가능한 유틸리티로 구조화 | **High** | 2-3 | `google-workspace-mcp/src/utils/sanitize.ts` (신규) | 설계서(security-spec.md Section 9.2)에만 존재하고 계획서에 명시적 FR 없음. OWASP A03(Injection) 횡단 대응 |
-| | | | **합계: 28-37** | | |
+| FR-S1-01 | **Add OAuth state parameter** -- Generate `state` token in `generateAuthUrl()`, implement state verification logic in callback | **Critical** | 1-2 | `oauth.ts:113-118` | SEC-08: CSRF attack prevention. `shared/oauth-helper.sh` already has PKCE+state implementation, can reference pattern |
+| FR-S1-02 | **Drive API query escaping** -- Escape single quotes in user input for `drive_search`, `drive_list` handlers | **Critical** | 2-3 | `drive.ts:18,59` | GWS-07: `name contains '${query}'` -- query manipulation possible when input contains `'`. Apply `query.replace(/'/g, "\\'")` |
+| FR-S1-03 | **osascript template injection prevention** -- Replace backtick usage in `parse_json()` function with stdin pipe method | **Critical** | 3-4 | `install.sh:29-39` | SEC-08a: Arbitrary JavaScript execution when remote JSON contains backtick/`${}`. Change to `echo "$json" \| osascript -l JavaScript -e "..."` method |
+| FR-S1-04 | **Atlassian API token secure storage** -- Change from plaintext in `.mcp.json` to environment variable reference method | **Critical** | 4-6 | `atlassian/install.sh:147-172` | SEC-02(Critical): `docker -e JIRA_API_TOKEN=$apiToken` records plaintext in config file. Separate `.env` file + `.gitignore` addition. Confirmed Critical in verification report (priority 3), consistent with Appendix A.1. `gap-security-verification.md` P-02 reflected: maintaining original risk level Critical from verification report |
+| FR-S1-05 | **Figma token secure storage** -- Change `module.json` env reference to read from actual environment variables, create `.env` file in install script | **Low** | 0.5 | `figma/module.json:24`, `figma/install.sh` | SEC-03: ~~Critical~~ -> **Informational** (CTO team verification result: `{accessToken}` is a template placeholder and actual token is not written to disk. Actual install.sh has already been converted to Remote MCP method) |
+| FR-S1-06 | **Add Docker non-root user** -- Add `RUN addgroup --system app && adduser --system --ingroup app app` + `USER app` to Dockerfile | **High** | 2-3 | `google-workspace-mcp/Dockerfile` | SEC-05: Running container as root risks host privilege escalation on container escape |
+| FR-S1-07 | **Set token.json file permissions** -- Add `fs.chmodSync(TOKEN_PATH, 0o600)` after `fs.writeFileSync()` in `saveToken()` function | **High** | 1 | `oauth.ts:105-108` | SEC-04: Token file created with default permissions (644), readable by other users |
+| FR-S1-08 | **Set config directory permissions** -- Apply `fs.mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 })` in `ensureConfigDir()` | **High** | 0.5 | `oauth.ts:51-55` | SEC-14: Config directory created with default permissions |
+| FR-S1-09 | **Atlassian install.sh variable escaping** -- Pass user input to Node.js `-e` block via environment variables (`URL=... node -e "process.env.URL"` instead of `node -e "..."`) | **High** | 3-4 | `atlassian/install.sh:147-172` | SEC-12: User input (URL, email, token) directly inserted into Node.js code string, enabling code injection |
+| FR-S1-10 | **Gmail email header injection prevention** -- Remove newline characters (`\r\n`) from `to`, `cc`, `bcc` fields in `gmail_send` handler | **Medium** | 2 | `gmail.ts` (send handler) | GWS-08: Hidden recipients can be added via newline characters |
+| FR-S1-11 | **Remote script download integrity verification** -- Replace `curl\|bash` pattern with `curl -o tmpfile + SHA-256 checksum verification + source` method. Publish `checksums.json` manifest to GitHub repository, implement `download_and_verify()` function. Covers 3 locations in install.sh + 1 in install.ps1. GPG signatures remain Out of Scope | **Critical** | 6-8 | `install.sh:101-117,350-351`, `install.ps1:336` | SEC-01(Critical): Remote code execution possible via MITM. Security verification report priority 1 response |
+| FR-S1-12 | **Build input validation layer** -- Create `src/utils/sanitize.ts` shared utility. Structure input validation as cross-cutting concern with reusable utilities including `escapeDriveQuery()`, `sanitizeEmailHeader()`, `validateEmail()`, `validateDriveId()`, `validateMaxLength()`. Restructures individual validations from FR-S1-02, FR-S1-10 | **High** | 2-3 | `google-workspace-mcp/src/utils/sanitize.ts` (new) | Exists only in design doc (security-spec.md Section 9.2) without explicit FR in plan. OWASP A03 (Injection) cross-cutting response |
+| | | | **Total: 28-37** | | |
 
-#### Sprint 2 — Platform & Stability (1주 내)
+#### Sprint 2 — Platform & Stability (Within 1 week)
 
-| ID | Requirement | Priority | 공수(h) | 대상 파일 | 분석 근거 |
+| ID | Requirement | Priority | Effort(h) | Target File | Analysis Basis |
 |----|-------------|:--------:|:-------:|----------|----------|
-| FR-S2-01 | **크로스 플랫폼 JSON 파서 구현** — `parse_json()`를 `node -e` 기반으로 재구현. Node 미설치 시 `python3 -c` 폴백, 둘 다 없으면 `jq` 폴백 | **Critical** | 4-6 | `install.sh:29-39` | INS-01/OS-01: `osascript`는 macOS 전용. Linux에서 모듈 로딩 완전 불가 |
-| FR-S2-02 | **원격 실행 시 shared 스크립트 다운로드** — `run_module()` 함수에서 원격 모드일 때 `curl -sSL` 하기 전에 `shared/oauth-helper.sh`를 임시 디렉토리에 다운로드하여 `source` 가능하도록 환경 구성. **임시 파일 정리 보장**: `trap 'rm -rf "$SHARED_TMP"' EXIT INT TERM` 패턴으로 정상/비정상 종료 시 모두 cleanup | **High** | 3-4 | `install.sh:346-352`, `notion/install.sh:54`, `figma/install.sh:58` | INS-07: `curl\|bash` 원격실행 시 `BASH_SOURCE[0]`가 빈 값이라 `$SCRIPT_DIR/../shared/oauth-helper.sh` 경로 해석 불가. `gap-requirements-traceability.md` 암묵적 요구사항 #3(임시 파일 정리) 반영 |
-| FR-S2-03 | **MCP 설정 경로 통일** — Mac/Linux도 Windows와 동일하게 `~/.claude/mcp.json` 사용하도록 통일. **영향 범위: 3개 파일** (`install.sh:406`, `google/install.sh:328`, `atlassian/install.sh:145`) | **High** | 2-3 | `install.sh:406`, `google/install.sh:328`, `atlassian/install.sh:145` | INS-02: Mac 스크립트 3곳이 `~/.mcp.json`(레거시), Windows는 `~/.claude/mcp.json`(현재). commit `b8b01a2`에서 Windows만 변경하고 Mac 미반영 |
-| FR-S2-04 | **Linux 패키지 관리자 확장** — `base/install.sh`에 `dnf`(Fedora/RHEL), `pacman`(Arch) 감지 및 설치 로직 추가. **주의**: FR-S2-01(parse_json) 완료 후 착수 필요 (직렬 의존성) | **Medium** | 3-4 | `base/install.sh:46-49, 88-93` | INS-05/OS-02: apt/snap만 지원. 주요 리눅스 배포판 커버리지 확대 |
-| FR-S2-05 | **Figma module.json 정합성 수정** — `type: "remote-mcp"` 으로 변경, `requirements.node: false`로 수정 (실제 구현이 `claude mcp add --transport http`이므로) | **Medium** | 1 | `figma/module.json` | INS-08: module.json에는 `type: "mcp"`, `node: true`이지만 실제 install.sh는 Remote MCP 등록 방식 |
-| FR-S2-06 | **Atlassian module.json Docker 표기 수정** — `requirements.docker: "optional"` 또는 별도 `modes` 필드 추가하여 Docker/Rovo 듀얼 모드 표현 | **Medium** | 1 | `atlassian/module.json:15` | INS-09: `docker: false`이지만 Docker 모드 존재. 메인 인스톨러 상태 표시에 영향 |
-| FR-S2-07 | **모듈 실행 순서 정렬** — `SELECTED_MODULES`를 `MODULE_ORDERS` 배열 기준으로 정렬 후 실행 | **Low** | 2 | `install.sh:376` | INS-04: 모듈이 입력 순서대로 실행됨. 의존성 있는 모듈(base→google)의 순서 보장 필요 |
-| FR-S2-08 | **Docker wait 타임아웃 추가** — `google/install.sh`의 `docker wait` 호출에 타임아웃(300초) 래퍼 추가 | **Low** | 1-2 | `google/install.sh:315` | INS-10: 인증 실패 시 무한 대기 가능 |
-| FR-S2-09 | **Python 3 의존성 module.json 명시** — Notion, Figma module.json에 `requirements.python3: true` 추가 | **Medium** | 0.5 | `notion/module.json`, `figma/module.json` | OS-07: OAuth 헬퍼가 python3 필수이나 미문서화 |
-| FR-S2-10 | **Windows 관리자 권한 조건부 요청** — base 모듈이 아닌 경우 관리자 권한 스킵 옵션 제공. `Test-AdminRequired` 함수로 모듈별 필요성 판단 후 조건부 UAC 상승 | **High** | 4-6 | `install.ps1:130-153` | SEC-06(High): 모든 설치에 무조건 관리자 권한 요구. 검증보고서 원래 위험도 High 복원. `gap-security-verification.md` P-03 반영 |
-| FR-S2-11 | **Docker Desktop 버전 호환성 체크** — Docker Desktop 4.42+ 버전에서 macOS Ventura 미지원 이슈 감지 로직 추가. `docker version` 출력에서 Desktop 버전 파싱, OS 버전과 교차 검증하여 비호환 시 경고 메시지 출력. 공유 유틸리티 `docker-utils.sh`의 `docker_check()` 함수에 통합 | **Medium** | 2-3 | `google/install.sh`, `atlassian/install.sh`, `installer/modules/shared/docker-utils.sh` | OS-06(High): Docker Desktop 4.42+ macOS Ventura 미지원. `gap-requirements-traceability.md` Section 2 #5 참조 |
-| | | | **합계: 26-39** | | |
+| FR-S2-01 | **Implement cross-platform JSON parser** -- Reimplement `parse_json()` using `node -e`. Fallback to `python3 -c` if Node not installed, then `jq` fallback | **Critical** | 4-6 | `install.sh:29-39` | INS-01/OS-01: `osascript` is macOS-only. Complete module loading failure on Linux |
+| FR-S2-02 | **Download shared scripts during remote execution** -- In `run_module()` function, download `shared/oauth-helper.sh` to temp directory via `curl -sSL` before execution in remote mode to enable `source`. **Ensure temporary file cleanup**: Use `trap 'rm -rf "$SHARED_TMP"' EXIT INT TERM` pattern for cleanup on both normal and abnormal termination | **High** | 3-4 | `install.sh:346-352`, `notion/install.sh:54`, `figma/install.sh:58` | INS-07: `BASH_SOURCE[0]` is empty during `curl\|bash` remote execution, making `$SCRIPT_DIR/../shared/oauth-helper.sh` path resolution impossible. `gap-requirements-traceability.md` implicit requirement #3 (temporary file cleanup) reflected |
+| FR-S2-03 | **Unify MCP config path** -- Unify Mac/Linux to use `~/.claude/mcp.json` same as Windows. **Affected scope: 3 files** (`install.sh:406`, `google/install.sh:328`, `atlassian/install.sh:145`) | **High** | 2-3 | `install.sh:406`, `google/install.sh:328`, `atlassian/install.sh:145` | INS-02: 3 Mac script locations use `~/.mcp.json` (legacy), Windows uses `~/.claude/mcp.json` (current). Commit `b8b01a2` only changed Windows, Mac not updated |
+| FR-S2-04 | **Expand Linux package managers** -- Add `dnf` (Fedora/RHEL), `pacman` (Arch) detection and installation logic to `base/install.sh`. **Note**: Must start after FR-S2-01 (parse_json) completion (serial dependency) | **Medium** | 3-4 | `base/install.sh:46-49, 88-93` | INS-05/OS-02: Only apt/snap supported. Expand major Linux distribution coverage |
+| FR-S2-05 | **Fix Figma module.json consistency** -- Change to `type: "remote-mcp"`, fix `requirements.node: false` (since actual implementation uses `claude mcp add --transport http`) | **Medium** | 1 | `figma/module.json` | INS-08: module.json has `type: "mcp"`, `node: true` but actual install.sh uses Remote MCP registration |
+| FR-S2-06 | **Fix Atlassian module.json Docker notation** -- Add `requirements.docker: "optional"` or separate `modes` field to represent Docker/Rovo dual mode | **Medium** | 1 | `atlassian/module.json:15` | INS-09: `docker: false` but Docker mode exists. Affects main installer status display |
+| FR-S2-07 | **Sort module execution order** -- Sort `SELECTED_MODULES` by `MODULE_ORDERS` array before execution | **Low** | 2 | `install.sh:376` | INS-04: Modules execute in input order. Need to guarantee order for dependent modules (base->google) |
+| FR-S2-08 | **Add Docker wait timeout** -- Add timeout wrapper (300 seconds) to `docker wait` call in `google/install.sh` | **Low** | 1-2 | `google/install.sh:315` | INS-10: Infinite wait possible on authentication failure |
+| FR-S2-09 | **Specify Python 3 dependency in module.json** -- Add `requirements.python3: true` to Notion, Figma module.json | **Medium** | 0.5 | `notion/module.json`, `figma/module.json` | OS-07: OAuth helper requires python3 but undocumented |
+| FR-S2-10 | **Conditional Windows admin privileges** -- Provide admin privilege skip option when not base module. Determine per-module necessity with `Test-AdminRequired` function and conditionally request UAC elevation | **High** | 4-6 | `install.ps1:130-153` | SEC-06(High): Unconditionally requires admin privileges for all installations. Original High risk level restored from verification report. `gap-security-verification.md` P-03 reflected |
+| FR-S2-11 | **Docker Desktop version compatibility check** -- Add detection logic for Docker Desktop 4.42+ not supporting macOS Ventura. Parse Desktop version from `docker version` output, cross-verify with OS version and output warning message on incompatibility. Integrate into `docker_check()` function in shared utility `docker-utils.sh` | **Medium** | 2-3 | `google/install.sh`, `atlassian/install.sh`, `installer/modules/shared/docker-utils.sh` | OS-06(High): Docker Desktop 4.42+ does not support macOS Ventura. See `gap-requirements-traceability.md` Section 2 #5 |
+| | | | **Total: 26-39** | | |
 
-#### Sprint 3 — Quality & Testing (2주 내)
+#### Sprint 3 — Quality & Testing (Within 2 weeks)
 
-| ID | Requirement | Priority | 공수(h) | 대상 파일 | 분석 근거 |
+| ID | Requirement | Priority | Effort(h) | Target File | Analysis Basis |
 |----|-------------|:--------:|:-------:|----------|----------|
-| FR-S3-01 | **Google MCP 유닛 테스트 작성** — Vitest 프레임워크 도입, 각 도구 파일(gmail, calendar, drive, docs, sheets, slides)별 최소 핵심 로직 테스트 작성. 목표 커버리지: 60%+ | **Critical** | 16-20 | `google-workspace-mcp/` (신규) | QA-01: 테스트 커버리지 0%. 회귀 방지를 위한 최소 안전망 필요 |
-| FR-S3-02 | **인스톨러 Smoke 테스트 작성** — Bash 기반 테스트 스크립트로 각 모듈의 `module.json` 파싱, 기본 실행 검증 | **High** | 8-10 | `installer/tests/` (신규) | QA-01: 인스톨러 변경 시 회귀 테스트 수단 없음 |
-| FR-S3-03 | **CI 자동 트리거 추가** — PR/push 시 자동 실행되는 워크플로우 추가. Google MCP 빌드 + 유닛 테스트 + 인스톨러 smoke 테스트 | **High** | 4-6 | `.github/workflows/test-installer.yml` | QA-02: 수동 `workflow_dispatch`만 존재. PR 머지 전 자동 검증 없음 |
-| FR-S3-04 | **CI 테스트 범위 확장** — google, atlassian 모듈을 CI 테스트 대상에 추가 (현재 base, github, notion, figma만) | **Medium** | 2-3 | `.github/workflows/test-installer.yml:17-22` | 분석서: CI 테스트 범위 불완전 |
-| FR-S3-05a | **인스톨러 공유 유틸리티 추출** — `installer/modules/shared/` 디렉토리에 5개 공유 스크립트 생성: `colors.sh`(ANSI 색상 상수 8+5개 + `print_success()`/`print_error()`/`print_warning()`/`print_info()`/`print_debug()` 편의함수 5개), `docker-utils.sh`(`docker_is_installed()`/`docker_is_running()`/`docker_get_status()`/`docker_check()`/`docker_wait_for_start()`/`docker_install()`/`docker_pull_image()`/`docker_cleanup_container()`/`docker_show_install_guide()` 9개 함수), `mcp-config.sh`(`mcp_get_config_path()`/`mcp_check_node()`/`mcp_add_docker_server()`/`mcp_add_stdio_server()`/`mcp_remove_server()`/`mcp_server_exists()` 6개 함수), `browser-utils.sh`(`browser_open()`/`browser_open_with_prompt()`/`browser_open_or_show()`/`browser_wait_for_completion()` 4개 함수, WSL 감지 포함), `package-manager.sh`(`pkg_detect_manager()`/`pkg_install()`/`pkg_install_cask()`/`pkg_is_installed()`/`pkg_ensure_installed()` 5개 함수, brew/apt/dnf/yum/pacman 지원). 7개 인스톨러 모듈(base, google, atlassian, figma, notion, github, pencil)을 공유 유틸리티 source로 순차 리팩토링. **수용 기준**: (1) 전 모듈 shared source 적용, (2) 인라인 색상 정의 0건, (3) Docker 모듈 `docker_check()` 사용, (4) MCP 모듈 `mcp_add_docker_server()`/`mcp_add_stdio_server()` 사용, (5) 브라우저 모듈 `browser_open()` 사용 | **Medium** | 12-16 | `installer/modules/shared/` (신규), `installer/modules/*/install.sh` (수정) | QA-06: 컬러 42줄 10회 중복, Docker 체크 4회 중복, MCP 설정 4회 중복, 브라우저 열기 4회 중복. `shared-utilities-design.md` Section 1.3 참조. `gap-shared-utilities.md` P-1~P-5, D-1~D-7 반영 |
-| FR-S3-05b | **Google MCP 공유 유틸리티 추출** — `src/utils/` 디렉토리에 5개 유틸리티 생성: `time.ts`(parseTime, getCurrentTime, addDays, formatDate + getTimezone, getUtcOffsetString -- timezone.ts 기능 통합), `retry.ts`(withRetry, RetryOptions, isRetryableError -- 429/500/502/503/504 + ECONNRESET/ETIMEDOUT 대응), `sanitize.ts`(입력 검증 통합 7개 함수 -- FR-S1-12와 연계), `messages.ts`(8개 카테고리 ~60개 메시지 키 + `msg()` 헬퍼 -- FR-S5-05 동시 구현), `mime.ts`(extractTextBody, extractAttachments -- 재귀적 MIME 파싱). `oauth.ts` 내 서비스 캐싱 + `clearServiceCache()` 테스트 유틸리티 추가(FR-S4-04 연계). **수용 기준**: (1) calendar.ts 내 중복 parseTime 0건, (2) 69개 핸들러 캐싱된 getGoogleServices() 사용, (3) 모든 API 호출에 withRetry() 적용, (4) 사용자 입력 sanitize 함수 통과, (5) 하드코딩 한국어 메시지 0건(Sprint 5 완료 시) | **Medium** | 10-14 | `google-workspace-mcp/src/utils/` (신규), `google-workspace-mcp/src/tools/*.ts` (수정) | QA-06: parseTime 2곳 중복, QA-07: 서비스 69회 재생성. `shared-utilities-design.md` Section 2 참조. `gap-shared-utilities.md` P-6~P-10, D-8~D-14 반영 |
-| FR-S3-06 | **ESLint + Prettier 설정** — Google MCP TypeScript 프로젝트에 린터/포매터 설정 추가 | **Low** | 2-3 | `google-workspace-mcp/` (신규) | QA-08: 코드 스타일 일관성 도구 없음 |
-| FR-S3-07 | **`any` 타입 제거** — `index.ts:32`, `sheets.ts:18,341`, `calendar.ts:288`, `slides.ts:135,156`, `docs.ts:236`의 `any`/`as any` 사용을 proper type으로 교체. 총 7개 위치 대응 | **Low** | 2-3 | `google-workspace-mcp/src/index.ts:32`, `sheets.ts`, `calendar.ts`, `slides.ts`, `docs.ts` | GWS-04: TypeScript strict 모드의 의미 약화. Appendix A.2 Code Analyzer 추가 발견 위치 반영. `gap-requirements-traceability.md` Section 2.1 참조 |
-| FR-S3-08 | **에러 메시지 영문 통일** — `index.ts:48`의 `오류:`, `oauth.ts:207`의 `서버 시작 실패:` 등을 영문으로 통일. FR-S3-05b의 `messages.ts` 중앙집중 메시지 구조를 활용하여 단순 치환이 아닌 구조적 메시지 관리 기반 마련 | **Low** | 1-2 | `index.ts:48`, `oauth.ts` | GWS-03: 한국어/영어 에러 메시지 혼재. `gap-shared-utilities.md` P-9 참조 |
-| FR-S3-09 | **npm audit CI 통합** — CI 파이프라인에 `npm audit --audit-level=high` 단계 추가. High 이상 취약점 발견 시 빌드 실패. `npm ci` 전환과 함께 의존성 보안 자동 검증 게이트 구축 | **High** | 2-3 | `.github/workflows/ci.yml` (수정) | Security Architect 추가 발견: "Dependencies Not Audited". `gap-security-verification.md` P-06 참조 |
-| FR-S3-10 | **보안 이벤트 로깅** — 인증 실패/성공, 토큰 갱신, 파일 권한 변경 이벤트를 stderr에 구조화된 형태로 출력. 최소 필드: timestamp, event_type, result, detail. MCP 서버 특성상 stdout은 JSON-RPC 전용이므로 stderr 사용 | **Medium** | 4-6 | `oauth.ts`, `index.ts` | OWASP A09(Security Logging and Monitoring Failures): 보안 로깅 부재. `gap-security-verification.md` P-05 참조 |
-| | | | **합계: 63-86** | | |
+| FR-S3-01 | **Write Google MCP unit tests** -- Adopt Vitest framework, write minimum core logic tests per tool file (gmail, calendar, drive, docs, sheets, slides). Target coverage: 60%+ | **Critical** | 16-20 | `google-workspace-mcp/` (new) | QA-01: 0% test coverage. Minimum safety net needed for regression prevention |
+| FR-S3-02 | **Write installer smoke tests** -- Bash-based test scripts for each module's `module.json` parsing and basic execution verification | **High** | 8-10 | `installer/tests/` (new) | QA-01: No regression testing means for installer changes |
+| FR-S3-03 | **Add CI auto-trigger** -- Add workflow that automatically runs on PR/push. Google MCP build + unit tests + installer smoke tests | **High** | 4-6 | `.github/workflows/test-installer.yml` | QA-02: Only manual `workflow_dispatch` exists. No automatic verification before PR merge |
+| FR-S3-04 | **Expand CI test scope** -- Add google, atlassian modules to CI test targets (currently only base, github, notion, figma) | **Medium** | 2-3 | `.github/workflows/test-installer.yml:17-22` | Analysis report: CI test scope incomplete |
+| FR-S3-05a | **Extract installer shared utilities** -- Create 5 shared scripts in `installer/modules/shared/` directory: `colors.sh` (8+5 ANSI color constants + 5 convenience functions: `print_success()`/`print_error()`/`print_warning()`/`print_info()`/`print_debug()`), `docker-utils.sh` (9 functions: `docker_is_installed()`/`docker_is_running()`/`docker_get_status()`/`docker_check()`/`docker_wait_for_start()`/`docker_install()`/`docker_pull_image()`/`docker_cleanup_container()`/`docker_show_install_guide()`), `mcp-config.sh` (6 functions: `mcp_get_config_path()`/`mcp_check_node()`/`mcp_add_docker_server()`/`mcp_add_stdio_server()`/`mcp_remove_server()`/`mcp_server_exists()`), `browser-utils.sh` (4 functions: `browser_open()`/`browser_open_with_prompt()`/`browser_open_or_show()`/`browser_wait_for_completion()`, includes WSL detection), `package-manager.sh` (5 functions: `pkg_detect_manager()`/`pkg_install()`/`pkg_install_cask()`/`pkg_is_installed()`/`pkg_ensure_installed()`, supports brew/apt/dnf/yum/pacman). Sequentially refactor 7 installer modules (base, google, atlassian, figma, notion, github, pencil) to shared utility source. **Acceptance criteria**: (1) All modules use shared source, (2) Zero inline color definitions, (3) Docker modules use `docker_check()`, (4) MCP modules use `mcp_add_docker_server()`/`mcp_add_stdio_server()`, (5) Browser modules use `browser_open()` | **Medium** | 12-16 | `installer/modules/shared/` (new), `installer/modules/*/install.sh` (modified) | QA-06: Color 42 lines duplicated 10 times, Docker check duplicated 4 times, MCP config duplicated 4 times, browser open duplicated 4 times. See `shared-utilities-design.md` Section 1.3. `gap-shared-utilities.md` P-1~P-5, D-1~D-7 reflected |
+| FR-S3-05b | **Extract Google MCP shared utilities** -- Create 5 utilities in `src/utils/` directory: `time.ts` (parseTime, getCurrentTime, addDays, formatDate + getTimezone, getUtcOffsetString -- timezone.ts functionality merged), `retry.ts` (withRetry, RetryOptions, isRetryableError -- handles 429/500/502/503/504 + ECONNRESET/ETIMEDOUT), `sanitize.ts` (7 integrated input validation functions -- linked with FR-S1-12), `messages.ts` (8 categories ~60 message keys + `msg()` helper -- implement simultaneously with FR-S5-05), `mime.ts` (extractTextBody, extractAttachments -- recursive MIME parsing). Add service caching + `clearServiceCache()` test utility to `oauth.ts` (linked with FR-S4-04). **Acceptance criteria**: (1) Zero duplicate parseTime in calendar.ts, (2) 69 handlers use cached getGoogleServices(), (3) All API calls wrapped with withRetry(), (4) User input passes through sanitize functions, (5) Zero hardcoded Korean messages (upon Sprint 5 completion) | **Medium** | 10-14 | `google-workspace-mcp/src/utils/` (new), `google-workspace-mcp/src/tools/*.ts` (modified) | QA-06: parseTime duplicated in 2 locations, QA-07: Service regenerated 69 times. See `shared-utilities-design.md` Section 2. `gap-shared-utilities.md` P-6~P-10, D-8~D-14 reflected |
+| FR-S3-06 | **ESLint + Prettier configuration** -- Add linter/formatter configuration to Google MCP TypeScript project | **Low** | 2-3 | `google-workspace-mcp/` (new) | QA-08: No code style consistency tooling |
+| FR-S3-07 | **Remove `any` types** -- Replace `any`/`as any` usage at `index.ts:32`, `sheets.ts:18,341`, `calendar.ts:288`, `slides.ts:135,156`, `docs.ts:236` with proper types. 7 locations total | **Low** | 2-3 | `google-workspace-mcp/src/index.ts:32`, `sheets.ts`, `calendar.ts`, `slides.ts`, `docs.ts` | GWS-04: Undermines meaning of TypeScript strict mode. Reflects additional discovery locations from Appendix A.2 Code Analyzer. See `gap-requirements-traceability.md` Section 2.1 |
+| FR-S3-08 | **Unify error messages to English** -- Unify `index.ts:48` `오류:`, `oauth.ts:207` `서버 시작 실패:` etc. to English. Not simple replacement but establish structured message management foundation using FR-S3-05b's `messages.ts` centralized message structure | **Low** | 1-2 | `index.ts:48`, `oauth.ts` | GWS-03: Mixed Korean/English error messages. See `gap-shared-utilities.md` P-9 |
+| FR-S3-09 | **npm audit CI integration** -- Add `npm audit --audit-level=high` step to CI pipeline. Build fails when High+ vulnerabilities found. Build automated dependency security verification gate with `npm ci` transition | **High** | 2-3 | `.github/workflows/ci.yml` (modified) | Security Architect additional finding: "Dependencies Not Audited". See `gap-security-verification.md` P-06 |
+| FR-S3-10 | **Security event logging** -- Output authentication success/failure, token refresh, file permission change events to stderr in structured format. Minimum fields: timestamp, event_type, result, detail. Since MCP server uses stdout exclusively for JSON-RPC, use stderr | **Medium** | 4-6 | `oauth.ts`, `index.ts` | OWASP A09 (Security Logging and Monitoring Failures): Absence of security logging. See `gap-security-verification.md` P-05 |
+| | | | **Total: 63-86** | | |
 
-#### Sprint 4 — Google MCP Hardening (3주 내)
+#### Sprint 4 — Google MCP Hardening (Within 3 weeks)
 
-| ID | Requirement | Priority | 공수(h) | 대상 파일 | 분석 근거 |
+| ID | Requirement | Priority | Effort(h) | Target File | Analysis Basis |
 |----|-------------|:--------:|:-------:|----------|----------|
-| FR-S4-01 | **Google API Rate Limiting 구현** — 지수 백오프 재시도 로직 추가. 429(Too Many Requests) 및 503 에러 시 자동 재시도 (최대 3회, 1s→2s→4s 백오프) | **High** | 4-6 | `google-workspace-mcp/src/tools/*.ts` | GWS-02: Google API 할당량 초과 시 에러만 반환. 일시적 오류에도 실패 |
-| FR-S4-02 | **OAuth 스코프 동적 설정** — 환경변수 `GOOGLE_SCOPES`로 필요한 서비스 스코프만 선택 가능하도록 변경. 미지정 시 현재 전체 스코프 유지 (하위호환) | **High** | 4-6 | `oauth.ts:17-25` | SEC-07: 6개 서비스 스코프를 항상 전체 요청. Gmail만 사용해도 Drive/Calendar 권한 요구 |
-| FR-S4-03 | **Calendar 타임존 동적화** — 하드코딩된 `Asia/Seoul` 대신 환경변수 `TIMEZONE`(기본값: `Intl.DateTimeFormat().resolvedOptions().timeZone`)에서 읽도록 변경 | **High** | 3-4 | `calendar.ts:161,170,175` | GWS-09: `+09:00` (KST) 하드코딩. 한국 외 사용자에게 잘못된 시간대 적용 |
-| FR-S4-04 | **getGoogleServices() 싱글톤/캐싱** — 인증 클라이언트와 서비스 인스턴스를 모듈 레벨에서 캐싱. 토큰 만료 시에만 재생성. **주의**: FR-S4-05(토큰 검증), FR-S4-06(뮤텍스) 완료 후 착수 권장 (직렬 의존성) | **Medium** | 4-6 | `oauth.ts:227-238` | QA-07: 71개 도구 호출마다 `getGoogleServices()` 재생성. 불필요한 OAuth 체크 반복 |
-| FR-S4-05 | **Token refresh_token 유효성 검증** — `loadToken()` 시 `refresh_token` 존재 여부 확인, 없으면 재인증 유도 | **Medium** | 2-3 | `oauth.ts:196-211` | GWS-01: `expiry_date`만 체크. refresh_token이 revoke된 경우 무한 실패 가능 |
-| FR-S4-06 | **동시 인증 요청 처리** — 뮤텍스/세마포어 패턴으로 동시 인증 요청 방지. 첫 번째 요청 완료 후 나머지는 캐시된 결과 사용 | **Medium** | 3-4 | `oauth.ts:113-182` | GWS-05: 여러 도구가 동시에 인증 요청 시 경쟁 조건 가능 |
-| FR-S4-07 | **Gmail 중첩 MIME 파싱 개선** — 재귀적 `parts` 탐색으로 중첩 multipart 이메일 본문 추출 | **Medium** | 3-4 | `gmail.ts:70-75` | GWS-10: 1단계 `parts`만 파싱. 첨부파일 포함 메일에서 본문 누락 |
-| FR-S4-08 | **Gmail 첨부파일 다운로드 개선** — 1000자 절삭 제거, base64 전체 데이터 반환 (크기 제한 옵션 추가) | **Low** | 2-3 | `gmail.ts:358` | GWS-11: 첨부파일 데이터가 1000자로 잘려 실질적 다운로드 불가 |
-| FR-S4-09 | **Node.js 22 마이그레이션** — Dockerfile의 `node:20-slim`을 `node:22-slim`으로 업데이트 | **Medium** | 2-3 | `Dockerfile` | OS-08: Node.js 20 LTS 2026-04-30 EOL. 보안 패치 중단 전 마이그레이션 필요 |
-| FR-S4-10 | **.dockerignore 추가** — `.google-workspace/`, `node_modules/`, `.git/` 등 빌드 컨텍스트 제외 | **Low** | 0.5 | `google-workspace-mcp/` (신규) | GWS-12: 인증 파일이 Docker 빌드 컨텍스트에 포함될 위험 |
-| | | | **합계: 28-40** | | |
+| FR-S4-01 | **Implement Google API rate limiting** -- Add exponential backoff retry logic. Auto-retry on 429 (Too Many Requests) and 503 errors (max 3 attempts, 1s->2s->4s backoff) | **High** | 4-6 | `google-workspace-mcp/src/tools/*.ts` | GWS-02: Only returns error on Google API quota exceeded. Fails even on transient errors |
+| FR-S4-02 | **Dynamic OAuth scope configuration** -- Enable selecting only needed service scopes via `GOOGLE_SCOPES` env variable. Maintain all scopes when unspecified (backward compatible) | **High** | 4-6 | `oauth.ts:17-25` | SEC-07: Always requests all 6 service scopes. Requires Drive/Calendar permission even for Gmail-only usage |
+| FR-S4-03 | **Dynamic Calendar timezone** -- Read from env variable `TIMEZONE` (default: `Intl.DateTimeFormat().resolvedOptions().timeZone`) instead of hardcoded `Asia/Seoul` | **High** | 3-4 | `calendar.ts:161,170,175` | GWS-09: `+09:00` (KST) hardcoded. Wrong timezone applied for non-Korean users |
+| FR-S4-04 | **getGoogleServices() singleton/caching** -- Cache auth client and service instances at module level. Regenerate only on token expiry. **Note**: Recommended to start after FR-S4-05 (token validation), FR-S4-06 (mutex) completion (serial dependency) | **Medium** | 4-6 | `oauth.ts:227-238` | QA-07: `getGoogleServices()` regenerated on every call from 71 tools. Unnecessary OAuth check repetition |
+| FR-S4-05 | **Token refresh_token validity verification** -- Check `refresh_token` existence during `loadToken()`, prompt re-authentication if missing | **Medium** | 2-3 | `oauth.ts:196-211` | GWS-01: Only checks `expiry_date`. Infinite failure possible when refresh_token is revoked |
+| FR-S4-06 | **Concurrent authentication request handling** -- Prevent concurrent auth requests using mutex/semaphore pattern. First request completes, rest use cached result | **Medium** | 3-4 | `oauth.ts:113-182` | GWS-05: Race condition possible when multiple tools request authentication simultaneously |
+| FR-S4-07 | **Gmail nested MIME parsing improvement** -- Extract nested multipart email body via recursive `parts` traversal | **Medium** | 3-4 | `gmail.ts:70-75` | GWS-10: Only parses 1st level `parts`. Body missing in emails with attachments |
+| FR-S4-08 | **Gmail attachment download improvement** -- Remove 1000-char truncation, return full base64 data (with size limit option) | **Low** | 2-3 | `gmail.ts:358` | GWS-11: Attachment data truncated to 1000 chars, making actual download impossible |
+| FR-S4-09 | **Node.js 22 migration** -- Update Dockerfile `node:20-slim` to `node:22-slim` | **Medium** | 2-3 | `Dockerfile` | OS-08: Node.js 20 LTS EOL 2026-04-30. Need to migrate before security patch discontinuation |
+| FR-S4-10 | **.dockerignore addition** -- Exclude `.google-workspace/`, `node_modules/`, `.git/` etc. from build context | **Low** | 0.5 | `google-workspace-mcp/` (new) | GWS-12: Risk of authentication files being included in Docker build context |
+| | | | **Total: 28-40** | | |
 
-#### Sprint 5 — UX & Documentation (1개월 내)
+#### Sprint 5 — UX & Documentation (Within 1 month)
 
-| ID | Requirement | Priority | 공수(h) | 대상 파일 | 분석 근거 |
+| ID | Requirement | Priority | Effort(h) | Target File | Analysis Basis |
 |----|-------------|:--------:|:-------:|----------|----------|
-| FR-S5-01 | **설치 후 자동 검증** — 각 모듈 설치 완료 후 MCP 서버 연결 테스트(health check) 실행. 실패 시 가이드 메시지 출력 | **High** | 6-8 | `install.sh` (완료 섹션) | 분석서 8.1: 설치 완료 후 정상 동작 자동 검증 미구현 |
-| FR-S5-02 | **롤백 메커니즘 도입** — 설치 시작 전 현재 `.mcp.json` 백업, 실패 시 원본 복원 | **Medium** | 4-6 | `install.sh` | INS-03: 설치 실패 시 부분 설치 상태로 남음 |
-| FR-S5-03 | **ARCHITECTURE.md 동기화** — Pencil 모듈, Remote MCP 타입(Notion, Figma), `shared/` 디렉토리 추가 | **Low** | 2-3 | `installer/ARCHITECTURE.md` | INS-06/QA 아키텍처 일치도: 2개 항목 불일치 |
-| FR-S5-04 | **package.json 버전 업데이트** — `0.1.0` → `1.0.0` (프로덕션 배포 중이므로 SemVer 준수) | **Low** | 0.5 | `google-workspace-mcp/package.json:3` | GWS-06: 프로덕션 사용 중이나 버전이 0.1.0 |
-| FR-S5-05 | **Google MCP 도구 메시지 영문화** — 전체 도구의 `description`, 응답 `message` 를 영문으로 통일 (국제화 준비). FR-S3-05b의 `messages.ts` 중앙집중 구조 활용 | **Low** | 4-6 | `google-workspace-mcp/src/tools/*.ts` | GWS-03: 한국어 메시지가 비한국어 사용자에게 의미 없음 |
-| FR-S5-06 | **.gitignore 보강** — `client_secret.json` 패턴 추가 확인, `.env` 파일 패턴 추가 | **Medium** | 0.5 | `.gitignore` | SEC-10: Google OAuth 클라이언트 시크릿 파일 누출 위험 |
-| | | | **합계: 17-24** | | |
+| FR-S5-01 | **Post-installation auto-verification** -- Run MCP server connection test (health check) after each module installation. Output guide message on failure | **High** | 6-8 | `install.sh` (completion section) | Analysis 8.1: Auto-verification of normal operation after installation not implemented |
+| FR-S5-02 | **Introduce rollback mechanism** -- Backup current `.mcp.json` before installation, restore original on failure | **Medium** | 4-6 | `install.sh` | INS-03: Remains in partial installation state on installation failure |
+| FR-S5-03 | **ARCHITECTURE.md sync** -- Add Pencil module, Remote MCP type (Notion, Figma), `shared/` directory | **Low** | 2-3 | `installer/ARCHITECTURE.md` | INS-06/QA architecture match: 2 items inconsistent |
+| FR-S5-04 | **package.json version update** -- `0.1.0` -> `1.0.0` (SemVer compliance since in production deployment) | **Low** | 0.5 | `google-workspace-mcp/package.json:3` | GWS-06: In production use but version is 0.1.0 |
+| FR-S5-05 | **Google MCP tool message internationalization** -- Unify all tool `description` and response `message` to English (internationalization preparation). Leverage FR-S3-05b's `messages.ts` centralized structure | **Low** | 4-6 | `google-workspace-mcp/src/tools/*.ts` | GWS-03: Korean messages meaningless for non-Korean users |
+| FR-S5-06 | **.gitignore enhancement** -- Verify `client_secret.json` pattern addition, add `.env` file patterns | **Medium** | 0.5 | `.gitignore` | SEC-10: Risk of Google OAuth client secret file leakage |
+| | | | **Total: 17-24** | | |
 
 ### 3.2 Non-Functional Requirements
 
 | Category | Criteria | Measurement Method |
 |----------|----------|-------------------|
-| **Security** | OWASP Top 10 주요 항목 대응 — Injection(A03), CSRF(A01), Broken Auth(A07) | 코드 리뷰 + 보안 에이전트 검증 |
-| **Test Coverage** | Google MCP 서버 60%+, 인스톨러 smoke 테스트 전 모듈 | Vitest coverage report |
-| **CI/CD** | PR 자동 테스트 + 빌드 검증 Gate | GitHub Actions 워크플로우 |
-| **Performance** | Google API 호출 시 서비스 인스턴스 재사용 (캐싱) | 응답시간 측정 |
-| **Compatibility** | macOS 14+, Windows 10+, Ubuntu 22.04+, Fedora 39+, Arch Linux | CI 매트릭스 테스트 |
-| **Reliability** | 설치 실패 시 롤백, Docker wait 타임아웃, Rate limit 재시도 | E2E 테스트 시나리오 |
-| **Shell Quality** | ShellCheck warning 수준 이상 오류 0건 (인스톨러 전체) | ShellCheck CI job |
-| **Dependency Security** | npm audit high+ 취약점 0건 | npm audit CI gate |
-| **Security Logging** | 인증 실패/성공, 토큰 갱신, 파일 권한 변경 이벤트 로깅 | 보안 로그 출력 검증 |
+| **Security** | OWASP Top 10 major item response -- Injection (A03), CSRF (A01), Broken Auth (A07) | Code review + security agent verification |
+| **Test Coverage** | Google MCP server 60%+, installer smoke tests for all modules | Vitest coverage report |
+| **CI/CD** | PR auto-test + build verification gate | GitHub Actions workflow |
+| **Performance** | Service instance reuse (caching) during Google API calls | Response time measurement |
+| **Compatibility** | macOS 14+, Windows 10+, Ubuntu 22.04+, Fedora 39+, Arch Linux | CI matrix test |
+| **Reliability** | Rollback on installation failure, Docker wait timeout, rate limit retry | E2E test scenarios |
+| **Shell Quality** | Zero ShellCheck warning-level or above errors (entire installer) | ShellCheck CI job |
+| **Dependency Security** | Zero npm audit high+ vulnerabilities | npm audit CI gate |
+| **Security Logging** | Authentication success/failure, token refresh, file permission change event logging | Security log output verification |
 
 ---
 
@@ -191,42 +191,42 @@ ADW 종합 분석 보고서(Match Rate 65.5%)에서 도출된 **3건 Critical, 8
 
 ### 4.1 Definition of Done
 
-- [ ] 모든 Critical/High 보안 이슈 해결 (FR-S1-01 ~ FR-S1-12)
-- [ ] Linux에서 `install.sh` 정상 동작 (FR-S2-01)
-- [ ] Google MCP 유닛 테스트 60%+ 커버리지 (FR-S3-01)
-- [ ] CI가 PR/push 시 자동 실행 (FR-S3-03)
-- [ ] Gap Analysis Match Rate 90%+ 달성
+- [ ] All Critical/High security issues resolved (FR-S1-01 ~ FR-S1-12)
+- [ ] `install.sh` works correctly on Linux (FR-S2-01)
+- [ ] Google MCP unit test 60%+ coverage (FR-S3-01)
+- [ ] CI auto-runs on PR/push (FR-S3-03)
+- [ ] Gap Analysis Match Rate 90%+ achieved
 
 ### 4.2 Quality Criteria
 
-- [ ] Zero Critical/High 보안 취약점
-- [ ] 테스트 커버리지 60% 이상 (Google MCP)
-- [ ] ESLint 에러 0건
-- [ ] CI 빌드 성공
-- [ ] 모든 모듈 설치 smoke 테스트 통과
+- [ ] Zero Critical/High security vulnerabilities
+- [ ] Test coverage 60% or higher (Google MCP)
+- [ ] Zero ESLint errors
+- [ ] CI build success
+- [ ] All module installation smoke tests pass
 
-### 4.3 정량적 기대 효과
+### 4.3 Quantitative Expected Impact
 
-| 지표 | 현재 | 목표 | 개선율 | 근거 |
+| Metric | Current | Target | Improvement | Basis |
 |------|:----:|:----:|:------:|------|
-| 인스톨러 LOC | ~1,200줄 | ~850줄 | **-29%** | 공유 유틸리티 추출(FR-S3-05a)로 7개 모듈의 중복 코드 제거 |
-| Google MCP LOC | ~1,800줄 | ~1,300줄 | **-28%** | 공유 유틸리티 추출(FR-S3-05b)로 parseTime, sanitize, messages 통합 |
-| 서비스 인스턴스 생성 | 414회/전체 호출 | 6회/캐시 TTL | **-99%** | getGoogleServices() 싱글톤 캐싱(FR-S4-04) |
-| 테스트 커버리지 | 0% | 60%+ | **+60%** | Vitest 도입(FR-S3-01) + 인스톨러 Smoke 테스트(FR-S3-02) |
-| 보안 취약점 (Critical/High) | 3C + 8H = 11건 | 0건 | **-100%** | Sprint 1~2 보안 이슈 전수 해결 |
-| Match Rate | 65.5% | 95%+ | **+30%** | 5개 Sprint 전체 완료 시 |
+| Installer LOC | ~1,200 lines | ~850 lines | **-29%** | Duplicate code removal across 7 modules via shared utility extraction (FR-S3-05a) |
+| Google MCP LOC | ~1,800 lines | ~1,300 lines | **-28%** | Integration of parseTime, sanitize, messages via shared utility extraction (FR-S3-05b) |
+| Service instance creation | 414 times/all calls | 6 times/cache TTL | **-99%** | getGoogleServices() singleton caching (FR-S4-04) |
+| Test coverage | 0% | 60%+ | **+60%** | Vitest adoption (FR-S3-01) + installer smoke tests (FR-S3-02) |
+| Security vulnerabilities (Critical/High) | 3C + 8H = 11 | 0 | **-100%** | Full resolution of Sprint 1~2 security issues |
+| Match Rate | 65.5% | 95%+ | **+30%** | Upon completion of all 5 Sprints |
 
-> `gap-shared-utilities.md` Section 5 정량적 기대 효과 참조
+> See `gap-shared-utilities.md` Section 5 for quantitative expected impact
 
-### 4.4 Sprint별 완료 기준
+### 4.4 Completion Criteria per Sprint
 
-| Sprint | 완료 기준 | 예상 Match Rate |
+| Sprint | Completion Criteria | Expected Match Rate |
 |--------|----------|:--------------:|
-| Sprint 1 | 보안 이슈 12건 해결(FR-S1-01~12), 코드 리뷰 완료 | 74% |
-| Sprint 2 | Linux 지원, 인스톨러 버그 11건 수정(FR-S2-01~11) | 82% |
-| Sprint 3 | 테스트 도입, CI 자동화(npm audit 포함), 코드 품질 개선, 공유 유틸리티 추출(5a/5b) | 88% |
-| Sprint 4 | Google MCP 강화 10건 | 92% |
-| Sprint 5 | UX 개선, 문서 동기화 | **95%+** |
+| Sprint 1 | 12 security issues resolved (FR-S1-01~12), code review complete | 74% |
+| Sprint 2 | Linux support, 11 installer bugs fixed (FR-S2-01~11) | 82% |
+| Sprint 3 | Test adoption, CI automation (incl. npm audit), code quality improvement, shared utility extraction (5a/5b) | 88% |
+| Sprint 4 | 10 Google MCP hardening items | 92% |
+| Sprint 5 | UX improvements, documentation sync | **95%+** |
 
 ---
 
@@ -234,14 +234,14 @@ ADW 종합 분석 보고서(Match Rate 65.5%)에서 도출된 **3건 Critical, 8
 
 | # | Risk | Impact | Likelihood | Mitigation |
 |---|------|:------:|:----------:|------------|
-| R-01 | MCP 설정 경로 변경 시 기존 사용자 설정 유실 | High | Medium | 마이그레이션 스크립트 제공, 기존 경로 폴백 지원 |
-| R-02 | OAuth state 추가 시 기존 인증 플로우 깨짐 | High | Low | 하위 호환: state 없는 콜백도 허용(경고 로그만) |
-| R-03 | Node.js 22 마이그레이션 시 googleapis 호환성 | Medium | Medium | 마이그레이션 전 로컬 테스트 + CI 검증 |
-| R-04 | 크로스 플랫폼 JSON 파서 변경 시 기존 macOS 동작 변경 | Medium | Low | macOS에서도 동일한 `node -e` 방식 사용. osascript 폴백 유지 |
-| R-05 | 환경변수 기반 토큰 저장이 Docker 환경에서 복잡도 증가 | Medium | Medium | Docker compose 예시 제공, 환경변수 설정 가이드 |
-| R-06 | 테스트 도입 시 Google API Mock 구현 복잡도 | Medium | High | googleapis-mock 라이브러리 사용 또는 MSW(Mock Service Worker) 활용 |
-| R-07 | Linux 패키지 관리자 다양성으로 엣지케이스 증가 | Low | High | 주요 3개(apt, dnf, pacman)만 지원, 나머지는 수동 안내 |
-| R-08 | 공유 유틸리티 리팩토링 시 기존 인스톨러 모듈 동작 깨짐 | High | Medium | 모듈별 순차 리팩토링 + 각 모듈 리팩토링 후 smoke 테스트 실행. `gap-shared-utilities.md` P-15 참조 |
+| R-01 | Existing user settings lost on MCP config path change | High | Medium | Provide migration script, support legacy path fallback |
+| R-02 | Existing auth flow breaks on OAuth state addition | High | Low | Backward compatible: allow callback without state (warning log only) |
+| R-03 | googleapis compatibility on Node.js 22 migration | Medium | Medium | Local test + CI verification before migration |
+| R-04 | Existing macOS behavior change on cross-platform JSON parser change | Medium | Low | Use same `node -e` method on macOS. Keep osascript fallback |
+| R-05 | Increased complexity of env variable-based token storage in Docker environment | Medium | Medium | Provide Docker compose example, environment variable setup guide |
+| R-06 | Google API mock implementation complexity on test adoption | Medium | High | Use googleapis-mock library or MSW (Mock Service Worker) |
+| R-07 | Edge cases increase due to Linux package manager diversity | Low | High | Support only 3 major (apt, dnf, pacman), manual guidance for others |
+| R-08 | Existing installer module behavior breaks during shared utility refactoring | High | Medium | Sequential per-module refactoring + smoke test after each module refactoring. See `gap-shared-utilities.md` P-15 |
 
 ---
 
@@ -255,47 +255,50 @@ ADW 종합 분석 보고서(Match Rate 65.5%)에서 도출된 **3건 Critical, 8
 | **Dynamic** | Feature-based modules, BaaS integration | Web apps with backend | ☐ |
 | **Enterprise** | Strict layer separation, DI, microservices | High-traffic systems | ☑ |
 
-> ADW는 크로스 플랫폼 인스톨러 + MCP 서버 + Docker 기반으로 Enterprise 레벨 구조를 따른다.
+> ADW follows Enterprise level structure based on cross-platform installer + MCP server + Docker architecture.
 
 ### 6.2 Key Architectural Decisions
 
 | Decision | Options | Selected | Rationale |
 |----------|---------|----------|-----------|
-| JSON Parser | osascript / node -e / python3 -c / jq | **node -e (primary)** | Node.js가 base 설치 의존성이므로 항상 가용. 미설치 시 python3 폴백 |
-| Test Framework | Jest / Vitest / Mocha | **Vitest** | TypeScript 네이티브 지원, ESM 호환, 빠른 실행 속도 |
-| CI Trigger | workflow_dispatch / push / PR | **push + PR** | PR 머지 전 자동 품질 게이트 필수 |
-| Token Storage | 평문 JSON / OS Keychain / .env | **.env + 환경변수** | 크로스 플랫폼 호환, Docker 친화적 |
-| Rate Limiting | 커스텀 구현 / p-retry / google-auth-library built-in | **커스텀 지수 백오프** | 외부 의존성 최소화, 429/503 특화 처리 |
-| Timezone | 하드코딩 / 환경변수 / Intl API | **Intl API 기본값 + 환경변수 오버라이드** | 사용자 시스템 타임존 자동 감지, 명시적 오버라이드 가능 |
+| JSON Parser | osascript / node -e / python3 -c / jq | **node -e (primary)** | Node.js is always available as base installation dependency. python3 fallback when not installed |
+| Test Framework | Jest / Vitest / Mocha | **Vitest** | Native TypeScript support, ESM compatible, fast execution |
+| CI Trigger | workflow_dispatch / push / PR | **push + PR** | Mandatory automatic quality gate before PR merge |
+| Token Storage | Plaintext JSON / OS Keychain / .env | **.env + environment variables** | Cross-platform compatible, Docker-friendly |
+| Rate Limiting | Custom implementation / p-retry / google-auth-library built-in | **Custom exponential backoff** | Minimize external dependencies, specialized 429/503 handling |
+| Timezone | Hardcoded / environment variable / Intl API | **Intl API default + environment variable override** | Auto-detect user system timezone, explicit override possible |
 
-### 6.3 변경 영향 범위
+### 6.3 Change Impact Scope
 
 ```
-변경 대상:
+Targets:
 ┌─────────────────────────────────────────────────────┐
 │ installer/                                           │
-│   install.sh ─── parse_json() 재구현, 모듈 정렬     │
-│   install.ps1 ── 관리자 권한 조건부 요청             │
+│   install.sh ─── parse_json() reimplementation,     │
+│                  module sorting                      │
+│   install.ps1 ── conditional admin privilege request │
 │   modules/                                           │
-│     shared/      ── 공유 유틸리티 추가                │
-│     atlassian/   ── 토큰 보안, 변수 이스케이핑       │
-│     figma/       ── module.json 수정, 토큰 보안      │
-│     notion/      ── module.json 수정                 │
-│     google/      ── Docker wait 타임아웃              │
-│     base/        ── Linux 패키지 관리자 확장          │
+│     shared/      ── add shared utilities             │
+│     atlassian/   ── token security, variable escaping│
+│     figma/       ── module.json fix, token security  │
+│     notion/      ── module.json fix                  │
+│     google/      ── Docker wait timeout              │
+│     base/        ── Linux package manager expansion  │
 ├─────────────────────────────────────────────────────┤
 │ google-workspace-mcp/                                │
 │   Dockerfile ─── non-root, Node 22, .dockerignore   │
-│   src/auth/oauth.ts ── state, 권한, 캐싱, 파일권한  │
-│   src/index.ts ─── 타입 수정, 에러 메시지 영문화     │
+│   src/auth/oauth.ts ── state, permissions, caching,  │
+│                        file permissions              │
+│   src/index.ts ─── type fix, error message i18n      │
 │   src/tools/                                         │
-│     drive.ts ─── 쿼리 이스케이핑                     │
-│     gmail.ts ─── 헤더 인젝션, MIME 파싱, 첨부파일    │
-│     calendar.ts ─── 타임존 동적화                    │
+│     drive.ts ─── query escaping                      │
+│     gmail.ts ─── header injection, MIME parsing,     │
+│                  attachments                          │
+│     calendar.ts ─── dynamic timezone                 │
 ├─────────────────────────────────────────────────────┤
-│ .github/workflows/ ── CI 자동 트리거, 테스트 확장    │
-│ .gitignore ── .env, client_secret.json 패턴 확인     │
-│ installer/ARCHITECTURE.md ── 문서 동기화              │
+│ .github/workflows/ ── CI auto-trigger, test expansion│
+│ .gitignore ── .env, client_secret.json pattern check │
+│ installer/ARCHITECTURE.md ── documentation sync      │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -308,67 +311,67 @@ ADW 종합 분석 보고서(Match Rate 65.5%)에서 도출된 **3건 Critical, 8
 - [ ] `CLAUDE.md` has coding conventions section
 - [x] `installer/ARCHITECTURE.md` exists (but needs sync)
 - [ ] `CONVENTIONS.md` exists at project root
-- [ ] ESLint configuration (`.eslintrc.*`) — **미존재, Sprint 3에서 추가**
-- [ ] Prettier configuration (`.prettierrc`) — **미존재, Sprint 3에서 추가**
-- [x] TypeScript configuration (`tsconfig.json`) — strict 모드 활성
+- [ ] ESLint configuration (`.eslintrc.*`) — **does not exist, to be added in Sprint 3**
+- [ ] Prettier configuration (`.prettierrc`) — **does not exist, to be added in Sprint 3**
+- [x] TypeScript configuration (`tsconfig.json`) — strict mode enabled
 
 ### 7.2 Conventions to Define/Verify
 
 | Category | Current State | To Define | Priority |
 |----------|:------------:|-----------|:--------:|
-| **Error Messages** | 한/영 혼재 | 영문 통일, i18n 키 방식 검토 | Medium |
-| **Shell Script** | 모듈별 중복 코드 | `shared/` 유틸리티 import 패턴 | High |
-| **TypeScript** | strict, any 사용 | `any` 금지, unknown + type guard | Medium |
-| **Security** | 평문 저장 | 환경변수 참조, 파일 권한 600 | **Critical** |
-| **Docker** | root 실행 | non-root 사용자 패턴 | High |
-| **Env Management** | 환경변수 분산 | `.env.example` 템플릿, 신규 환경변수 문서화 | Medium |
-| **Module Schema** | 비공식 JSON 구조 | `installer/module-schema.json` JSON Schema 정의 | Medium |
-| **Shell Quality** | ShellCheck 미적용 | CI에 ShellCheck 검증 통합, warning 수준 이상 오류 0건 | Medium |
+| **Error Messages** | Mixed Korean/English | Unify to English, review i18n key approach | Medium |
+| **Shell Script** | Per-module duplicated code | `shared/` utility import pattern | High |
+| **TypeScript** | strict, any usage | Prohibit `any`, use unknown + type guard | Medium |
+| **Security** | Plaintext storage | Environment variable reference, file permission 600 | **Critical** |
+| **Docker** | Root execution | Non-root user pattern | High |
+| **Env Management** | Distributed environment variables | `.env.example` template, document new environment variables | Medium |
+| **Module Schema** | Unofficial JSON structure | Define `installer/module-schema.json` JSON Schema | Medium |
+| **Shell Quality** | ShellCheck not applied | Integrate ShellCheck verification into CI, zero warning-level or above errors | Medium |
 
 ---
 
 ## 8. Implementation Strategy
 
-### 8.1 Sprint 실행 계획
+### 8.1 Sprint Execution Plan
 
 ```
-Sprint 1 (Critical Security) ─── 즉시 착수
-  ├── S1-WP1: OAuth + CSRF 방지 (FR-S1-01, FR-S1-08)
-  ├── S1-WP2: 인젝션 방지 (FR-S1-02, FR-S1-03, FR-S1-09, FR-S1-10, FR-S1-12)
-  ├── S1-WP3: 자격증명 보안 (FR-S1-04~07)
-  └── S1-WP4: 무결성 검증 (FR-S1-11)
+Sprint 1 (Critical Security) ─── Start immediately
+  ├── S1-WP1: OAuth + CSRF prevention (FR-S1-01, FR-S1-08)
+  ├── S1-WP2: Injection prevention (FR-S1-02, FR-S1-03, FR-S1-09, FR-S1-10, FR-S1-12)
+  ├── S1-WP3: Credential security (FR-S1-04~07)
+  └── S1-WP4: Integrity verification (FR-S1-11)
 
-Sprint 2 (Platform) ─── Sprint 1 완료 후
-  ├── S2-WP1: 크로스 플랫폼 (FR-S2-01, FR-S2-10, FR-S2-11)
-  │   └── **PG-02**: FR-S2-04는 FR-S2-01 완료 후 착수 (직렬 의존성)
-  │   └── **PG-03**: FR-S2-09는 FR-S2-05 완료 후 착수 (동일 파일 직렬)
-  ├── S2-WP2: 인스톨러 버그 (FR-S2-02, FR-S2-03, FR-S2-04, FR-S2-05~09)
-  └── S2-WP3: Gap Analysis #1 (Sprint 1+2 검증)
+Sprint 2 (Platform) ─── After Sprint 1 completion
+  ├── S2-WP1: Cross-platform (FR-S2-01, FR-S2-10, FR-S2-11)
+  │   └── **PG-02**: FR-S2-04 starts after FR-S2-01 completion (serial dependency)
+  │   └── **PG-03**: FR-S2-09 starts after FR-S2-05 completion (same file, serial)
+  ├── S2-WP2: Installer bugs (FR-S2-02, FR-S2-03, FR-S2-04, FR-S2-05~09)
+  └── S2-WP3: Gap Analysis #1 (Sprint 1+2 verification)
 
-Sprint 3 (Quality) ─── Sprint 2 완료 후
-  ├── S3-WP1: 테스트 기반 구축 (FR-S3-01, FR-S3-02, FR-S3-06)
-  ├── S3-WP2: CI/CD 자동화 (FR-S3-03, FR-S3-04, FR-S3-09) + ShellCheck CI 통합
-  ├── S3-WP3: 코드 품질 (FR-S3-05a, FR-S3-05b, FR-S3-07, FR-S3-08)
-  │   └── FR-S3-05a(인스톨러) → FR-S3-05b(Google MCP) 순차 리팩토링
-  └── S3-WP4: 보안 품질 (FR-S3-10: 보안 이벤트 로깅, OWASP A09 대응)
+Sprint 3 (Quality) ─── After Sprint 2 completion
+  ├── S3-WP1: Test foundation (FR-S3-01, FR-S3-02, FR-S3-06)
+  ├── S3-WP2: CI/CD automation (FR-S3-03, FR-S3-04, FR-S3-09) + ShellCheck CI integration
+  ├── S3-WP3: Code quality (FR-S3-05a, FR-S3-05b, FR-S3-07, FR-S3-08)
+  │   └── FR-S3-05a (installer) → FR-S3-05b (Google MCP) sequential refactoring
+  └── S3-WP4: Security quality (FR-S3-10: security event logging, OWASP A09 response)
 
-Sprint 4 (Google MCP) ─── Sprint 3과 병렬 가능
-  ├── S4-WP1: 안정성 (FR-S4-01, FR-S4-05, FR-S4-06)
-  │   └── **PG-04**: FR-S4-04(캐싱)는 FR-S4-05(토큰 검증) + FR-S4-06(뮤텍스) 완료 후 착수 (직렬 의존성)
-  ├── S4-WP2: 국제화/캐싱 (FR-S4-02, FR-S4-03, FR-S4-04)
-  └── S4-WP3: 인프라/기능 (FR-S4-07~10)
+Sprint 4 (Google MCP) ─── Can run in parallel with Sprint 3
+  ├── S4-WP1: Stability (FR-S4-01, FR-S4-05, FR-S4-06)
+  │   └── **PG-04**: FR-S4-04 (caching) starts after FR-S4-05 (token validation) + FR-S4-06 (mutex) completion (serial dependency)
+  ├── S4-WP2: Internationalization/caching (FR-S4-02, FR-S4-03, FR-S4-04)
+  └── S4-WP3: Infrastructure/features (FR-S4-07~10)
 
-Sprint 5 (UX & Docs) ─── Sprint 3+4 완료 후
-  ├── S5-WP1: 사용자 경험 (FR-S5-01, FR-S5-02)
-  ├── S5-WP2: 문서화 (FR-S5-03~05)
-  └── S5-WP3: 최종 Gap Analysis + Completion Report
+Sprint 5 (UX & Docs) ─── After Sprint 3+4 completion
+  ├── S5-WP1: User experience (FR-S5-01, FR-S5-02)
+  ├── S5-WP2: Documentation (FR-S5-03~05)
+  └── S5-WP3: Final Gap Analysis + Completion Report
 ```
 
-### 8.2 분석서 이슈 → 요구사항 매핑 (전수 추적)
+### 8.2 Analysis Issue → Requirement Mapping (Full Traceability)
 
-| 분석 이슈 ID | 심각도 | 요구사항 ID | Sprint |
+| Analysis Issue ID | Severity | Requirement ID | Sprint |
 |:----------:|:------:|:----------:|:------:|
-| SEC-01 | Critical | FR-S1-03 (osascript 인젝션), **FR-S1-11** (SHA-256 체크섬), Out of Scope (GPG) | S1 |
+| SEC-01 | Critical | FR-S1-03 (osascript injection), **FR-S1-11** (SHA-256 checksum), Out of Scope (GPG) | S1 |
 | SEC-02 | Critical | FR-S1-04 | S1 |
 | SEC-03 | Critical | FR-S1-05 | S1 |
 | SEC-04 | High | FR-S1-07 | S1 |
@@ -379,9 +382,9 @@ Sprint 5 (UX & Docs) ─── Sprint 3+4 완료 후
 | SEC-08a | High | FR-S1-03 | S1 |
 | SEC-09 | Medium | FR-S1-09 | S1 |
 | SEC-10 | Medium | FR-S5-06 | S5 |
-| SEC-11 | Medium | Out of Scope (서드파티 이미지 검증) | - |
+| SEC-11 | Medium | Out of Scope (third-party image verification) | - |
 | SEC-12 | Medium | FR-S1-09 | S1 |
-| SEC-13 | Medium | FR-S1-04 (환경변수 전환으로 해결) | S1 |
+| SEC-13 | Medium | FR-S1-04 (resolved by env variable transition) | S1 |
 | SEC-14 | Medium | FR-S1-08 | S1 |
 | INS-01 | High | FR-S2-01 | S2 |
 | INS-02 | Medium | FR-S2-03 | S2 |
@@ -407,37 +410,37 @@ Sprint 5 (UX & Docs) ─── Sprint 3+4 완료 후
 | GWS-12 | Low | FR-S4-10 | S4 |
 | OS-01 | High | FR-S2-01 | S2 |
 | OS-02 | Medium | FR-S2-04 | S2 |
-| OS-05 | Medium | (문서화로 대응) | S5 |
-| OS-06 | High | **FR-S2-11** (Docker Desktop 버전 호환성 체크) | S2 |
+| OS-05 | Medium | (addressed via documentation) | S5 |
+| OS-06 | High | **FR-S2-11** (Docker Desktop version compatibility check) | S2 |
 | OS-07 | Medium | FR-S2-09 | S2 |
 | OS-08 | Medium | FR-S4-09 | S4 |
 | QA-01 | Critical | FR-S3-01, FR-S3-02 | S3 |
 | QA-02 | High | FR-S3-03 | S3 |
 | QA-03 | Medium | FR-S3-05a, FR-S3-05b | S3 |
 | QA-04 | Medium | FR-S5-02 | S5 |
-| QA-05 | Low | (구조적 로깅은 Out of Scope, 단 보안 로깅은 **FR-S3-10**으로 대응) | S3/- |
+| QA-05 | Low | (Structured logging is Out of Scope, but security logging addressed via **FR-S3-10**) | S3/- |
 | QA-06 | Medium | FR-S3-05a, FR-S3-05b | S3 |
 | QA-07 | Medium | FR-S4-04 | S4 |
 | QA-08 | Low | FR-S3-06 | S3 |
-| QA-09 | Low | Out of Scope (CHANGELOG 생성) | - |
+| QA-09 | Low | Out of Scope (CHANGELOG generation) | - |
 
-> **추적 결과**: 분석서 총 48건 이슈 중 **45건 대응** (93.8%), 3건 Out of Scope (SEC-11, QA-05, QA-09)
-> v2.1 신규 FR(S1-11, S1-12, S2-11, S3-09, S3-10) 추가로 커버리지 89.6% → 93.8% 향상
+> **Traceability result**: 48 total analysis issues, **45 addressed** (93.8%), 3 Out of Scope (SEC-11, QA-05, QA-09)
+> Coverage improved from 89.6% to 93.8% with addition of new FRs in v2.1 (S1-11, S1-12, S2-11, S3-09, S3-10)
 >
-> **v2.2 추가 검증**: 3개 갭 분석 보고서(보안 검증, 공유 유틸리티, 요구사항 추적) 전수 교차 검증 완료.
-> - 보안 검증 갭 6개 계획서 보완사항(P-01~P-06): 전수 반영 (v2.1에서 5건 반영, v2.2에서 1건 추가 보완)
-> - 공유 유틸리티 갭 15개 계획서 항목(P-1~P-15): 전수 반영 (FR-S3-05a/b 세분화, R-08 추가, 정량적 기대효과 포함)
-> - 요구사항 추적 갭 19개 항목: High 4건 전수 반영, Medium 7건 전수 반영, Low 8건 중 6건 반영(Pencil 보안검토/i18n 방향은 별도 검토)
+> **v2.2 additional verification**: Full cross-verification of 3 gap analysis reports (security verification, shared utilities, requirements traceability) completed.
+> - Security verification gap 6 plan supplement items (P-01~P-06): Fully reflected (5 items in v2.1, 1 additional item supplemented in v2.2)
+> - Shared utilities gap 15 plan items (P-1~P-15): Fully reflected (FR-S3-05a/b detailed, R-08 added, quantitative expected impact included)
+> - Requirements traceability gap 19 items: All 4 High items reflected, all 7 Medium items reflected, 6 of 8 Low items reflected (Pencil security review/i18n direction to be reviewed separately)
 
 ---
 
 ## 9. Detailed Remediation Approaches
 
-### 9.1 Sprint 1 핵심 구현 가이드
+### 9.1 Sprint 1 Core Implementation Guide
 
-#### FR-S1-01: OAuth state 파라미터 (oauth.ts)
+#### FR-S1-01: OAuth state parameter (oauth.ts)
 
-**현재 코드** (`oauth.ts:113-118`):
+**Current code** (`oauth.ts:113-118`):
 ```typescript
 const authUrl = oauth2Client.generateAuthUrl({
   access_type: "offline",
@@ -446,7 +449,7 @@ const authUrl = oauth2Client.generateAuthUrl({
 });
 ```
 
-**개선 방향**:
+**Improvement direction**:
 ```typescript
 import crypto from "crypto";
 
@@ -457,39 +460,39 @@ const authUrl = oauth2Client.generateAuthUrl({
   prompt: "consent",
   state,
 });
-// 콜백에서 state 검증:
+// State verification in callback:
 // if (url.searchParams.get("state") !== state) reject("State mismatch");
 ```
 
-#### FR-S1-02: Drive API 쿼리 이스케이핑 (drive.ts)
+#### FR-S1-02: Drive API query escaping (drive.ts)
 
-**현재 코드** (`drive.ts:18`):
+**Current code** (`drive.ts:18`):
 ```typescript
 let q = `name contains '${query}' and trashed = false`;
 ```
 
-**개선 방향**:
+**Improvement direction**:
 ```typescript
 const escapedQuery = query.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 let q = `name contains '${escapedQuery}' and trashed = false`;
 ```
 
-#### FR-S1-03: parse_json() osascript 인젝션 방지 (install.sh)
+#### FR-S1-03: parse_json() osascript injection prevention (install.sh)
 
-**현재 코드** (`install.sh:29-39`):
+**Current code** (`install.sh:29-39`):
 ```bash
 parse_json() {
     local json="$1"
     osascript -l JavaScript -e "
-        var obj = JSON.parse(\`$json\`);  # backtick 인젝션 취약
+        var obj = JSON.parse(\`$json\`);  # backtick injection vulnerable
 ```
 
-**개선 방향** (Sprint 2 FR-S2-01과 통합):
+**Improvement direction** (integrated with Sprint 2 FR-S2-01):
 ```bash
 parse_json() {
     local json="$1"
     local key="$2"
-    # node -e 방식 (stdin으로 JSON 전달, 인젝션 불가)
+    # node -e method (JSON passed via stdin, injection impossible)
     echo "$json" | node -e "
         const chunks = [];
         process.stdin.on('data', c => chunks.push(c));
@@ -504,16 +507,16 @@ parse_json() {
 }
 ```
 
-#### FR-S1-06: Docker non-root 사용자 (Dockerfile)
+#### FR-S1-06: Docker non-root user (Dockerfile)
 
-**현재 코드** — root로 실행:
+**Current code** -- runs as root:
 ```dockerfile
 CMD ["node", "dist/index.js"]
 ```
 
-**개선 방향**:
+**Improvement direction**:
 ```dockerfile
-# Production stage에 추가:
+# Add to production stage:
 RUN addgroup --system --gid 1001 app && \
     adduser --system --uid 1001 --ingroup app app && \
     chown -R app:app /app
@@ -521,16 +524,16 @@ USER app
 CMD ["node", "dist/index.js"]
 ```
 
-### 9.2 Sprint 2 핵심 구현 가이드
+### 9.2 Sprint 2 Core Implementation Guide
 
-#### FR-S2-01: 크로스 플랫폼 JSON 파서
+#### FR-S2-01: Cross-platform JSON parser
 
 ```bash
 parse_json() {
     local json="$1"
     local key="$2"
 
-    # 우선순위: node > python3 > osascript(macOS only)
+    # Priority: node > python3 > osascript (macOS only)
     if command -v node > /dev/null 2>&1; then
         echo "$json" | node -e "..." "$key"
     elif command -v python3 > /dev/null 2>&1; then
@@ -544,7 +547,7 @@ for k in keys:
 print(val if val else '')
 " "$key"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS 폴백 (기존 방식 유지하되 stdin 방식으로 개선)
+        # macOS fallback (keep existing method but improved to stdin method)
         echo "$json" | osascript -l JavaScript -e "..."
     else
         echo "Error: node or python3 required" >&2
@@ -553,23 +556,23 @@ print(val if val else '')
 }
 ```
 
-#### FR-S2-02: 원격 실행 시 shared 스크립트 다운로드
+#### FR-S2-02: Shared script download during remote execution
 
-`install.sh`의 `run_module()` 함수에 원격 모드용 사전 다운로드 로직 추가:
+Add pre-download logic for remote mode to `run_module()` function in `install.sh`:
 
 ```bash
 run_module() {
     local module_name=$1
     # ...
     if [ "$USE_LOCAL" = false ]; then
-        # 원격 모드: shared 스크립트를 임시 디렉토리에 다운로드
+        # Remote mode: download shared scripts to temp directory
         local tmp_dir=$(mktemp -d)
         mkdir -p "$tmp_dir/shared"
         curl -sSL "$BASE_URL/modules/shared/oauth-helper.sh" \
             -o "$tmp_dir/shared/oauth-helper.sh" 2>/dev/null || true
-        # SCRIPT_DIR를 임시 디렉토리로 설정하여 source 경로 해결
+        # Set SCRIPT_DIR to temp directory to resolve source path
         export INSTALLER_SHARED_DIR="$tmp_dir/shared"
-        # 모듈 스크립트에서 INSTALLER_SHARED_DIR 환경변수 우선 사용
+        # Module scripts prioritize INSTALLER_SHARED_DIR environment variable
     fi
 }
 ```
@@ -578,10 +581,10 @@ run_module() {
 
 ## 10. Next Steps
 
-1. [ ] Plan 문서 리뷰 및 승인
-2. [ ] Design 문서 작성 (`/pdca design adw-improvement`)
-3. [ ] Sprint 1 착수 — Critical Security 이슈 즉시 수정
-4. [ ] Sprint 1 완료 후 Gap Analysis 실행 (`/pdca analyze adw-improvement`)
+1. [ ] Plan document review and approval
+2. [ ] Design document creation (`/pdca design adw-improvement`)
+3. [ ] Sprint 1 start -- Critical Security issues immediate fix
+4. [ ] Run Gap Analysis after Sprint 1 completion (`/pdca analyze adw-improvement`)
 
 ---
 
@@ -590,74 +593,74 @@ run_module() {
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 0.1 | 2026-02-12 | Initial draft -- CTO Team 8-agent parallel analysis | CTO Team |
-| 2.0 | 2026-02-12 | adw-comprehensive.analysis.md 기반 44개 요구사항 수립 | CTO Team |
-| 2.1 | 2026-02-12 | 3개 추가 분석문서 + 3개 갭 분석 반영. 신규 FR 5건(S1-11, S1-12, S2-11, S3-09, S3-10), FR-S3-05 세분화(5a/5b), R-08 리스크 추가, 개별 공수 추정, 정량적 기대 효과, Sprint 실행 계획 | CTO Team |
-| 2.2 | 2026-02-13 | 7개 분석문서 전수 교차 검증 완료. FR-S1-04 우선순위 Critical 정정(P-02), FR-S2-10 우선순위 High 복원(P-03), FR-S2-02 임시파일 정리 보장(trap 패턴), FR-S3-05a/b 함수명 상세화(29+7개 함수 확정), PG-02/PG-04 직렬 의존성 명시, NFR 3건 추가(ShellCheck/npm audit/보안로깅), Convention 3건 추가(Env/Schema/ShellCheck), Out of Scope 정밀화(In Scope 전환 이력), References 7개 분석문서 전체 목록, Sprint 2 합계 재산출 | CTO Lead |
+| 2.0 | 2026-02-12 | 44 requirements established based on adw-comprehensive.analysis.md | CTO Team |
+| 2.1 | 2026-02-12 | Reflected 3 additional analysis documents + 3 gap analyses. 5 new FRs (S1-11, S1-12, S2-11, S3-09, S3-10), FR-S3-05 detailed (5a/5b), R-08 risk added, individual effort estimates, quantitative expected impact, Sprint execution plan | CTO Team |
+| 2.2 | 2026-02-13 | Full cross-verification of 7 analysis documents completed. FR-S1-04 priority corrected to Critical (P-02), FR-S2-10 priority restored to High (P-03), FR-S2-02 temporary file cleanup guarantee (trap pattern), FR-S3-05a/b function names detailed (29+7 functions finalized), PG-02/PG-04 serial dependencies specified, 3 NFRs added (ShellCheck/npm audit/security logging), 3 conventions added (Env/Schema/ShellCheck), Out of Scope refined (In Scope transition history), References full list of 7 analysis documents, Sprint 2 total recalculated | CTO Lead |
 
 ---
 
 ## Appendix A: CTO Team Verification Summary
 
-### A.1 Security Architect 검증 결과
+### A.1 Security Architect Verification Results
 
-| 보고 ID | 보고 심각도 | 검증 심각도 | 상태 | 비고 |
+| Report ID | Reported Severity | Verified Severity | Status | Notes |
 |---------|:----------:|:----------:|:----:|------|
-| SEC-01 | Critical | **Critical** | Confirmed | MITM 시 원격 코드 실행 가능 |
-| SEC-02 | Critical | **Critical** | Confirmed | `.mcp.json`에 API 토큰 평문 기록 |
-| SEC-03 | Critical | **Informational** | **Downgraded** | `{accessToken}`은 템플릿 플레이스홀더, 디스크 미기록 |
-| SEC-04 | High | **High** | Confirmed | `token.json` 파일 권한 644 (타 사용자 읽기 가능) |
-| SEC-05 | High | **High** | Confirmed | Docker 컨테이너 root 실행 |
-| SEC-06 | High | **High** | Confirmed | Windows 전 모듈에 관리자 권한 요구 |
-| SEC-07 | High | **High** | Confirmed | 6개 서비스 스코프 무조건 전체 요청 |
-| SEC-08 | High | **High** | Confirmed | OAuth state 파라미터 누락 (CSRF) |
-| SEC-08a | High | **High** | Confirmed | backtick 인젝션으로 임의 JS 실행 가능 |
-| GWS-07 | High | **High** | Confirmed | Drive 쿼리에 `'` 미이스케이핑 |
-| GWS-08 | Medium | **Medium** | Confirmed | CRLF로 이메일 헤더 인젝션 가능 |
-| SEC-12 | Medium | **Medium** | Confirmed | `node -e`에 사용자 입력 직접 삽입 |
+| SEC-01 | Critical | **Critical** | Confirmed | Remote code execution possible via MITM |
+| SEC-02 | Critical | **Critical** | Confirmed | API token recorded as plaintext in `.mcp.json` |
+| SEC-03 | Critical | **Informational** | **Downgraded** | `{accessToken}` is template placeholder, not written to disk |
+| SEC-04 | High | **High** | Confirmed | `token.json` file permission 644 (readable by other users) |
+| SEC-05 | High | **High** | Confirmed | Docker container running as root |
+| SEC-06 | High | **High** | Confirmed | Admin privileges required for all modules on Windows |
+| SEC-07 | High | **High** | Confirmed | Always requests all 6 service scopes unconditionally |
+| SEC-08 | High | **High** | Confirmed | OAuth state parameter missing (CSRF) |
+| SEC-08a | High | **High** | Confirmed | Arbitrary JS execution possible via backtick injection |
+| GWS-07 | High | **High** | Confirmed | `'` not escaped in Drive queries |
+| GWS-08 | Medium | **Medium** | Confirmed | Email header injection possible via CRLF |
+| SEC-12 | Medium | **Medium** | Confirmed | User input directly inserted into `node -e` |
 
-> 추가 발견: 입력 검증 레이어 부재, 보안 로깅 미구현, `npm audit` 미적용
+> Additional findings: Absence of input validation layer, security logging not implemented, `npm audit` not applied
 
-### A.2 Code Analyzer 검증 결과
+### A.2 Code Analyzer Verification Results
 
-| 보고 ID | 보고 심각도 | 검증 심각도 | 상태 | 비고 |
+| Report ID | Reported Severity | Verified Severity | Status | Notes |
 |---------|:----------:|:----------:|:----:|------|
-| INS-01 | High | **High** | Confirmed | `osascript` macOS 전용, Linux 모듈 로딩 불가 |
-| INS-02 | Medium | **High** | **Upgraded** | Mac 3개 파일 경로 불일치 (commit b8b01a2 Windows만 변경) |
-| INS-03 | Medium | **Medium** | Confirmed | 롤백 메커니즘 부재 |
-| INS-07 | High | **High** | Confirmed | 원격실행 시 oauth-helper.sh 미다운로드 |
-| INS-08 | Medium | **Medium** | Confirmed | Figma module.json이 npx 방식이나 실제는 Remote MCP |
-| INS-09 | Medium | **Low** | **Downgraded** | `docker: false`는 Rovo 경로 고려한 설계 의도 |
-| GWS-01 | Medium | **Medium** | Confirmed | 만료 버퍼 없음 + expiry_date 미존재 케이스 미처리 |
-| GWS-02 | Medium | **Medium** | Confirmed | 69개 핸들러 전부 Rate Limit 없음 |
-| GWS-05 | Medium | **Medium** | Confirmed | 동시 인증 시 EADDRINUSE 가능 |
-| GWS-07 | High | **High** | Confirmed | drive_search + drive_list + mimeType 3곳 |
-| GWS-09 | Medium | **Medium** | Confirmed | 4곳에 `Asia/Seoul` 하드코딩 |
-| GWS-10 | Medium | **Medium** | Confirmed | 중첩 multipart 미파싱 |
+| INS-01 | High | **High** | Confirmed | `osascript` macOS-only, module loading fails on Linux |
+| INS-02 | Medium | **High** | **Upgraded** | Mac 3-file path mismatch (commit b8b01a2 only changed Windows) |
+| INS-03 | Medium | **Medium** | Confirmed | No rollback mechanism |
+| INS-07 | High | **High** | Confirmed | oauth-helper.sh not downloaded during remote execution |
+| INS-08 | Medium | **Medium** | Confirmed | Figma module.json is npx style but actual is Remote MCP |
+| INS-09 | Medium | **Low** | **Downgraded** | `docker: false` is design intent considering Rovo path |
+| GWS-01 | Medium | **Medium** | Confirmed | No expiry buffer + expiry_date non-existence case not handled |
+| GWS-02 | Medium | **Medium** | Confirmed | All 69 handlers have no rate limit |
+| GWS-05 | Medium | **Medium** | Confirmed | EADDRINUSE possible on concurrent authentication |
+| GWS-07 | High | **High** | Confirmed | drive_search + drive_list + mimeType in 3 locations |
+| GWS-09 | Medium | **Medium** | Confirmed | `Asia/Seoul` hardcoded in 4 locations |
+| GWS-10 | Medium | **Medium** | Confirmed | Nested multipart not parsed |
 | QA-01 | Critical | **Critical** | Confirmed | 0 test files, 0 test infrastructure |
-| QA-06 | Medium | **Medium** | Confirmed | 컬러 9파일 중복, MCP config 2곳, parseTime 2곳 |
-| QA-07 | Medium | **Medium** | Confirmed | 69 핸들러마다 6개 서비스 재생성 |
+| QA-06 | Medium | **Medium** | Confirmed | Color duplicated in 9 files, MCP config in 2 locations, parseTime in 2 locations |
+| QA-07 | Medium | **Medium** | Confirmed | 6 services regenerated per each of 69 handlers |
 
-> 추가 발견: `any` 타입 `sheets.ts:18,341`, `calendar.ts:288`, `slides.ts:135,156`에서도 사용
+> Additional findings: `any` type also used at `sheets.ts:18,341`, `calendar.ts:288`, `slides.ts:135,156`
 
-### A.3 Enterprise Expert 검증 결과
+### A.3 Enterprise Expert Verification Results
 
-| 보고 ID | 보고 심각도 | 검증 심각도 | 상태 | 비고 |
+| Report ID | Reported Severity | Verified Severity | Status | Notes |
 |---------|:----------:|:----------:|:----:|------|
-| OS-01 | High | **Critical** | **Upgraded** | install.sh 전체가 Linux에서 비기능적 |
-| OS-02 | Medium | **Medium** | Confirmed | apt/snap만 지원, github 모듈만 dnf 지원 |
-| OS-05 | Medium | **Low** | **Downgraded** | WSL 재시작 가이드 이미 구현됨 |
-| OS-06 | High | **High** | Confirmed | Docker Desktop 4.42+ macOS Ventura 미지원 |
-| OS-07 | Medium | **Medium** | Confirmed | 3개 모듈에서 python3 필수이나 module.json 미표기 |
-| OS-08 | Medium | **High** | **Upgraded** | Node.js 20 EOL 77일 남음 (2026-04-30) |
-| INS-04 | Low | **Low** | Confirmed | PowerShell은 정렬 구현, Shell은 미구현 |
-| INS-05 | Medium | (중복) | = OS-02 | 동일 이슈 |
-| INS-10 | Low | **Low** | Confirmed | `docker wait` 타임아웃 없음 |
+| OS-01 | High | **Critical** | **Upgraded** | Entire install.sh non-functional on Linux |
+| OS-02 | Medium | **Medium** | Confirmed | Only apt/snap supported, only github module supports dnf |
+| OS-05 | Medium | **Low** | **Downgraded** | WSL restart guide already implemented |
+| OS-06 | High | **High** | Confirmed | Docker Desktop 4.42+ does not support macOS Ventura |
+| OS-07 | Medium | **Medium** | Confirmed | python3 required in 3 modules but not indicated in module.json |
+| OS-08 | Medium | **High** | **Upgraded** | Node.js 20 EOL in 77 days (2026-04-30) |
+| INS-04 | Low | **Low** | Confirmed | PowerShell has sorting implementation, Shell does not |
+| INS-05 | Medium | (duplicate) | = OS-02 | Same issue |
+| INS-10 | Low | **Low** | Confirmed | No `docker wait` timeout |
 
-> 핵심 발견: **PowerShell 구현이 Shell보다 모든 차원에서 견고** — JSON 파싱(네이티브), 모듈 정렬(구현), 에러 처리(`try/catch`), 패키지 관리자(winget 유니버설)
+> Key finding: **PowerShell implementation is more robust than Shell in every dimension** -- JSON parsing (native), module sorting (implemented), error handling (`try/catch`), package manager (winget universal)
 
-### A.4 종합 노력 추정
+### A.4 Overall Effort Estimate
 
-| 분류 | 보안 에이전트 | 코드 분석 에이전트 | 엔터프라이즈 에이전트 | 합계 |
+| Category | Security Agent | Code Analysis Agent | Enterprise Agent | Total |
 |------|:-----------:|:----------------:|:------------------:|:----:|
 | Critical Path | 12-16h | 7-8h | 7-13h | **26-37h** |
-| 전체 | 34-49h | 40-55h | 18-32h | **92-136h** |
+| Overall | 34-49h | 40-55h | 18-32h | **92-136h** |

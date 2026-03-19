@@ -1,12 +1,12 @@
 # Gemini CLI Support Plan
 
-> **Summary**: ADW 인스톨러에 Claude / Gemini 선택 옵션 추가 — 사용자가 선택하면 IDE, CLI, 플러그인, MCP 설정까지 전부 해당 플랫폼에 맞게 설치
+> **Summary**: Add Claude / Gemini selection option to ADW installer -- when the user selects one, IDE, CLI, plugins, and MCP configuration are all installed for that platform
 >
 > **Project**: popup-claude (AI-Driven Work Installer)
 > **Feature**: gemini-cli-support
 > **Author**: Claude (PDCA Plan)
 > **Date**: 2026-02-22
-> **Status**: Draft (v2 — 호환성 조사 반영)
+> **Status**: Draft (v2 -- compatibility research reflected)
 
 ---
 
@@ -14,45 +14,45 @@
 
 ### 1.1 Purpose
 
-현재 ADW 인스톨러는 Claude 전용으로 하드코딩되어 있다. 사용자가 **Claude 또는 Gemini 중 하나를 선택**하면 IDE, CLI, 플러그인, MCP 설정까지 **전부 해당 플랫폼에 맞게** 설치되도록 한다.
+The current ADW installer is hardcoded for Claude only. When a user **selects either Claude or Gemini**, IDE, CLI, plugins, and MCP configuration should **all be installed for that platform**.
 
-### 1.2 호환성 조사 결과
+### 1.2 Compatibility Research Results
 
-#### Claude vs Gemini — 설치 항목 비교
+#### Claude vs Gemini -- Installation Item Comparison
 
-| 항목 | Claude | Gemini |
+| Item | Claude | Gemini |
 |------|--------|--------|
 | **IDE** | VS Code | VS Code |
-| **IDE 설치** | `winget install Microsoft.VisualStudioCode` / `brew install --cask visual-studio-code` | 동일 |
-| **VS Code 확장** | `anthropic.claude-code` | `Google.gemini-cli-vscode-ide-companion` |
-| **CLI 설치** | `curl claude.ai/install.sh \| bash` / `irm claude.ai/install.ps1 \| iex` | `npm install -g @google/gemini-cli` |
-| **플러그인** | `claude plugin install bkit@bkit-marketplace` | `gemini extensions install https://github.com/popup-studio-ai/bkit-gemini.git` |
-| **MCP 설정 파일** | `~/.claude/mcp.json` | `~/.gemini/settings.json` |
-| **MCP 등록 명령어** | `claude mcp add` | `gemini mcp add` |
-| **MCP JSON 구조** | `{ "mcpServers": { ... } }` | `{ "mcpServers": { ... } }` (동일) |
-| **CLI 존재 체크** | `command -v claude` | `command -v gemini` |
-| **인증** | Anthropic 계정/API 키 | Google 계정 (무료) |
+| **IDE Installation** | `winget install Microsoft.VisualStudioCode` / `brew install --cask visual-studio-code` | Same |
+| **VS Code Extension** | `anthropic.claude-code` | `Google.gemini-cli-vscode-ide-companion` |
+| **CLI Installation** | `curl claude.ai/install.sh \| bash` / `irm claude.ai/install.ps1 \| iex` | `npm install -g @google/gemini-cli` |
+| **Plugin** | `claude plugin install bkit@bkit-marketplace` | `gemini extensions install https://github.com/popup-studio-ai/bkit-gemini.git` |
+| **MCP Config File** | `~/.claude/mcp.json` | `~/.gemini/settings.json` |
+| **MCP Registration Command** | `claude mcp add` | `gemini mcp add` |
+| **MCP JSON Structure** | `{ "mcpServers": { ... } }` | `{ "mcpServers": { ... } }` (same) |
+| **CLI Existence Check** | `command -v claude` | `command -v gemini` |
+| **Authentication** | Anthropic account/API key | Google account (free) |
 
-#### MCP 모듈별 변경 필요 사항
+#### Per-MCP Module Change Requirements
 
-| 모듈 | CLI 체크 | MCP 등록 명령어 | MCP 설정 파일 경로 | 변경 필요 |
+| Module | CLI Check | MCP Registration Command | MCP Config File Path | Changes Needed |
 |------|:--------:|:--------------:|:----------------:|:---------:|
-| **Notion** | `claude` → `gemini` | `claude mcp add` → `gemini mcp add` | — | 2곳 |
-| **Figma** | `claude` → `gemini` | `claude mcp add` → `gemini mcp add` | — | 2곳 |
-| **Atlassian** | — | `claude mcp add` → `gemini mcp add` | `~/.claude/` → `~/.gemini/` | 2곳 |
-| **Google** | — | — | `~/.claude/` → `~/.gemini/` | 1곳 |
-| **GitHub** | — | — | — | 없음 |
-| **Pencil** | — | — | VS Code 확장 | 미확인 |
-| **OAuth Helper** | — | `claude mcp list` → `gemini mcp list` | — | 1곳 |
+| **Notion** | `claude` -> `gemini` | `claude mcp add` -> `gemini mcp add` | -- | 2 locations |
+| **Figma** | `claude` -> `gemini` | `claude mcp add` -> `gemini mcp add` | -- | 2 locations |
+| **Atlassian** | -- | `claude mcp add` -> `gemini mcp add` | `~/.claude/` -> `~/.gemini/` | 2 locations |
+| **Google** | -- | -- | `~/.claude/` -> `~/.gemini/` | 1 location |
+| **GitHub** | -- | -- | -- | None |
+| **Pencil** | -- | -- | VS Code extension | TBD |
+| **OAuth Helper** | -- | `claude mcp list` -> `gemini mcp list` | -- | 1 location |
 
-### 1.3 분기 포인트 요약
+### 1.3 Branch Point Summary
 
-모든 변경은 아래 **4가지 분기**로 귀결됨:
+All changes come down to these **4 branch points**:
 
-1. **VS Code 확장**: `anthropic.claude-code` vs `Google.gemini-cli-vscode-ide-companion`
-2. **CLI 설치 + 체크**: `claude` vs `gemini` 명령어
-3. **플러그인 설치**: bkit(claude) vs bkit-gemini
-4. **MCP 설정**: `~/.claude/mcp.json` vs `~/.gemini/settings.json`
+1. **VS Code Extension**: `anthropic.claude-code` vs `Google.gemini-cli-vscode-ide-companion`
+2. **CLI Installation + Check**: `claude` vs `gemini` command
+3. **Plugin Installation**: bkit (claude) vs bkit-gemini
+4. **MCP Configuration**: `~/.claude/mcp.json` vs `~/.gemini/settings.json`
 
 ---
 
@@ -60,21 +60,21 @@
 
 ### 2.1 In Scope
 
-- [ ] **메인 인스톨러**: `--cli claude|gemini` 파라미터 + `CLI_TYPE` 환경변수
-- [ ] **base 모듈**: IDE, CLI, 플러그인, VS Code 확장 분기
-- [ ] **Notion 모듈**: CLI 체크 + MCP 등록 명령어 분기
-- [ ] **Figma 모듈**: CLI 체크 + MCP 등록 명령어 분기
-- [ ] **Atlassian 모듈**: MCP 등록 명령어 + 설정 파일 경로 분기
-- [ ] **Google 모듈**: MCP 설정 파일 경로 분기
-- [ ] **공유 유틸(mcp-config.sh)**: 설정 파일 경로 분기
-- [ ] **공유 유틸(oauth-helper.sh)**: `claude mcp list` → CLI별 분기
-- [ ] **README 업데이트**
+- [ ] **Main installer**: `--cli claude|gemini` parameter + `CLI_TYPE` environment variable
+- [ ] **base module**: IDE, CLI, plugin, VS Code extension branching
+- [ ] **Notion module**: CLI check + MCP registration command branching
+- [ ] **Figma module**: CLI check + MCP registration command branching
+- [ ] **Atlassian module**: MCP registration command + config file path branching
+- [ ] **Google module**: MCP config file path branching
+- [ ] **Shared utility (mcp-config.sh)**: Config file path branching
+- [ ] **Shared utility (oauth-helper.sh)**: `claude mcp list` -> per-CLI branching
+- [ ] **README update**
 
 ### 2.2 Out of Scope
 
-- Gemini + Claude 동시 설치 (하나만 선택)
-- 랜딩페이지 UI 변경 (별도 작업)
-- Pencil 모듈의 Gemini 대응 (확인 후 별도 작업)
+- Simultaneous Gemini + Claude installation (only one selectable)
+- Landing page UI changes (separate task)
+- Pencil module Gemini support (separate task after confirmation)
 
 ---
 
@@ -82,103 +82,105 @@
 
 ### 3.1 Functional Requirements
 
-#### 메인 인스톨러 (install.sh / install.ps1)
+#### Main Installer (install.sh / install.ps1)
 
-| ID | Requirement | Priority | 대상 파일 |
+| ID | Requirement | Priority | Target File |
 |----|-------------|:--------:|----------|
-| FR-01 | **`--cli claude\|gemini` 파라미터 추가** — 미지정 시 기본값 `claude` | **High** | `install.sh`, `install.ps1` |
-| FR-02 | **`CLI_TYPE` 환경변수 지원** — 원격 실행 시 `CLI_TYPE=gemini bash` | **High** | `install.sh`, `install.ps1` |
-| FR-03 | **`$CLI_TYPE`을 모든 하위 모듈에 export** | **High** | `install.sh`, `install.ps1` |
+| FR-01 | **Add `--cli claude\|gemini` parameter** -- Default `claude` when unspecified | **High** | `install.sh`, `install.ps1` |
+| FR-02 | **`CLI_TYPE` environment variable support** -- `CLI_TYPE=gemini bash` for remote execution | **High** | `install.sh`, `install.ps1` |
+| FR-03 | **Export `$CLI_TYPE` to all child modules** | **High** | `install.sh`, `install.ps1` |
 
-#### base 모듈 (base/install.sh / install.ps1)
+#### base module (base/install.sh / install.ps1)
 
-| ID | Requirement | Priority | 대상 파일 |
+| ID | Requirement | Priority | Target File |
 |----|-------------|:--------:|----------|
-| FR-04 | **IDE 설치** — Claude/Gemini 모두 VS Code 설치 (공통) | **High** | `base/install.sh`, `base/install.ps1` |
-| FR-05 | **CLI 설치 분기** — `claude` → claude.ai 설치, `gemini` → `npm install -g @google/gemini-cli` | **High** | `base/install.sh`, `base/install.ps1` |
-| FR-06 | **플러그인 분기** — `claude` → bkit, `gemini` → bkit-gemini | **High** | `base/install.sh`, `base/install.ps1` |
-| FR-07 | **VS Code 확장 분기** — `claude` → `anthropic.claude-code`, `gemini` → `Google.gemini-cli-vscode-ide-companion` | **High** | `base/install.sh`, `base/install.ps1` |
+| FR-04 | **IDE installation** -- Both Claude/Gemini install VS Code (common) | **High** | `base/install.sh`, `base/install.ps1` |
+| FR-05 | **CLI installation branching** -- `claude` -> claude.ai install, `gemini` -> `npm install -g @google/gemini-cli` | **High** | `base/install.sh`, `base/install.ps1` |
+| FR-06 | **Plugin branching** -- `claude` -> bkit, `gemini` -> bkit-gemini | **High** | `base/install.sh`, `base/install.ps1` |
+| FR-07 | **VS Code extension branching** -- `claude` -> `anthropic.claude-code`, `gemini` -> `Google.gemini-cli-vscode-ide-companion` | **High** | `base/install.sh`, `base/install.ps1` |
 
-#### MCP 모듈 (각 모듈 install.sh / install.ps1)
+#### MCP Modules (each module install.sh / install.ps1)
 
-| ID | Requirement | Priority | 대상 파일 |
+| ID | Requirement | Priority | Target File |
 |----|-------------|:--------:|----------|
-| FR-08 | **Notion: CLI 체크 + MCP 등록 분기** | **High** | `notion/install.sh`, `notion/install.ps1` |
-| FR-09 | **Figma: CLI 체크 + MCP 등록 분기** | **High** | `figma/install.sh`, `figma/install.ps1` |
-| FR-10 | **Atlassian: MCP 등록 + 설정 경로 분기** | **High** | `atlassian/install.sh`, `atlassian/install.ps1` |
-| FR-11 | **Google: MCP 설정 경로 분기** | **High** | `google/install.sh`, `google/install.ps1` |
+| FR-08 | **Notion: CLI check + MCP registration branching** | **High** | `notion/install.sh`, `notion/install.ps1` |
+| FR-09 | **Figma: CLI check + MCP registration branching** | **High** | `figma/install.sh`, `figma/install.ps1` |
+| FR-10 | **Atlassian: MCP registration + config path branching** | **High** | `atlassian/install.sh`, `atlassian/install.ps1` |
+| FR-11 | **Google: MCP config path branching** | **High** | `google/install.sh`, `google/install.ps1` |
 
-#### 공유 유틸리티
+#### Shared Utilities
 
-| ID | Requirement | Priority | 대상 파일 |
+| ID | Requirement | Priority | Target File |
 |----|-------------|:--------:|----------|
-| FR-12 | **mcp-config.sh 경로 분기** — `CLI_TYPE`에 따라 `~/.claude/mcp.json` 또는 `~/.gemini/settings.json` | **High** | `shared/mcp-config.sh` |
-| FR-13 | **oauth-helper.sh 명령어 분기** — `claude mcp list` → `gemini mcp list` | **High** | `shared/oauth-helper.sh`, `shared/oauth-helper.ps1` |
+| FR-12 | **mcp-config.sh path branching** -- `~/.claude/mcp.json` or `~/.gemini/settings.json` based on `CLI_TYPE` | **High** | `shared/mcp-config.sh` |
+| FR-13 | **oauth-helper.sh command branching** -- `claude mcp list` -> `gemini mcp list` | **High** | `shared/oauth-helper.sh`, `shared/oauth-helper.ps1` |
 
-#### 기타
+#### Other
 
-| ID | Requirement | Priority | 대상 파일 |
+| ID | Requirement | Priority | Target File |
 |----|-------------|:--------:|----------|
-| FR-14 | **README.md 업데이트** — Gemini 설치 명령어 예시 추가 | **Low** | `README.md` |
+| FR-14 | **README.md update** -- Add Gemini installation command examples | **Low** | `README.md` |
 
 ### 3.2 Non-Functional Requirements
 
 | ID | Requirement | Priority |
 |----|-------------|:--------:|
-| NFR-01 | `--cli` 미지정 시 기본값 `claude` — 기존 동작 100% 유지 | **Critical** |
-| NFR-02 | 설치 실패 시 명확한 에러 메시지 + 수동 설치 안내 | **High** |
-| NFR-03 | 기존 테스트 깨지지 않음 | **High** |
+| NFR-01 | Default `claude` when `--cli` unspecified -- 100% existing behavior preserved | **Critical** |
+| NFR-02 | Clear error message + manual installation guide on installation failure | **High** |
+| NFR-03 | Existing tests do not break | **High** |
 
 ---
 
 ## 4. Implementation Strategy
 
-### 4.1 변경 흐름
+### 4.1 Change Flow
 
 ```
-사용자 입력: --cli gemini (또는 CLI_TYPE=gemini)
-        │
-        ▼
+User input: --cli gemini (or CLI_TYPE=gemini)
+        |
+        v
     install.sh / install.ps1
-        │  CLI_TYPE 변수 설정 + export
-        ▼
-    ┌─────────────────────────────────────────────┐
-    │  base 모듈                                   │
-    │  ├── [공통] Node.js, Git, WSL, Docker        │
-    │  ├── [분기] IDE: VS Code vs Antigravity      │
-    │  ├── [분기] CLI: Claude vs Gemini CLI        │
-    │  └── [분기] 플러그인: bkit vs bkit-gemini    │
-    └─────────────────────────────────────────────┘
-        │  CLI_TYPE 계속 전달
-        ▼
-    ┌─────────────────────────────────────────────┐
-    │  MCP 모듈들 (notion, figma, atlassian, etc.) │
-    │  ├── [분기] CLI 체크: claude vs gemini        │
-    │  ├── [분기] MCP 등록: claude mcp vs gemini mcp│
-    │  └── [분기] 설정 경로: ~/.claude vs ~/.gemini │
-    └─────────────────────────────────────────────┘
+        |  Set CLI_TYPE variable + export
+        v
+    +---------------------------------------------+
+    |  base module                                 |
+    |  +-- [common] Node.js, Git, WSL, Docker      |
+    |  +-- [branch] IDE: VS Code vs Antigravity    |
+    |  +-- [branch] CLI: Claude vs Gemini CLI      |
+    |  +-- [branch] Plugin: bkit vs bkit-gemini    |
+    +---------------------------------------------+
+        |  CLI_TYPE continues to pass
+        v
+    +---------------------------------------------+
+    |  MCP modules (notion, figma, atlassian, etc.)|
+    |  +-- [branch] CLI check: claude vs gemini    |
+    |  +-- [branch] MCP register: claude mcp vs    |
+    |  |   gemini mcp                              |
+    |  +-- [branch] Config path: ~/.claude vs      |
+    |      ~/.gemini                               |
+    +---------------------------------------------+
 ```
 
-### 4.2 수정 대상 파일 (총 16개)
+### 4.2 Files to Modify (16 total)
 
-| 파일 | 변경 내용 |
+| File | Changes |
 |------|----------|
-| `installer/install.sh` | `--cli` 파라미터 + `CLI_TYPE` export |
-| `installer/install.ps1` | `-cli` 파라미터 + `$env:CLI_TYPE` |
-| `modules/base/install.sh` | IDE + CLI + 플러그인 + 확장 분기 |
-| `modules/base/install.ps1` | IDE + CLI + 플러그인 + 확장 분기 |
-| `modules/notion/install.sh` | CLI 체크 + MCP 등록 분기 |
-| `modules/notion/install.ps1` | CLI 체크 + MCP 등록 분기 |
-| `modules/figma/install.sh` | CLI 체크 + MCP 등록 분기 |
-| `modules/figma/install.ps1` | CLI 체크 + MCP 등록 분기 |
-| `modules/atlassian/install.sh` | MCP 등록 + 설정 경로 분기 |
-| `modules/atlassian/install.ps1` | MCP 등록 + 설정 경로 분기 |
-| `modules/google/install.sh` | MCP 설정 경로 분기 |
-| `modules/google/install.ps1` | MCP 설정 경로 분기 |
-| `modules/shared/mcp-config.sh` | 설정 파일 경로 분기 |
-| `modules/shared/oauth-helper.sh` | `claude mcp list` 분기 |
-| `modules/shared/oauth-helper.ps1` | `claude mcp list` 분기 |
-| `README.md` | Gemini 옵션 문서화 |
+| `installer/install.sh` | `--cli` parameter + `CLI_TYPE` export |
+| `installer/install.ps1` | `-cli` parameter + `$env:CLI_TYPE` |
+| `modules/base/install.sh` | IDE + CLI + plugin + extension branching |
+| `modules/base/install.ps1` | IDE + CLI + plugin + extension branching |
+| `modules/notion/install.sh` | CLI check + MCP registration branching |
+| `modules/notion/install.ps1` | CLI check + MCP registration branching |
+| `modules/figma/install.sh` | CLI check + MCP registration branching |
+| `modules/figma/install.ps1` | CLI check + MCP registration branching |
+| `modules/atlassian/install.sh` | MCP registration + config path branching |
+| `modules/atlassian/install.ps1` | MCP registration + config path branching |
+| `modules/google/install.sh` | MCP config path branching |
+| `modules/google/install.ps1` | MCP config path branching |
+| `modules/shared/mcp-config.sh` | Config file path branching |
+| `modules/shared/oauth-helper.sh` | `claude mcp list` branching |
+| `modules/shared/oauth-helper.ps1` | `claude mcp list` branching |
+| `README.md` | Gemini option documentation |
 
 ---
 
@@ -186,17 +188,17 @@
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Gemini CLI가 빠르게 변화 중 | 설치 명령어 변경 가능 | npm 패키지명은 안정적 |
-| `gemini mcp add` 문법이 `claude mcp add`와 다를 수 있음 | MCP 등록 실패 | Design 단계에서 정확한 문법 확인 |
-| Gemini CLI Companion Extension ID 변경 | 확장 설치 실패 | 실패 시 수동 설치 안내 메시지 포함 |
+| Gemini CLI is rapidly evolving | Installation command may change | npm package name is stable |
+| `gemini mcp add` syntax may differ from `claude mcp add` | MCP registration failure | Verify exact syntax during Design phase |
+| Gemini CLI Companion Extension ID change | Extension installation failure | Include manual installation guide message on failure |
 
 ---
 
 ## 6. Success Criteria
 
-- [ ] `./install.sh --cli gemini` → VS Code + Gemini CLI Companion 확장 + Gemini CLI + bkit-gemini 설치
-- [ ] `.\install.ps1 -cli gemini` → 동일
-- [ ] `--cli` 미지정 → 기존 Claude 설치 (하위호환 100%)
-- [ ] MCP 모듈(notion, figma, atlassian, google)이 Gemini 설정에 등록됨
-- [ ] Pencil 모듈이 Gemini 모드에서도 정상 설치됨
-- [ ] 기존 테스트 통과
+- [ ] `./install.sh --cli gemini` -> VS Code + Gemini CLI Companion extension + Gemini CLI + bkit-gemini installed
+- [ ] `.\install.ps1 -cli gemini` -> Same
+- [ ] `--cli` unspecified -> Existing Claude installation (100% backward compatible)
+- [ ] MCP modules (notion, figma, atlassian, google) registered in Gemini settings
+- [ ] Pencil module installs normally in Gemini mode
+- [ ] Existing tests pass

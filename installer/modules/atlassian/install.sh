@@ -59,12 +59,12 @@ read -p "Select (1/2): " choice < /dev/tty
 # Determine which mode based on Docker status and choice
 USE_DOCKER=false
 if [ "$HAS_DOCKER" = true ]; then
-    # Docker 있음: 1=Docker, 2=Rovo
+    # Docker available: 1=Docker, 2=Rovo
     if [ "$choice" != "2" ]; then
         USE_DOCKER=true
     fi
 else
-    # Docker 없음: 1=Rovo, 2=Docker
+    # No Docker: 1=Rovo, 2=Docker
     if [ "$choice" = "2" ]; then
         USE_DOCKER=true
     fi

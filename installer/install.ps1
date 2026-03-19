@@ -54,10 +54,10 @@ if ($env:INSTALL_ALL -eq "true" -or $env:INSTALL_ALL -eq "1") {
 }
 
 # Base URL for module downloads - GitHub raw (always latest from master)
-$BaseUrl = "https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer"
+$BaseUrl = "https://raw.githubusercontent.com/popup-studio-ai/ai-driven-work-quickstart/main/installer"
 
 # For local development, use local files
-# 원격 실행 시 $MyInvocation.MyCommand.Path가 null이므로 체크 필요
+# Remote execution sets $MyInvocation.MyCommand.Path to null, so check needed
 $ScriptPath = $MyInvocation.MyCommand.Path
 if ($ScriptPath) {
     $ScriptDir = Split-Path -Parent $ScriptPath

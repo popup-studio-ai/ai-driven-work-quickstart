@@ -1,399 +1,399 @@
-# Base Module 설치 에러 케이스 종합 보고서 (macOS)
+# Base Module Installation Error Cases Comprehensive Report (macOS)
 
-> **작성일**: 2026-02-23
-> **대상**: macOS 환경에서 Homebrew, Node.js, Git, VS Code, Docker Desktop, Antigravity 설치
-> **목적**: 다양한 macOS 환경에서 base 모듈 설치 시 발생 가능한 모든 에러 케이스 정리
+> **Date**: 2026-02-23
+> **Scope**: Installing Homebrew, Node.js, Git, VS Code, Docker Desktop, Antigravity on macOS
+> **Purpose**: Documenting all possible error cases when installing base modules across various macOS environments
 
 ---
 
-## 목차
+## Table of Contents
 
-1. [개요](#1-개요)
-2. [Homebrew (사전 필수)](#2-homebrew-사전-필수)
-   - 2.1 [macOS 버전 호환성](#21-macos-버전-호환성)
-   - 2.2 [Apple Silicon vs Intel Mac 차이](#22-apple-silicon-vs-intel-mac-차이)
+1. [Overview](#1-overview)
+2. [Homebrew (Prerequisite)](#2-homebrew-prerequisite)
+   - 2.1 [macOS Version Compatibility](#21-macos-version-compatibility)
+   - 2.2 [Apple Silicon vs Intel Mac Differences](#22-apple-silicon-vs-intel-mac-differences)
    - 2.3 [Xcode Command Line Tools](#23-xcode-command-line-tools)
-   - 2.4 [권한(Permission) 에러](#24-권한permission-에러)
-   - 2.5 [기업/엔터프라이즈 환경 (MDM)](#25-기업엔터프라이즈-환경-mdm)
-   - 2.6 [네트워크 문제 (프록시/방화벽/VPN)](#26-네트워크-문제-프록시방화벽vpn)
-   - 2.7 [디스크 공간 문제](#27-디스크-공간-문제)
+   - 2.4 [Permission Errors](#24-permission-errors)
+   - 2.5 [Enterprise Environment (MDM)](#25-enterprise-environment-mdm)
+   - 2.6 [Network Issues (Proxy/Firewall/VPN)](#26-network-issues-proxyfirewallvpn)
+   - 2.7 [Disk Space Issues](#27-disk-space-issues)
    - 2.8 [SIP (System Integrity Protection)](#28-sip-system-integrity-protection)
-   - 2.9 [PATH 설정 문제](#29-path-설정-문제)
-   - 2.10 [Rosetta 2 관련 문제](#210-rosetta-2-관련-문제)
-   - 2.11 [쉘 설정 문제 (zsh/bash)](#211-쉘-설정-문제-zshbash)
-   - 2.12 [FileVault 암호화 관련](#212-filevault-암호화-관련)
-   - 2.13 [다중 사용자 계정 문제](#213-다중-사용자-계정-문제)
-   - 2.14 [기존 Homebrew 손상/구버전](#214-기존-homebrew-손상구버전)
-   - 2.15 [curl/git 실패](#215-curlgit-실패)
-3. [Node.js 에러 케이스](#3-nodejs-에러-케이스)
-   - 3.1 [Homebrew Node.js vs nvm/fnm/volta 충돌](#31-homebrew-nodejs-vs-nvmfnmvolta-충돌)
-   - 3.2 [npm 전역 설치 권한 에러 (EACCES)](#32-npm-전역-설치-권한-에러-eacces)
+   - 2.9 [PATH Configuration Issues](#29-path-configuration-issues)
+   - 2.10 [Rosetta 2 Related Issues](#210-rosetta-2-related-issues)
+   - 2.11 [Shell Configuration Issues (zsh/bash)](#211-shell-configuration-issues-zshbash)
+   - 2.12 [FileVault Encryption Related](#212-filevault-encryption-related)
+   - 2.13 [Multi-User Account Issues](#213-multi-user-account-issues)
+   - 2.14 [Existing Homebrew Corruption/Outdated Version](#214-existing-homebrew-corruptionoutdated-version)
+   - 2.15 [curl/git Failures](#215-curlgit-failures)
+3. [Node.js Error Cases](#3-nodejs-error-cases)
+   - 3.1 [Homebrew Node.js vs nvm/fnm/volta Conflicts](#31-homebrew-nodejs-vs-nvmfnmvolta-conflicts)
+   - 3.2 [npm Global Install Permission Error (EACCES)](#32-npm-global-install-permission-error-eacces)
    - 3.3 [Apple Silicon native vs Rosetta Node.js](#33-apple-silicon-native-vs-rosetta-nodejs)
-   - 3.4 [node-gyp / 네이티브 모듈 컴파일 에러](#34-node-gyp--네이티브-모듈-컴파일-에러)
-   - 3.5 [Xcode Command Line Tools 요구사항](#35-xcode-command-line-tools-요구사항)
-   - 3.6 [Python 의존성 문제 (node-gyp)](#36-python-의존성-문제-node-gyp)
-   - 3.7 [PATH 충돌 (다중 Node.js 설치)](#37-path-충돌-다중-nodejs-설치)
-   - 3.8 [npm 레지스트리 접근 문제 (기업 프록시/VPN)](#38-npm-레지스트리-접근-문제-기업-프록시vpn)
-   - 3.9 [npm 캐시 손상](#39-npm-캐시-손상)
-   - 3.10 [brew link 에러](#310-brew-link-에러)
-4. [Git 에러 케이스](#4-git-에러-케이스)
-   - 4.1 [Apple 기본 Git vs Homebrew Git 충돌](#41-apple-기본-git-vs-homebrew-git-충돌)
-   - 4.2 [Xcode Git vs 독립 Git](#42-xcode-git-vs-독립-git)
-   - 4.3 [Git Credential Helper 문제 (Keychain)](#43-git-credential-helper-문제-keychain)
-   - 4.4 [SSH 키 문제 (macOS Keychain 통합)](#44-ssh-키-문제-macos-keychain-통합)
-   - 4.5 [Git LFS 문제](#45-git-lfs-문제)
-   - 4.6 [기업 프록시/SSL 인증서 문제](#46-기업-프록시ssl-인증서-문제)
-   - 4.7 [대소문자 비구분 파일시스템 (APFS)](#47-대소문자-비구분-파일시스템-apfs)
-   - 4.8 [.gitconfig 위치 문제](#48-gitconfig-위치-문제)
-   - 4.9 [Git 버전 구식 문제](#49-git-버전-구식-문제)
-5. [VS Code 설치 에러](#5-vs-code-설치-에러)
-   - 5.1 [Homebrew Cask 설치 실패](#51-homebrew-cask-설치-실패)
-   - 5.2 [`code` 명령어 PATH 문제](#52-code-명령어-path-문제)
-   - 5.3 [Gatekeeper / Quarantine 문제](#53-gatekeeper--quarantine-문제)
-   - 5.4 [확장 (Extension) 설치 실패](#54-확장-extension-설치-실패)
-   - 5.5 [VS Code Insiders vs Stable 충돌](#55-vs-code-insiders-vs-stable-충돌)
-   - 5.6 [기업 MDM 차단](#56-기업-mdm-차단)
-   - 5.7 [Apple Silicon (Rosetta 2) 문제](#57-apple-silicon-rosetta-2-문제)
-   - 5.8 [Remote SSH 확장 문제](#58-remote-ssh-확장-문제)
-   - 5.9 [터미널 통합 (Shell Detection) 문제](#59-터미널-통합-shell-detection-문제)
-   - 5.10 [확장 디렉토리 권한 문제](#510-확장-디렉토리-권한-문제)
-6. [Docker Desktop 설치 에러](#6-docker-desktop-설치-에러)
-   - 6.1 [Apple Silicon (M1/M2/M3/M4) 호환성 문제](#61-apple-silicon-m1m2m3m4-호환성-문제)
-   - 6.2 [Rosetta 2 요구사항](#62-rosetta-2-요구사항)
-   - 6.3 [Docker Desktop 라이선스](#63-docker-desktop-라이선스)
-   - 6.4 [Virtualization Framework / QEMU 백엔드](#64-virtualization-framework--qemu-백엔드)
-   - 6.5 [Docker 데몬 미시작](#65-docker-데몬-미시작)
-   - 6.6 [메모리/CPU 할당 문제](#66-메모리cpu-할당-문제)
-   - 6.7 [파일 공유 / Bind Mount 성능](#67-파일-공유--bind-mount-성능)
-   - 6.8 [네트워크 (VPN 충돌)](#68-네트워크-vpn-충돌)
-   - 6.9 [Docker Desktop 업데이트 실패](#69-docker-desktop-업데이트-실패)
-   - 6.10 [macOS 버전별 호환성](#610-macos-버전별-호환성)
-   - 6.11 [`docker` 명령어 미등록](#611-docker-명령어-미등록)
-   - 6.12 [디스크 공간 문제](#612-디스크-공간-문제)
-   - 6.13 [기업 프록시 설정](#613-기업-프록시-설정)
-7. [Antigravity (Google) 설치 에러](#7-antigravity-google-설치-에러)
-   - 7.1 [Homebrew Cask 설치](#71-homebrew-cask-설치)
-   - 7.2 [Gatekeeper / Quarantine 차단](#72-gatekeeper--quarantine-차단)
-   - 7.3 [`agy` CLI PATH 문제](#73-agy-cli-path-문제)
-   - 7.4 [Google 계정 요구사항/제한](#74-google-계정-요구사항제한)
-   - 7.5 [Copilot 확장 충돌](#75-copilot-확장-충돌)
-   - 7.6 [OpenVSX vs VS Code Marketplace 차이](#76-openvsx-vs-vs-code-marketplace-차이)
-8. [Claude Code CLI 설치](#8-claude-code-cli-설치)
-   - 8.1 [네이티브 설치 (curl installer)](#81-네이티브-설치-curl-installer)
-   - 8.2 [npm 설치 (deprecated)](#82-npm-설치-deprecated)
-   - 8.3 [네트워크/프록시 문제](#83-네트워크프록시-문제)
-   - 8.4 [Shell/PATH 문제](#84-shellpath-문제)
-   - 8.5 [macOS 플랫폼 고유 문제](#85-macos-플랫폼-고유-문제)
-   - 8.6 [인증 문제](#86-인증-문제)
-   - 8.7 [VS Code 확장 문제 (Claude Code)](#87-vs-code-확장-문제-claude-code)
-9. [Gemini CLI 설치](#9-gemini-cli-설치)
-   - 9.1 [npm 설치](#91-npm-설치)
-   - 9.2 [Homebrew 설치](#92-homebrew-설치)
-   - 9.3 [네트워크/프록시 문제](#93-네트워크프록시-문제)
-   - 9.4 [인증 문제](#94-인증-문제)
-   - 9.5 [할당량 및 지역 제한](#95-할당량-및-지역-제한)
+   - 3.4 [node-gyp / Native Module Compilation Errors](#34-node-gyp--native-module-compilation-errors)
+   - 3.5 [Xcode Command Line Tools Requirements](#35-xcode-command-line-tools-requirements)
+   - 3.6 [Python Dependency Issues (node-gyp)](#36-python-dependency-issues-node-gyp)
+   - 3.7 [PATH Conflicts (Multiple Node.js Installations)](#37-path-conflicts-multiple-nodejs-installations)
+   - 3.8 [npm Registry Access Issues (Corporate Proxy/VPN)](#38-npm-registry-access-issues-corporate-proxyvpn)
+   - 3.9 [npm Cache Corruption](#39-npm-cache-corruption)
+   - 3.10 [brew link Errors](#310-brew-link-errors)
+4. [Git Error Cases](#4-git-error-cases)
+   - 4.1 [Apple Default Git vs Homebrew Git Conflict](#41-apple-default-git-vs-homebrew-git-conflict)
+   - 4.2 [Xcode Git vs Standalone Git](#42-xcode-git-vs-standalone-git)
+   - 4.3 [Git Credential Helper Issues (Keychain)](#43-git-credential-helper-issues-keychain)
+   - 4.4 [SSH Key Issues (macOS Keychain Integration)](#44-ssh-key-issues-macos-keychain-integration)
+   - 4.5 [Git LFS Issues](#45-git-lfs-issues)
+   - 4.6 [Corporate Proxy/SSL Certificate Issues](#46-corporate-proxyssl-certificate-issues)
+   - 4.7 [Case-Insensitive Filesystem (APFS)](#47-case-insensitive-filesystem-apfs)
+   - 4.8 [.gitconfig Location Issues](#48-gitconfig-location-issues)
+   - 4.9 [Outdated Git Version Issues](#49-outdated-git-version-issues)
+5. [VS Code Installation Errors](#5-vs-code-installation-errors)
+   - 5.1 [Homebrew Cask Installation Failure](#51-homebrew-cask-installation-failure)
+   - 5.2 [`code` Command PATH Issues](#52-code-command-path-issues)
+   - 5.3 [Gatekeeper / Quarantine Issues](#53-gatekeeper--quarantine-issues)
+   - 5.4 [Extension Installation Failure](#54-extension-installation-failure)
+   - 5.5 [VS Code Insiders vs Stable Conflict](#55-vs-code-insiders-vs-stable-conflict)
+   - 5.6 [Enterprise MDM Blocking](#56-enterprise-mdm-blocking)
+   - 5.7 [Apple Silicon (Rosetta 2) Issues](#57-apple-silicon-rosetta-2-issues)
+   - 5.8 [Remote SSH Extension Issues](#58-remote-ssh-extension-issues)
+   - 5.9 [Terminal Integration (Shell Detection) Issues](#59-terminal-integration-shell-detection-issues)
+   - 5.10 [Extension Directory Permission Issues](#510-extension-directory-permission-issues)
+6. [Docker Desktop Installation Errors](#6-docker-desktop-installation-errors)
+   - 6.1 [Apple Silicon (M1/M2/M3/M4) Compatibility Issues](#61-apple-silicon-m1m2m3m4-compatibility-issues)
+   - 6.2 [Rosetta 2 Requirements](#62-rosetta-2-requirements)
+   - 6.3 [Docker Desktop License](#63-docker-desktop-license)
+   - 6.4 [Virtualization Framework / QEMU Backend](#64-virtualization-framework--qemu-backend)
+   - 6.5 [Docker Daemon Not Started](#65-docker-daemon-not-started)
+   - 6.6 [Memory/CPU Allocation Issues](#66-memorycpu-allocation-issues)
+   - 6.7 [File Sharing / Bind Mount Performance](#67-file-sharing--bind-mount-performance)
+   - 6.8 [Network (VPN Conflicts)](#68-network-vpn-conflicts)
+   - 6.9 [Docker Desktop Update Failure](#69-docker-desktop-update-failure)
+   - 6.10 [macOS Version Compatibility](#610-macos-version-compatibility)
+   - 6.11 [`docker` Command Not Registered](#611-docker-command-not-registered)
+   - 6.12 [Disk Space Issues](#612-disk-space-issues)
+   - 6.13 [Corporate Proxy Settings](#613-corporate-proxy-settings)
+7. [Antigravity (Google) Installation Errors](#7-antigravity-google-installation-errors)
+   - 7.1 [Homebrew Cask Installation](#71-homebrew-cask-installation)
+   - 7.2 [Gatekeeper / Quarantine Blocking](#72-gatekeeper--quarantine-blocking)
+   - 7.3 [`agy` CLI PATH Issues](#73-agy-cli-path-issues)
+   - 7.4 [Google Account Requirements/Restrictions](#74-google-account-requirementsrestrictions)
+   - 7.5 [Copilot Extension Conflicts](#75-copilot-extension-conflicts)
+   - 7.6 [OpenVSX vs VS Code Marketplace Differences](#76-openvsx-vs-vs-code-marketplace-differences)
+8. [Claude Code CLI Installation](#8-claude-code-cli-installation)
+   - 8.1 [Native Installation (curl installer)](#81-native-installation-curl-installer)
+   - 8.2 [npm Installation (deprecated)](#82-npm-installation-deprecated)
+   - 8.3 [Network/Proxy Issues](#83-networkproxy-issues)
+   - 8.4 [Shell/PATH Issues](#84-shellpath-issues)
+   - 8.5 [macOS Platform-Specific Issues](#85-macos-platform-specific-issues)
+   - 8.6 [Authentication Issues](#86-authentication-issues)
+   - 8.7 [VS Code Extension Issues (Claude Code)](#87-vs-code-extension-issues-claude-code)
+9. [Gemini CLI Installation](#9-gemini-cli-installation)
+   - 9.1 [npm Installation](#91-npm-installation)
+   - 9.2 [Homebrew Installation](#92-homebrew-installation)
+   - 9.3 [Network/Proxy Issues](#93-networkproxy-issues)
+   - 9.4 [Authentication Issues](#94-authentication-issues)
+   - 9.5 [Quota and Regional Restrictions](#95-quota-and-regional-restrictions)
 10. [bkit Plugin](#10-bkit-plugin)
-    - 10.1 [Claude Code Plugin (MCP 서버)](#101-claude-code-plugin-mcp-서버)
+    - 10.1 [Claude Code Plugin (MCP Server)](#101-claude-code-plugin-mcp-server)
     - 10.2 [Gemini CLI Extensions](#102-gemini-cli-extensions)
-11. [환경별 위험도 매트릭스 (종합)](#11-환경별-위험도-매트릭스-종합)
-12. [Top 15 빈출 에러 (종합)](#12-top-15-빈출-에러-종합)
+11. [Risk Matrix by Environment (Comprehensive)](#11-risk-matrix-by-environment-comprehensive)
+12. [Top 15 Most Frequent Errors (Comprehensive)](#12-top-15-most-frequent-errors-comprehensive)
 
 ---
 
-## 1. 개요
+## 1. Overview
 
-### 설치 대상 프로그램
+### Target Programs for Installation
 
-| Step | 프로그램 | 설치 방법 | 필수 여부 |
+| Step | Program | Installation Method | Required |
 |------|---------|----------|----------|
-| 0 | Homebrew | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` | **필수** |
-| 1 | Node.js LTS | `brew install node` | **필수** |
-| 2 | Git | `brew install git` | **필수** |
-| 3 | VS Code / Antigravity | `brew install --cask visual-studio-code` | **필수** |
-| 4 | Docker Desktop | `brew install --cask docker` | 모듈 필요 시 |
-| 5 | Claude Code CLI | `curl -fsSL https://claude.ai/install.sh \| bash` (네이티브, 권장) | **필수** |
-| 6 | Gemini CLI | `npm install -g @google/gemini-cli` 또는 `brew install gemini-cli` | **필수** |
-| 7 | bkit Plugin | `claude mcp add` / Gemini extensions | **필수** |
+| 0 | Homebrew | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` | **Required** |
+| 1 | Node.js LTS | `brew install node` | **Required** |
+| 2 | Git | `brew install git` | **Required** |
+| 3 | VS Code / Antigravity | `brew install --cask visual-studio-code` | **Required** |
+| 4 | Docker Desktop | `brew install --cask docker` | When module needed |
+| 5 | Claude Code CLI | `curl -fsSL https://claude.ai/install.sh \| bash` (native, recommended) | **Required** |
+| 6 | Gemini CLI | `npm install -g @google/gemini-cli` or `brew install gemini-cli` | **Required** |
+| 7 | bkit Plugin | `claude mcp add` / Gemini extensions | **Required** |
 
-### 테스트 대상 환경 유형
+### Target Environment Types
 
-- **일반 Mac 사용자**: macOS Sonoma/Sequoia, 기본 설정
-- **Apple Silicon (M1/M2/M3/M4)**: ARM64 네이티브
-- **Intel Mac**: x86_64 아키텍처
-- **기업 환경 (MDM 관리)**: Jamf/Mosyle, 프록시, 방화벽
-- **교육기관**: 제한된 사용자 권한
-- **개발자 환경**: 기존 nvm/fnm/volta, 다중 Node.js 버전
+- **General Mac users**: macOS Sonoma/Sequoia, default settings
+- **Apple Silicon (M1/M2/M3/M4)**: ARM64 native
+- **Intel Mac**: x86_64 architecture
+- **Enterprise environment (MDM managed)**: Jamf/Mosyle, proxy, firewall
+- **Educational institutions**: Limited user permissions
+- **Developer environment**: Existing nvm/fnm/volta, multiple Node.js versions
 
 ---
 
-## 2. Homebrew (사전 필수)
+## 2. Homebrew (Prerequisite)
 
-> 현재 코드: Homebrew 없으면 `curl` 설치 스크립트 실행 → PATH 추가 → 확인
+> Current code: If Homebrew is missing, run `curl` install script -> add to PATH -> verify
 
-### 설치 경로 (아키텍처별)
+### Installation Path (by Architecture)
 
-| 플랫폼 | 기본 경로 | 비고 |
+| Platform | Default Path | Notes |
 |--------|----------|------|
-| Apple Silicon (M1/M2/M3/M4) | `/opt/homebrew` | macOS 11+ 전용 |
+| Apple Silicon (M1/M2/M3/M4) | `/opt/homebrew` | macOS 11+ only |
 | Intel x86_64 | `/usr/local` | macOS 10.15+ |
 
-### Homebrew 지원 티어 (2025년 11월 기준)
+### Homebrew Support Tiers (as of November 2025)
 
-| 티어 | Apple Silicon | Intel x86_64 | 설명 |
+| Tier | Apple Silicon | Intel x86_64 | Description |
 |------|-------------|-------------|------|
-| Tier 1 | Sequoia 15, Sonoma 14 | Sequoia 15, Sonoma 14 | 완전 지원, CI 빌드 |
-| Tier 3 | Ventura 13 이하 | Ventura 13 이하 | 미지원, 소스 빌드 필요할 수 있음 |
+| Tier 1 | Sequoia 15, Sonoma 14 | Sequoia 15, Sonoma 14 | Full support, CI builds |
+| Tier 3 | Ventura 13 and below | Ventura 13 and below | Unsupported, may require source build |
 
-### 2.1 macOS 버전 호환성
+### 2.1 macOS Version Compatibility
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| V1 | macOS Mojave 10.14 이하 | `Homebrew is not supported on this macOS version` | Homebrew 4.x+는 Catalina 10.15 이상 필요 | macOS 업그레이드 필수 |
-| V2 | macOS Catalina 10.15 | `Warning: You are using macOS 10.15. We (and Apple) do not provide support for this old version.` | Tier 3 지원. 2026년 9월 이후 완전 미지원 예정 | macOS 업그레이드 권장 |
-| V3 | macOS Big Sur 11 | 일부 formula bottle 미제공 경고 | Tier 3. CI 빌드 미수행 | 소스 빌드 fallback. Xcode CLT 최신 유지 |
-| V4 | macOS Monterey 12 | `Warning: You are using macOS 12. We do not provide support for this old version.` | 2024년부터 Tier 3 강등 | Sonoma 14 이상으로 업그레이드 |
-| V5 | macOS Ventura 13 | 일부 최신 formula에서 bottle 미제공 | 2025년 11월부터 Tier 3 | Sonoma 14 이상 업그레이드 권장 |
-| V6 | macOS 베타/프리릴리스 | `We do not provide support for this pre-release version` | Homebrew가 베타 macOS 인식 못함 | 정식 릴리스 대기 또는 `brew update` 후 재시도 |
-| V7 | macOS 버전 인식 실패 | `unknown or unsupported macOS version: :dunno` | Homebrew 내부 버전 매핑 테이블에 없음 | `brew update-reset` 실행 |
-| V8 | macOS 업그레이드 직후 | `dyld: Library not loaded: /opt/homebrew/opt/icu4c/lib/libicui18n.76.dylib` | 시스템 라이브러리 변경으로 기존 빌드 깨짐 | `xcode-select --install` 후 `brew upgrade` |
-| V9 | macOS 업그레이드 직후 | `configure: error: Cannot find libz` | Xcode CLT가 비호환 상태 | `xcode-select --install` 재설치 후 `brew upgrade` |
-| V10 | macOS Sequoia 15 (초기) | `Error: Homebrew does not provide support for this macOS version` | Homebrew 4.4.0 이전 미지원 | `brew update`로 4.4.0+ 업데이트 |
+| V1 | macOS Mojave 10.14 and below | `Homebrew is not supported on this macOS version` | Homebrew 4.x+ requires Catalina 10.15 or higher | macOS upgrade required |
+| V2 | macOS Catalina 10.15 | `Warning: You are using macOS 10.15. We (and Apple) do not provide support for this old version.` | Tier 3 support. Full deprecation planned after September 2026 | macOS upgrade recommended |
+| V3 | macOS Big Sur 11 | Warning about some formula bottles not available | Tier 3. No CI builds | Source build fallback. Keep Xcode CLT up to date |
+| V4 | macOS Monterey 12 | `Warning: You are using macOS 12. We do not provide support for this old version.` | Demoted to Tier 3 since 2024 | Upgrade to Sonoma 14 or higher |
+| V5 | macOS Ventura 13 | Some latest formulas without bottle support | Tier 3 since November 2025 | Upgrade to Sonoma 14 or higher recommended |
+| V6 | macOS beta/pre-release | `We do not provide support for this pre-release version` | Homebrew does not recognize beta macOS | Wait for official release or retry after `brew update` |
+| V7 | macOS version recognition failure | `unknown or unsupported macOS version: :dunno` | Not in Homebrew's internal version mapping table | Run `brew update-reset` |
+| V8 | Right after macOS upgrade | `dyld: Library not loaded: /opt/homebrew/opt/icu4c/lib/libicui18n.76.dylib` | Existing builds broken due to system library changes | Run `xcode-select --install` then `brew upgrade` |
+| V9 | Right after macOS upgrade | `configure: error: Cannot find libz` | Xcode CLT in incompatible state | Reinstall `xcode-select --install` then `brew upgrade` |
+| V10 | macOS Sequoia 15 (early) | `Error: Homebrew does not provide support for this macOS version` | Not supported before Homebrew 4.4.0 | Update to 4.4.0+ via `brew update` |
 
-#### 향후 지원 중단 예고
+#### Upcoming Support Deprecation
 
-| 시점 | 변경 사항 |
+| Timeline | Changes |
 |------|----------|
-| 2026년 9월 이후 | Catalina 10.15 이하 완전 미지원. Intel x86_64 전체 Tier 3 강등 |
-| 2027년 9월 이후 | Big Sur 11 미지원 (Apple Silicon). Intel x86_64 전체 미지원 |
+| After September 2026 | Full deprecation of Catalina 10.15 and below. All Intel x86_64 demoted to Tier 3 |
+| After September 2027 | Big Sur 11 unsupported (Apple Silicon). All Intel x86_64 fully unsupported |
 
-### 2.2 Apple Silicon vs Intel Mac 차이
+### 2.2 Apple Silicon vs Intel Mac Differences
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| A1 | Apple Silicon에서 `/usr/local`에 설치 시도 | `Cannot install in Homebrew on ARM processor in Intel default prefix (/usr/local)` | ARM Mac에서 Intel 전용 경로에 설치 시도 | `/opt/homebrew`에 새로 설치 |
-| A2 | Migration Assistant로 Intel Mac에서 이전 | `/usr/local`과 `/opt/homebrew` 두 개의 Homebrew 공존 | MA가 Intel Mac의 `/usr/local`을 그대로 복사 | Intel 설치 제거 후 ARM만 유지 |
-| A3 | Apple Silicon에서 x86_64 터미널 사용 | brew가 `/usr/local` 경로를 사용 | iTerm2 등이 Rosetta 모드로 실행 | "Open using Rosetta" 체크 해제. `arch` 명령으로 `arm64` 확인 |
-| A4 | Apple Silicon에서 설치 후 brew 못 찾음 | `zsh: command not found: brew` | `/opt/homebrew/bin`이 PATH에 없음 | `eval "$(/opt/homebrew/bin/brew shellenv)"` 을 `~/.zprofile`에 추가 |
-| A5 | Intel Mac에서 `/opt/homebrew`에 설치 시도 | `Homebrew is not (yet) supported on this hardware` | Intel Mac은 `/usr/local`만 지원 | 기본 설치 스크립트 사용 |
-| A6 | Universal binary 충돌 | 특정 formula가 arm64 bottle 미제공 | 일부 formula는 arm64 미지원 | `brew install --build-from-source <formula>` 또는 Rosetta 사용 |
+| A1 | Attempting to install in `/usr/local` on Apple Silicon | `Cannot install in Homebrew on ARM processor in Intel default prefix (/usr/local)` | Attempting to install in Intel-only path on ARM Mac | Fresh install in `/opt/homebrew` |
+| A2 | Migrated from Intel Mac via Migration Assistant | Two Homebrew installations coexist at `/usr/local` and `/opt/homebrew` | MA copied Intel Mac's `/usr/local` as-is | Remove Intel installation, keep ARM only |
+| A3 | Using x86_64 terminal on Apple Silicon | brew uses `/usr/local` path | iTerm2 etc. running in Rosetta mode | Uncheck "Open using Rosetta". Verify `arm64` with `arch` command |
+| A4 | brew not found after installation on Apple Silicon | `zsh: command not found: brew` | `/opt/homebrew/bin` not in PATH | Add `eval "$(/opt/homebrew/bin/brew shellenv)"` to `~/.zprofile` |
+| A5 | Attempting to install in `/opt/homebrew` on Intel Mac | `Homebrew is not (yet) supported on this hardware` | Intel Mac only supports `/usr/local` | Use default install script |
+| A6 | Universal binary conflict | Certain formulas do not provide arm64 bottles | Some formulas do not support arm64 | `brew install --build-from-source <formula>` or use Rosetta |
 
 ### 2.3 Xcode Command Line Tools
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| X1 | CLT 미설치 | `xcode-select: note: No developer tools were found` | Homebrew에 Xcode CLT 필수 | `xcode-select --install` |
-| X2 | CLT 설치 UI 실패 | `Can't install the software because it is not currently available from the Software Update server` | Apple 서버 문제 또는 macOS 너무 오래됨 | developer.apple.com/download/all/ 에서 수동 다운로드 |
-| X3 | CLT 버전 구버전 | `Your Command Line Tools are too outdated` | macOS 업그레이드 후 CLT 버전 불일치 | `sudo rm -rf /Library/Developer/CommandLineTools && xcode-select --install` |
-| X4 | Xcode와 CLT 충돌 | `Your CLT does not support macOS <version>` | 전체 Xcode와 독립 CLT 간 버전 충돌 | `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer` |
-| X5 | CLT 부분 설치 | `Xcode alone is not sufficient on <macOS version>` | CLT 설치가 불완전 | `sudo rm -rf /Library/Developer/CommandLineTools && sudo xcode-select --install` |
-| X6 | Xcode 라이선스 미동의 | `You have not agreed to the Xcode license` | Xcode 설치 후 라이선스 동의 필요 | `sudo xcodebuild -license accept` |
-| X7 | 헤드리스 설치 실패 | `xcode-select --install` GUI 팝업 필요한데 SSH 세션 | 원격 세션에서 GUI 팝업 불가 | `softwareupdate --install "Command Line Tools for Xcode-<version>"` |
-| X8 | CLT 업데이트 감지 실패 | `brew doctor` 경고는 뜨지만 Software Update에 없음 | macOS 소프트웨어 업데이트 캐시 문제 | Apple Developer 사이트에서 직접 다운로드 |
+| X1 | CLT not installed | `xcode-select: note: No developer tools were found` | Xcode CLT required for Homebrew | `xcode-select --install` |
+| X2 | CLT installation UI failure | `Can't install the software because it is not currently available from the Software Update server` | Apple server issue or macOS too old | Manual download from developer.apple.com/download/all/ |
+| X3 | Outdated CLT version | `Your Command Line Tools are too outdated` | CLT version mismatch after macOS upgrade | `sudo rm -rf /Library/Developer/CommandLineTools && xcode-select --install` |
+| X4 | Xcode and CLT conflict | `Your CLT does not support macOS <version>` | Version conflict between full Xcode and standalone CLT | `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer` |
+| X5 | Partial CLT installation | `Xcode alone is not sufficient on <macOS version>` | CLT installation incomplete | `sudo rm -rf /Library/Developer/CommandLineTools && sudo xcode-select --install` |
+| X6 | Xcode license not accepted | `You have not agreed to the Xcode license` | License agreement required after Xcode installation | `sudo xcodebuild -license accept` |
+| X7 | Headless installation failure | `xcode-select --install` requires GUI popup but in SSH session | GUI popup not available in remote session | `softwareupdate --install "Command Line Tools for Xcode-<version>"` |
+| X8 | CLT update detection failure | `brew doctor` shows warning but not in Software Update | macOS software update cache issue | Download directly from Apple Developer site |
 
-### 2.4 권한(Permission) 에러
+### 2.4 Permission Errors
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| P1 | Intel Mac - `/usr/local` 소유권 | `Permission denied @ dir_s_mkdir - /usr/local/Frameworks` | 다른 프로그램이 소유권 변경 | `sudo chown -R $(whoami):admin /usr/local/*` |
-| P2 | Intel Mac - zsh compinit | `zsh compinit: insecure directories` | `/usr/local/share/zsh/site-functions` 권한 불일치 | `chmod go-w /usr/local/share` |
-| P3 | Apple Silicon - `/opt/homebrew` 소유권 | `Permission denied - /opt/homebrew/Cellar` | 다른 사용자가 설치 또는 sudo로 설치 | `sudo chown -R $(whoami):admin /opt/homebrew` |
-| P4 | Cask 설치 - `/Applications` 쓰기 불가 | `Operation not permitted` | MDM 또는 TCC가 Applications 접근 차단 | `brew install --cask <app> --appdir=~/Applications` |
-| P5 | `sudo brew` 실행 시도 | `Running Homebrew as root is extremely dangerous and no longer supported.` | root로 Homebrew 실행 시도 | sudo 없이 일반 사용자로 실행 |
-| P6 | `/opt/homebrew` 생성 불가 | `Failed to create /opt/homebrew` | `/opt`에 쓰기 권한 없음 | 사용자가 admin 그룹에 속해야 함 |
-| P7 | macOS Sequoia TCC 제한 | `Operation not permitted` | TCC가 터미널의 폴더 접근 차단 | Privacy & Security > Full Disk Access에 Terminal.app 추가 |
-| P8 | Homebrew Caskroom 소유권 | `Permission denied @ dir_s_mkdir - /opt/homebrew/Caskroom/<app>` | Caskroom 권한 불일치 | `sudo chown -R $(whoami):admin $(brew --caskroom)` |
+| P1 | Intel Mac - `/usr/local` ownership | `Permission denied @ dir_s_mkdir - /usr/local/Frameworks` | Another program changed ownership | `sudo chown -R $(whoami):admin /usr/local/*` |
+| P2 | Intel Mac - zsh compinit | `zsh compinit: insecure directories` | Permission mismatch on `/usr/local/share/zsh/site-functions` | `chmod go-w /usr/local/share` |
+| P3 | Apple Silicon - `/opt/homebrew` ownership | `Permission denied - /opt/homebrew/Cellar` | Installed by another user or installed with sudo | `sudo chown -R $(whoami):admin /opt/homebrew` |
+| P4 | Cask install - `/Applications` not writable | `Operation not permitted` | MDM or TCC blocking Applications access | `brew install --cask <app> --appdir=~/Applications` |
+| P5 | Attempting `sudo brew` | `Running Homebrew as root is extremely dangerous and no longer supported.` | Attempting to run Homebrew as root | Run as regular user without sudo |
+| P6 | Cannot create `/opt/homebrew` | `Failed to create /opt/homebrew` | No write permission to `/opt` | User must belong to admin group |
+| P7 | macOS Sequoia TCC restriction | `Operation not permitted` | TCC blocking terminal's folder access | Add Terminal.app to Privacy & Security > Full Disk Access |
+| P8 | Homebrew Caskroom ownership | `Permission denied @ dir_s_mkdir - /opt/homebrew/Caskroom/<app>` | Caskroom permission mismatch | `sudo chown -R $(whoami):admin $(brew --caskroom)` |
 
-### 2.5 기업/엔터프라이즈 환경 (MDM)
+### 2.5 Enterprise Environment (MDM)
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| M1 | MDM이 소프트웨어 설치 차단 | `Operation not permitted` | Jamf/Kandji 등이 비인가 소프트웨어 제한 | IT에 Homebrew 허용 요청. Workbrew 검토 |
-| M2 | MDM Mac - admin 권한 없음 | sudo 사용 불가 | 일반 사용자는 admin 권한 없음 | IT에 admin 권한 요청 또는 MDM PKG 배포 요청 |
-| M3 | Configuration Profile이 터미널 제한 | 특정 명령어 실행 불가 | MDM Profile이 터미널 기능 제한 | IT에 개발자용 Profile 예외 요청 |
-| M4 | MDM이 `/opt` 접근 차단 | `mkdir: /opt/homebrew: Operation not permitted` | SIP 강화 또는 MDM 파일시스템 제한 | IT에 디렉토리 생성 허용 요청 |
-| M5 | MDM root 계정으로 설치 | 일반 사용자로 사용 불가 | MDM 스크립트가 root로 실행 | 사용자 계정으로 설치: `sudo -u $loggedInUser brew install ...` |
-| M6 | 기업 인증서 스토어 충돌 | `curl: (60) SSL certificate problem` | 기업 프록시 SSL 인터셉트 | 기업 CA 인증서를 키체인에 추가 |
-| M7 | Homebrew가 root 실행 거부 | `Don't run this as root!` | Homebrew는 root 불가 설계 | Homebrew PKG Installer 사용 |
+| M1 | MDM blocks software installation | `Operation not permitted` | Jamf/Kandji etc. restrict unauthorized software | Request IT to allow Homebrew. Consider Workbrew |
+| M2 | MDM Mac - no admin privileges | Cannot use sudo | Regular user has no admin privileges | Request admin privileges from IT or request MDM PKG deployment |
+| M3 | Configuration Profile restricts terminal | Cannot execute certain commands | MDM Profile restricts terminal functionality | Request developer Profile exception from IT |
+| M4 | MDM blocks `/opt` access | `mkdir: /opt/homebrew: Operation not permitted` | Enhanced SIP or MDM filesystem restriction | Request IT to allow directory creation |
+| M5 | MDM installed as root account | Cannot use as regular user | MDM script runs as root | Install under user account: `sudo -u $loggedInUser brew install ...` |
+| M6 | Corporate certificate store conflict | `curl: (60) SSL certificate problem` | Corporate proxy SSL interception | Add corporate CA certificate to Keychain |
+| M7 | Homebrew refuses root execution | `Don't run this as root!` | Homebrew designed to not run as root | Use Homebrew PKG Installer |
 
-### 2.6 네트워크 문제 (프록시/방화벽/VPN)
+### 2.6 Network Issues (Proxy/Firewall/VPN)
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| N1 | 기업 프록시 | `curl: (7) Failed to connect to raw.githubusercontent.com` | 프록시가 GitHub 차단 | `export http_proxy=http://proxy:port && export https_proxy=http://proxy:port` |
-| N2 | 방화벽이 GitHub 차단 | `curl: (28) Connection timed out` | 방화벽이 GitHub 도메인 차단 | `github.com`, `raw.githubusercontent.com`, `ghcr.io` 허용 요청 |
-| N3 | VPN 사용 중 | `error: RPC failed; curl 92 HTTP/2 stream was not closed cleanly` | VPN이 HTTP/2 간섭 | VPN 해제 후 설치 또는 `git config --global http.version HTTP/1.1` |
-| N4 | SSL 인터셉트 프록시 | `curl failed to verify the legitimacy of the server` | 기업 프록시 SSL MitM | 기업 CA 인증서를 키체인에 추가. `export HOMEBREW_FORCE_BREWED_CURL=1` |
-| N5 | `.curlrc` 간섭 | 다양한 curl 에러 | `~/.curlrc`가 curl 동작 변경 | `mv ~/.curlrc ~/.curlrc.bak` 후 재시도 |
-| N6 | DNS 해석 실패 | `curl: (6) Could not resolve host` | DNS 서버 문제 | DNS를 `8.8.8.8` 또는 `1.1.1.1`로 변경 |
-| N7 | Git clone 연결 끊김 | `fatal: early EOF` | 불안정한 네트워크 | 유선 연결. `git config --global http.postBuffer 524288000` |
-| N8 | Homebrew API 다운로드 실패 | `Error: Failure while executing; /usr/bin/curl ... exit status 56` | JSON API 다운로드 실패 | `brew update --force` 재시도 |
-| N9 | bottle 다운로드 실패 | `curl: (18) transfer closed with outstanding read data remaining` | bottle 다운로드 중 연결 종료 | 재시도. 소스 빌드 fallback |
+| N1 | Corporate proxy | `curl: (7) Failed to connect to raw.githubusercontent.com` | Proxy blocks GitHub | `export http_proxy=http://proxy:port && export https_proxy=http://proxy:port` |
+| N2 | Firewall blocks GitHub | `curl: (28) Connection timed out` | Firewall blocks GitHub domains | Request allowlisting of `github.com`, `raw.githubusercontent.com`, `ghcr.io` |
+| N3 | VPN active | `error: RPC failed; curl 92 HTTP/2 stream was not closed cleanly` | VPN interferes with HTTP/2 | Disconnect VPN before installing or `git config --global http.version HTTP/1.1` |
+| N4 | SSL intercept proxy | `curl failed to verify the legitimacy of the server` | Corporate proxy SSL MitM | Add corporate CA certificate to Keychain. `export HOMEBREW_FORCE_BREWED_CURL=1` |
+| N5 | `.curlrc` interference | Various curl errors | `~/.curlrc` modifies curl behavior | Rename `mv ~/.curlrc ~/.curlrc.bak` and retry |
+| N6 | DNS resolution failure | `curl: (6) Could not resolve host` | DNS server issue | Change DNS to `8.8.8.8` or `1.1.1.1` |
+| N7 | Git clone connection drop | `fatal: early EOF` | Unstable network | Use wired connection. `git config --global http.postBuffer 524288000` |
+| N8 | Homebrew API download failure | `Error: Failure while executing; /usr/bin/curl ... exit status 56` | JSON API download failed | Retry with `brew update --force` |
+| N9 | Bottle download failure | `curl: (18) transfer closed with outstanding read data remaining` | Connection closed during bottle download | Retry. Source build fallback |
 
-### 2.7 디스크 공간 문제
+### 2.7 Disk Space Issues
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| D1 | 디스크 공간 부족 | `No space left on device` | Homebrew + formulae에 수 GB 필요 | `brew cleanup` 으로 캐시 정리 |
-| D2 | 캐시 비대화 | 디스크 공간 지속 감소 | `~/Library/Caches/Homebrew`에 bottle 보관 | `brew cleanup --prune=all` |
-| D3 | APFS 컨테이너 혼동 | `No space left on device` 이지만 전체에는 공간 있음 | APFS 볼륨 간 공간 공유 문제 | Disk Utility에서 볼륨 확인. Time Machine 스냅샷 삭제 |
-| D4 | Xcode CLT 설치 시 | `Not enough free disk space` | CLT가 약 1.5-3GB 필요 | 불필요한 파일 삭제 후 설치 |
-| D5 | 소스 빌드 시 | `make: *** [all] Error 1` + 공간 부족 로그 | 소스 빌드에 수 GB 임시 공간 필요 | 최소 10GB 여유 공간 확보 |
+| D1 | Insufficient disk space | `No space left on device` | Homebrew + formulae require several GB | Clean cache with `brew cleanup` |
+| D2 | Cache bloat | Continuous disk space decrease | Bottles stored in `~/Library/Caches/Homebrew` | `brew cleanup --prune=all` |
+| D3 | APFS container confusion | `No space left on device` but overall space available | APFS volume space sharing issue | Check volumes in Disk Utility. Delete Time Machine snapshots |
+| D4 | During Xcode CLT installation | `Not enough free disk space` | CLT requires approximately 1.5-3GB | Delete unnecessary files before installation |
+| D5 | During source build | `make: *** [all] Error 1` + space shortage log | Source build requires several GB of temporary space | Ensure at least 10GB free space |
 
 ### 2.8 SIP (System Integrity Protection)
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| S1 | SIP 활성에서 `/usr/local` 접근 | `Operation not permitted` | SIP가 시스템 디렉토리 보호 | Homebrew 기본 스크립트 사용 (SIP 우회 불필요) |
-| S2 | SIP 비활성화 상태 | `brew doctor` 경고: `Your system has SIP disabled` | 보안 위험 증가 | SIP 재활성화: Recovery > Terminal > `csrutil enable` |
-| S3 | macOS 업그레이드 + SIP 비활성 | 시스템 불안정, 부팅 실패 | SIP 비활성 상태에서 업그레이드 시 문제 | 업그레이드 전 SIP 재활성화 필수 |
-| S4 | `/usr/local/bin` 심볼릭 링크 실패 | `Error: Could not symlink ... is not writable` | SIP 또는 다른 프로그램이 권한 변경 | `sudo chown -R $(whoami):admin /usr/local/bin` |
+| S1 | Accessing `/usr/local` with SIP enabled | `Operation not permitted` | SIP protects system directories | Use Homebrew default script (no SIP bypass needed) |
+| S2 | SIP disabled state | `brew doctor` warning: `Your system has SIP disabled` | Increased security risk | Re-enable SIP: Recovery > Terminal > `csrutil enable` |
+| S3 | macOS upgrade + SIP disabled | System instability, boot failure | Issues when upgrading with SIP disabled | Must re-enable SIP before upgrading |
+| S4 | `/usr/local/bin` symlink failure | `Error: Could not symlink ... is not writable` | SIP or another program changed permissions | `sudo chown -R $(whoami):admin /usr/local/bin` |
 
-### 2.9 PATH 설정 문제
+### 2.9 PATH Configuration Issues
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| PA1 | Apple Silicon 설치 직후 | `zsh: command not found: brew` | `/opt/homebrew/bin`이 PATH에 없음 | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile` |
-| PA2 | 터미널 미재시작 | `command not found: brew` | 현재 세션에 미적용 | 터미널 재시작 또는 `source ~/.zprofile` |
-| PA3 | Intel PATH가 ARM보다 우선 | 잘못된 brew 버전 실행 | Migration 후 PATH 순서 문제 | `~/.zprofile`에서 `brew shellenv`가 맨 위에 오도록 확인 |
-| PA4 | `path_helper` 간섭 | PATH 순서가 예상과 다름 | `/usr/libexec/path_helper`가 PATH 재정렬 | `brew shellenv`를 `path_helper` 이후에 설정 |
-| PA5 | formula가 PATH에 없음 | `command not found: <installed-program>` | keg-only이거나 `brew link` 안 됨 | `brew link <formula>` 또는 PATH에 수동 추가 |
-| PA6 | bash 사용자 | `bash: brew: command not found` | `~/.bash_profile`에 설정해야 함 | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.bash_profile` |
+| PA1 | Right after Apple Silicon installation | `zsh: command not found: brew` | `/opt/homebrew/bin` not in PATH | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile` |
+| PA2 | Terminal not restarted | `command not found: brew` | Not applied to current session | Restart terminal or `source ~/.zprofile` |
+| PA3 | Intel PATH takes priority over ARM | Wrong brew version executed | PATH order issue after Migration | Ensure `brew shellenv` is at the top in `~/.zprofile` |
+| PA4 | `path_helper` interference | PATH order differs from expected | `/usr/libexec/path_helper` reorders PATH | Set `brew shellenv` after `path_helper` |
+| PA5 | Formula not in PATH | `command not found: <installed-program>` | keg-only or `brew link` not done | `brew link <formula>` or manually add to PATH |
+| PA6 | bash user | `bash: brew: command not found` | Must be set in `~/.bash_profile` | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.bash_profile` |
 
-### 2.10 Rosetta 2 관련 문제
+### 2.10 Rosetta 2 Related Issues
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| R1 | ARM에서 Intel Homebrew 설치 시도 | `Cannot install in Homebrew on ARM processor in Intel default prefix` | ARM Mac에서 `/usr/local`에 설치 시도 | 기본 스크립트 사용 → 자동으로 `/opt/homebrew` |
-| R2 | Rosetta 미설치 | `Bad CPU type in executable` | Rosetta 2 없이 x86_64 바이너리 실행 | `softwareupdate --install-rosetta --agree-to-license` |
-| R3 | Rosetta 터미널에서 Homebrew 설치 | `/usr/local`에 설치됨 (의도와 다름) | Rosetta 모드 터미널은 x86_64로 인식 | "Open using Rosetta" 해제 후 재설치 |
-| R4 | ARM + x86_64 Homebrew 공존 | 패키지 충돌 | 이중 설치 | Intel 버전 제거, ARM만 유지 |
-| R5 | formula가 arm64 미지원 | `<formula> is not available for the arm64 architecture` | arm64 빌드 미지원 | `arch -x86_64 /usr/local/bin/brew install <formula>` |
+| R1 | Attempting Intel Homebrew install on ARM | `Cannot install in Homebrew on ARM processor in Intel default prefix` | Attempting to install in `/usr/local` on ARM Mac | Use default script -> automatically installs to `/opt/homebrew` |
+| R2 | Rosetta not installed | `Bad CPU type in executable` | Running x86_64 binary without Rosetta 2 | `softwareupdate --install-rosetta --agree-to-license` |
+| R3 | Installing Homebrew in Rosetta terminal | Installed in `/usr/local` (unintended) | Rosetta mode terminal is recognized as x86_64 | Uncheck "Open using Rosetta" and reinstall |
+| R4 | ARM + x86_64 Homebrew coexistence | Package conflicts | Dual installation | Remove Intel version, keep ARM only |
+| R5 | Formula does not support arm64 | `<formula> is not available for the arm64 architecture` | arm64 build not supported | `arch -x86_64 /usr/local/bin/brew install <formula>` |
 
-### 2.11 쉘 설정 문제 (zsh/bash)
+### 2.11 Shell Configuration Issues (zsh/bash)
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| SH1 | zsh PATH 미설정 | `zsh: command not found: brew` | `~/.zprofile`에 `brew shellenv` 미추가 | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile` |
-| SH2 | `.zshrc`에 설정했지만 login shell에서 안 됨 | 비-인터랙티브 쉘에서 못 찾음 | `.zshrc`는 인터랙티브에서만 로드 | 환경변수는 `~/.zprofile`에 배치 |
-| SH3 | bash에서 zsh 설정 무시 | `bash: brew: command not found` | bash는 `~/.bash_profile` 사용 | 쉘에 맞는 설정 파일 사용 |
-| SH4 | fish shell | `fish: Unknown command 'brew'` | fish는 POSIX 호환 아님 | `echo 'eval (/opt/homebrew/bin/brew shellenv)' >> ~/.config/fish/config.fish` |
-| SH5 | oh-my-zsh PATH 재정렬 | 시스템 버전으로 실행됨 | oh-my-zsh가 PATH 변경 | oh-my-zsh 로드 전에 `brew shellenv` 설정 확인 |
-| SH6 | `~/.zshenv` 사용 시 | PATH 순서 뒤집힘 | `path_helper`가 `.zshenv` 설정 덮어씀 | `~/.zshenv` 대신 `~/.zprofile` 사용 |
+| SH1 | zsh PATH not configured | `zsh: command not found: brew` | `brew shellenv` not added to `~/.zprofile` | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile` |
+| SH2 | Set in `.zshrc` but not working in login shell | Not found in non-interactive shell | `.zshrc` only loads in interactive shells | Place environment variables in `~/.zprofile` |
+| SH3 | zsh settings ignored in bash | `bash: brew: command not found` | bash uses `~/.bash_profile` | Use the appropriate config file for the shell |
+| SH4 | fish shell | `fish: Unknown command 'brew'` | fish is not POSIX compatible | `echo 'eval (/opt/homebrew/bin/brew shellenv)' >> ~/.config/fish/config.fish` |
+| SH5 | oh-my-zsh PATH reordering | System version is executed | oh-my-zsh changes PATH | Ensure `brew shellenv` is set before oh-my-zsh loads |
+| SH6 | When using `~/.zshenv` | PATH order reversed | `path_helper` overrides `.zshenv` settings | Use `~/.zprofile` instead of `~/.zshenv` |
 
-#### Homebrew `shellenv` 설정 가이드
+#### Homebrew `shellenv` Configuration Guide
 
-| 쉘 | 설정 파일 | 명령어 |
+| Shell | Config File | Command |
 |----|----------|--------|
-| zsh (기본) | `~/.zprofile` | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile` |
+| zsh (default) | `~/.zprofile` | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile` |
 | bash | `~/.bash_profile` | `echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.bash_profile` |
 | fish | `~/.config/fish/config.fish` | `echo 'eval (/opt/homebrew/bin/brew shellenv)' >> ~/.config/fish/config.fish` |
 
-> **참고**: Intel Mac은 `/opt/homebrew/bin/brew`를 `/usr/local/bin/brew`로 대체
+> **Note**: On Intel Mac, replace `/opt/homebrew/bin/brew` with `/usr/local/bin/brew`
 
-### 2.12 FileVault 암호화 관련
+### 2.12 FileVault Encryption Related
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| F1 | FileVault 암호화 진행 중 설치 | 설치 극도로 느림 | FileVault 초기 암호화가 I/O 점유 | 암호화 완료 후 설치 |
-| F2 | FileVault + 저용량 디스크 | `No space left on device` | 암호화가 추가 공간 사용 | 여유 공간 15% 이상 확보 |
-| F3 | 부팅 후 디스크 잠금 | Homebrew 경로 접근 불가 | 잠금 해제 전 스크립트가 접근 | 사용자 로그인 후 실행되도록 설정 |
+| F1 | Installing during FileVault encryption | Installation extremely slow | FileVault initial encryption occupies I/O | Install after encryption completes |
+| F2 | FileVault + low disk space | `No space left on device` | Encryption uses additional space | Ensure at least 15% free space |
+| F3 | Disk locked after boot | Homebrew path inaccessible | Script accesses before unlock | Configure to run after user login |
 
-### 2.13 다중 사용자 계정 문제
+### 2.13 Multi-User Account Issues
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| MU1 | 다른 사용자가 설치한 Homebrew | `Permission denied` 다수 | Homebrew는 단일 사용자용 설계 | 각 사용자별 독립 Homebrew 설치 |
-| MU2 | 공유 설치 - 권한 충돌 | `Error: Permission denied` | 여러 사용자가 같은 prefix 접근 | 사용자별 독립 설치 권장 |
-| MU3 | `su`/`sudo -u` 전환 후 | 권한 에러 | 환경변수/PATH 불일치 | 각 사용자 계정에서 직접 로그인 |
-| MU4 | 게스트 계정 | 설치 실패 | 로그아웃 시 데이터 삭제 | 정식 사용자 계정에서 설치 |
+| MU1 | Homebrew installed by another user | Multiple `Permission denied` | Homebrew designed for single user | Install Homebrew independently per user |
+| MU2 | Shared installation - permission conflict | `Error: Permission denied` | Multiple users accessing same prefix | Independent installation per user recommended |
+| MU3 | After `su`/`sudo -u` switch | Permission errors | Environment variable/PATH mismatch | Log in directly to each user account |
+| MU4 | Guest account | Installation fails | Data deleted on logout | Install from a regular user account |
 
-### 2.14 기존 Homebrew 손상/구버전
+### 2.14 Existing Homebrew Corruption/Outdated Version
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| B1 | `brew update` 실패 | `fatal: Could not resolve HEAD to a revision` | git repository 손상 | `brew update-reset` |
-| B2 | git 충돌 | `error: Your local changes would be overwritten` | 수동으로 Homebrew 파일 수정 | `cd "$(brew --repository)" && git reset --hard FETCH_HEAD` |
-| B3 | Tap 손상 | `Error: Tap <name> already tapped` | tap repository 손상 | `brew tap --repair` 또는 `brew untap && brew tap` |
-| B4 | 극도로 오래된 Homebrew | `Error: undefined method` Ruby 에러 | 현재 formula 포맷 불일치 | 완전 재설치: `brew bundle dump`, uninstall, reinstall |
-| B5 | Homebrew 1.x→4.x+ 업그레이드 | API 변경 에러 | 4.x에서 JSON API 전환 | 완전 재설치 권장 |
-| B6 | `brew doctor` 경고 다수 | 다양한 경고 | 설정 불일치 누적 | `brew doctor` 출력 순차 해결 |
-| B7 | Cellar/Caskroom 손상 | `Error: No such keg` | 패키지 파일 부분 삭제 | `brew reinstall <formula>` |
-| B8 | macOS 업그레이드 후 전체 깨짐 | 대부분 brew 명령 실패 | 시스템 라이브러리 변경 | `xcode-select --install && brew update && brew upgrade` |
+| B1 | `brew update` fails | `fatal: Could not resolve HEAD to a revision` | git repository corrupted | `brew update-reset` |
+| B2 | git conflict | `error: Your local changes would be overwritten` | Homebrew files manually modified | `cd "$(brew --repository)" && git reset --hard FETCH_HEAD` |
+| B3 | Tap corrupted | `Error: Tap <name> already tapped` | tap repository corrupted | `brew tap --repair` or `brew untap && brew tap` |
+| B4 | Extremely old Homebrew | `Error: undefined method` Ruby error | Current formula format mismatch | Full reinstall: `brew bundle dump`, uninstall, reinstall |
+| B5 | Homebrew 1.x to 4.x+ upgrade | API change errors | JSON API transition in 4.x | Full reinstall recommended |
+| B6 | Multiple `brew doctor` warnings | Various warnings | Accumulated configuration mismatches | Resolve `brew doctor` output sequentially |
+| B7 | Cellar/Caskroom corrupted | `Error: No such keg` | Package files partially deleted | `brew reinstall <formula>` |
+| B8 | Everything broken after macOS upgrade | Most brew commands fail | System library changes | `xcode-select --install && brew update && brew upgrade` |
 
-### 2.15 curl/git 실패
+### 2.15 curl/git Failures
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| C1 | 설치 스크립트 다운로드 실패 | `curl: (7) Failed to connect to raw.githubusercontent.com` | 네트워크 차단 | 모바일 핫스팟 시도. DNS 변경 |
-| C2 | Git clone 타임아웃 | `fatal: early EOF` | 불안정한 네트워크 | `git config --global http.postBuffer 524288000`. 유선 연결 |
-| C3 | SSL 인증서 검증 실패 | `curl: (60) SSL certificate problem: certificate has expired` | 시스템 시간 틀림 | 시스템 시간 자동 동기화 활성화 |
-| C4 | GitHub rate limit | `curl: (22) The requested URL returned error: 403` | API 호출 횟수 초과 | `export HOMEBREW_GITHUB_API_TOKEN=<token>` |
-| C5 | HTTP/2 프로토콜 문제 | `error: RPC failed; curl 92 HTTP/2 stream was not closed cleanly` | 네트워크 장비가 HTTP/2 미지원 | `git config --global http.version HTTP/1.1` |
-| C6 | Git shallow clone 실패 | `fatal: error processing shallow info: 4` | shallow clone 네트워크 문제 | `HOMEBREW_NO_AUTO_UPDATE=1` 설정 후 수동 업데이트 |
+| C1 | Install script download failure | `curl: (7) Failed to connect to raw.githubusercontent.com` | Network blocked | Try mobile hotspot. Change DNS |
+| C2 | Git clone timeout | `fatal: early EOF` | Unstable network | `git config --global http.postBuffer 524288000`. Use wired connection |
+| C3 | SSL certificate verification failure | `curl: (60) SSL certificate problem: certificate has expired` | System time incorrect | Enable automatic system time sync |
+| C4 | GitHub rate limit | `curl: (22) The requested URL returned error: 403` | API call limit exceeded | `export HOMEBREW_GITHUB_API_TOKEN=<token>` |
+| C5 | HTTP/2 protocol issue | `error: RPC failed; curl 92 HTTP/2 stream was not closed cleanly` | Network equipment does not support HTTP/2 | `git config --global http.version HTTP/1.1` |
+| C6 | Git shallow clone failure | `fatal: error processing shallow info: 4` | Shallow clone network issue | Set `HOMEBREW_NO_AUTO_UPDATE=1` then manually update |
 
-### 현재 코드의 대응 수준
+### Current Code Coverage Level
 
 ```
-현재:
-  Mac: brew 없으면 curl 설치 → PATH 추가 → 확인
-  실패 시: 수동 설치 안내 (URL + PATH 명령)
+Current:
+  Mac: If brew missing, curl install -> add PATH -> verify
+  On failure: Manual install guide (URL + PATH commands)
 
-개선 필요:
-  - Apple Silicon vs Intel 자동 감지 + 올바른 PATH 안내
-  - Xcode CLT 사전 검사 + 자동 설치
-  - Rosetta 모드 터미널 감지 + 경고
-  - 기업 MDM/프록시 환경 감지
-  - 기존 Homebrew 손상 여부 검사 (brew doctor)
+Improvements needed:
+  - Apple Silicon vs Intel auto-detection + correct PATH guidance
+  - Xcode CLT pre-check + auto-installation
+  - Rosetta mode terminal detection + warning
+  - Enterprise MDM/proxy environment detection
+  - Existing Homebrew corruption check (brew doctor)
 ```
 
 ---
 
-## 3. Node.js 에러 케이스
+## 3. Node.js Error Cases
 
-### 3.1 Homebrew Node.js vs nvm/fnm/volta 충돌
+### 3.1 Homebrew Node.js vs nvm/fnm/volta Conflicts
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| NV1 | nvm + brew node 동시 설치 | `node` 명령이 예상과 다른 버전 실행 | nvm이 shell 초기화 시 PATH를 덮어씀. `~/.nvm/versions/node/` 경로가 우선됨 | **하나만 사용**: `brew uninstall node` 또는 `nvm deactivate && nvm unload` |
-| NV2 | fnm + brew node 동시 설치 | `which node`가 fnm 경로 표시, `node -v`가 다른 버전 | fnm의 shim이 Homebrew보다 PATH에서 앞에 위치 | fnm 사용 시 `brew uninstall node`. Homebrew 사용 시 shell rc에서 fnm 초기화 제거 |
-| NV3 | volta + brew node 동시 설치 | `npm install -g` 패키지가 실행 안됨 | volta가 자체 shim 시스템 사용 (`~/.volta/bin`), npm global과 충돌 | volta 사용 시 `brew uninstall node`. volta의 `volta install` 사용 |
-| NV4 | asdf + brew node | `No version is set for command node` | asdf가 node를 관리하나 shim이 Homebrew node를 가림 | asdf 사용 시 brew node 제거, 또는 asdf에서 node 플러그인 제거 |
-| NV5 | nvm + brew로 nvm 설치 | nvm 동작 불안정, `nvm is not compatible with the npm config "prefix"` | **nvm 공식 문서에서 Homebrew를 통한 nvm 설치를 지원하지 않음** | `brew uninstall nvm` 후 공식 설치 스크립트 사용: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh \| bash` |
+| NV1 | nvm + brew node simultaneously installed | `node` command runs unexpected version | nvm overwrites PATH during shell initialization. `~/.nvm/versions/node/` path takes priority | **Use only one**: `brew uninstall node` or `nvm deactivate && nvm unload` |
+| NV2 | fnm + brew node simultaneously installed | `which node` shows fnm path, `node -v` shows different version | fnm's shim is ahead of Homebrew in PATH | When using fnm: `brew uninstall node`. When using Homebrew: remove fnm initialization from shell rc |
+| NV3 | volta + brew node simultaneously installed | `npm install -g` packages won't run | volta uses its own shim system (`~/.volta/bin`), conflicts with npm global | When using volta: `brew uninstall node`. Use volta's `volta install` |
+| NV4 | asdf + brew node | `No version is set for command node` | asdf manages node but shim shadows Homebrew node | When using asdf: remove brew node, or remove node plugin from asdf |
+| NV5 | nvm + nvm installed via brew | nvm behavior unstable, `nvm is not compatible with the npm config "prefix"` | **nvm official docs do not support installing nvm via Homebrew** | `brew uninstall nvm` then use official install script: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh \| bash` |
 
-**감지 로직 권장사항**:
+**Detection Logic Recommendations**:
 ```bash
-# 기존 Node.js 버전 매니저 감지
+# Detect existing Node.js version managers
 if command -v nvm &>/dev/null || [ -d "$HOME/.nvm" ]; then
-  echo "Warning: nvm이 감지되었습니다. brew install node와 충돌할 수 있습니다."
+  echo "Warning: nvm detected. May conflict with brew install node."
 fi
 if command -v fnm &>/dev/null; then
-  echo "Warning: fnm이 감지되었습니다."
+  echo "Warning: fnm detected."
 fi
 if command -v volta &>/dev/null || [ -d "$HOME/.volta" ]; then
-  echo "Warning: volta가 감지되었습니다."
+  echo "Warning: volta detected."
 fi
 ```
 
 ---
 
-### 3.2 npm 전역 설치 권한 에러 (EACCES)
+### 3.2 npm Global Install Permission Error (EACCES)
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| NP1 | `npm install -g` 실행 | `EACCES: permission denied, access '/usr/local/lib/node_modules'` | npm global 디렉토리가 root 소유. 과거 `sudo npm install` 사용으로 인한 소유권 변경 | `sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share}` |
-| NP2 | npm 캐시 디렉토리 권한 | `EACCES: permission denied, mkdir '/Users/<user>/.npm/_cacache'` | `~/.npm` 디렉토리가 root 소유 (과거 sudo 사용) | `sudo chown -R $(whoami) ~/.npm` |
-| NP3 | Apple Silicon + Homebrew | `EACCES: permission denied, access '/opt/homebrew/lib/node_modules'` | `/opt/homebrew` 디렉토리 소유권 문제 | `sudo chown -R $(whoami) /opt/homebrew` |
-| NP4 | 다중 사용자 Mac | 다른 사용자가 설치한 npm global 패키지 접근 불가 | node_modules 디렉토리가 다른 사용자 소유 | 사용자별 npm prefix 설정: `npm config set prefix '~/.npm-global'` 후 PATH에 `~/.npm-global/bin` 추가 |
+| NP1 | Running `npm install -g` | `EACCES: permission denied, access '/usr/local/lib/node_modules'` | npm global directory owned by root. Ownership changed due to past `sudo npm install` usage | `sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share}` |
+| NP2 | npm cache directory permission | `EACCES: permission denied, mkdir '/Users/<user>/.npm/_cacache'` | `~/.npm` directory owned by root (past sudo usage) | `sudo chown -R $(whoami) ~/.npm` |
+| NP3 | Apple Silicon + Homebrew | `EACCES: permission denied, access '/opt/homebrew/lib/node_modules'` | `/opt/homebrew` directory ownership issue | `sudo chown -R $(whoami) /opt/homebrew` |
+| NP4 | Multi-user Mac | Cannot access npm global packages installed by another user | node_modules directory owned by another user | Set per-user npm prefix: `npm config set prefix '~/.npm-global'` then add `~/.npm-global/bin` to PATH |
 
-**권장 해결 전략** (npm 공식 문서 기반):
+**Recommended Resolution Strategy** (based on npm official docs):
 ```bash
-# 방법 1: npm global 디렉토리를 사용자 디렉토리로 변경
+# Method 1: Change npm global directory to user directory
 mkdir -p ~/.npm-global
 npm config set prefix '~/.npm-global'
-# ~/.zshrc에 추가:
+# Add to ~/.zshrc:
 export PATH="$HOME/.npm-global/bin:$PATH"
 
-# 방법 2: Homebrew Node.js 디렉토리 소유권 수정
+# Method 2: Fix Homebrew Node.js directory ownership
 sudo chown -R $(whoami) $(brew --prefix)/lib/node_modules
 sudo chown -R $(whoami) $(brew --prefix)/bin
 ```
@@ -402,155 +402,155 @@ sudo chown -R $(whoami) $(brew --prefix)/bin
 
 ### 3.3 Apple Silicon native vs Rosetta Node.js
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| AS1 | Rosetta 터미널에서 brew install node | x86_64 Node.js 설치됨 (`/usr/local/bin/node`) | Terminal이 Rosetta 모드로 실행 중이어서 Intel Homebrew 사용 | Terminal.app 정보 > "Rosetta를 사용하여 열기" 해제. `arch` 명령으로 확인 |
-| AS2 | ARM64 Node.js + x86_64 npm 패키지 | `Error: Unsupported platform: darwin-arm64` 또는 `mach-o file, but is an incompatible architecture (have 'x86_64', need 'arm64')` | npm 패키지가 Rosetta 환경에서 설치되어 x86_64 바이너리만 포함 | `rm -rf node_modules && npm install` (ARM64 터미널에서) |
-| AS3 | esbuild/swc 아키텍처 불일치 | `Error: The package "esbuild-darwin-arm64" could not be found` | package-lock.json이 다른 아키텍처 환경에서 생성됨 | `rm package-lock.json node_modules && npm install` |
-| AS4 | 두 종류 Homebrew 동시 설치 | 혼란스러운 동작, 패키지 중복 | `/usr/local` (Intel)과 `/opt/homebrew` (ARM64) 모두 존재 | Intel Homebrew 제거: `/usr/local/bin/brew` 삭제 후 ARM64만 사용 |
-| AS5 | node-sass 등 레거시 패키지 | `Unsupported architecture (arm64)` | 레거시 패키지가 ARM64 바이너리 미제공 | 대체 패키지 사용 (예: `node-sass` -> `sass`) |
+| AS1 | brew install node in Rosetta terminal | x86_64 Node.js installed (`/usr/local/bin/node`) | Terminal running in Rosetta mode, using Intel Homebrew | Terminal.app Info > Uncheck "Open using Rosetta". Verify with `arch` command |
+| AS2 | ARM64 Node.js + x86_64 npm packages | `Error: Unsupported platform: darwin-arm64` or `mach-o file, but is an incompatible architecture (have 'x86_64', need 'arm64')` | npm packages installed in Rosetta environment, containing only x86_64 binaries | `rm -rf node_modules && npm install` (in ARM64 terminal) |
+| AS3 | esbuild/swc architecture mismatch | `Error: The package "esbuild-darwin-arm64" could not be found` | package-lock.json generated in a different architecture environment | `rm package-lock.json node_modules && npm install` |
+| AS4 | Two Homebrew installations simultaneously | Confusing behavior, duplicate packages | Both `/usr/local` (Intel) and `/opt/homebrew` (ARM64) exist | Remove Intel Homebrew: delete `/usr/local/bin/brew` and use ARM64 only |
+| AS5 | Legacy packages like node-sass | `Unsupported architecture (arm64)` | Legacy packages do not provide ARM64 binaries | Use alternative packages (e.g., `node-sass` -> `sass`) |
 
-**아키텍처 확인 명령**:
+**Architecture Check Commands**:
 ```bash
-# 현재 아키텍처 확인
-arch                          # arm64 또는 i386
-uname -m                      # arm64 또는 x86_64
+# Check current architecture
+arch                          # arm64 or i386
+uname -m                      # arm64 or x86_64
 
-# Node.js 아키텍처 확인
-node -p "process.arch"        # arm64 또는 x64
+# Check Node.js architecture
+node -p "process.arch"        # arm64 or x64
 
-# Homebrew 아키텍처 확인
+# Check Homebrew architecture
 file $(which brew)            # Mach-O 64-bit executable arm64
 ```
 
 ---
 
-### 3.4 node-gyp / 네이티브 모듈 컴파일 에러
+### 3.4 node-gyp / Native Module Compilation Errors
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| NG1 | Xcode CLT 미설치 | `gyp: No Xcode or CLT version detected!` | node-gyp가 C++ 컴파일러(clang) 필요 | `xcode-select --install` |
-| NG2 | macOS 업그레이드 후 | `gyp ERR! stack Error: Could not find any Python installation to use` 또는 `xcrun: error: invalid active developer path` | macOS 업그레이드가 CLT를 무효화함 | `sudo xcode-select --reset` 또는 `xcode-select --install` 재실행 |
-| NG3 | Apple Silicon + 구버전 네이티브 모듈 | `ld: warning: ignoring file, building for macOS-x86_64 but attempting to link with file built for macOS-arm64` | 네이티브 모듈이 ARM64 미지원 또는 아키텍처 혼합 | 모듈 업데이트 또는 `npm rebuild` |
-| NG4 | node-gyp + Python 3.12+ | `ModuleNotFoundError: No module named 'distutils'` | Python 3.12에서 distutils 모듈 제거됨 (PEP 632) | **node-gyp v10+로 업데이트**: `npm install -g node-gyp@latest` 또는 `pip3 install setuptools` |
-| NG5 | macOS Sonoma + CLT only (Xcode 미설치) | `xcode-select: error: tool 'xcodebuild' requires Xcode` | 일부 node-gyp 버전이 full Xcode를 요구 | `sudo xcode-select -s /Library/Developer/CommandLineTools` 또는 node-gyp 최신 버전으로 업데이트 |
-| NG6 | `-march=native` 컴파일러 플래그 | `error: the clang compiler does not support '-march=native'` | Apple Silicon의 clang이 특정 x86 컴파일러 플래그 미지원 | 해당 모듈의 binding.gyp에서 플래그 제거 또는 모듈 업데이트 |
+| NG1 | Xcode CLT not installed | `gyp: No Xcode or CLT version detected!` | node-gyp requires C++ compiler (clang) | `xcode-select --install` |
+| NG2 | After macOS upgrade | `gyp ERR! stack Error: Could not find any Python installation to use` or `xcrun: error: invalid active developer path` | macOS upgrade invalidated CLT | `sudo xcode-select --reset` or re-run `xcode-select --install` |
+| NG3 | Apple Silicon + old native modules | `ld: warning: ignoring file, building for macOS-x86_64 but attempting to link with file built for macOS-arm64` | Native module does not support ARM64 or mixed architectures | Update module or `npm rebuild` |
+| NG4 | node-gyp + Python 3.12+ | `ModuleNotFoundError: No module named 'distutils'` | distutils module removed in Python 3.12 (PEP 632) | **Update to node-gyp v10+**: `npm install -g node-gyp@latest` or `pip3 install setuptools` |
+| NG5 | macOS Sonoma + CLT only (Xcode not installed) | `xcode-select: error: tool 'xcodebuild' requires Xcode` | Some node-gyp versions require full Xcode | `sudo xcode-select -s /Library/Developer/CommandLineTools` or update node-gyp to latest version |
+| NG6 | `-march=native` compiler flag | `error: the clang compiler does not support '-march=native'` | Apple Silicon's clang does not support certain x86 compiler flags | Remove flag from the module's binding.gyp or update the module |
 
 ---
 
-### 3.5 Xcode Command Line Tools 요구사항
+### 3.5 Xcode Command Line Tools Requirements
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| XC1 | CLT 완전 미설치 | `xcode-select: note: no developer tools were found at '/Applications/Xcode.app'` | 깨끗한 macOS에 개발 도구 없음 | `xcode-select --install` (약 1.2GB 다운로드) |
-| XC2 | macOS 메이저 업그레이드 후 | `xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools)` | OS 업그레이드가 CLT를 무효화. 설치 기록은 남아있으나 바이너리 무효 | `sudo rm -rf /Library/Developer/CommandLineTools && xcode-select --install` |
-| XC3 | Xcode 설치됨 + CLT 미설치 | Xcode가 있으나 CLI 빌드 실패 | Xcode가 있어도 CLT를 별도 설치해야 할 수 있음 | `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` 또는 CLT 별도 설치 |
-| XC4 | CLT 버전 불일치 | `Agreeing to the Xcode/iOS license requires admin privileges` | Xcode 업데이트 후 라이선스 동의 필요 | `sudo xcodebuild -license accept` |
-| XC5 | `softwareupdate` 으로 CLT 업데이트 안됨 | CLT 업데이트가 소프트웨어 업데이트 목록에 없음 | Apple의 소프트웨어 업데이트 카탈로그 문제 | Apple Developer 사이트에서 직접 다운로드: https://developer.apple.com/download/all/ |
+| XC1 | CLT completely not installed | `xcode-select: note: no developer tools were found at '/Applications/Xcode.app'` | No development tools on clean macOS | `xcode-select --install` (approximately 1.2GB download) |
+| XC2 | After macOS major upgrade | `xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools)` | OS upgrade invalidated CLT. Installation record remains but binaries invalid | `sudo rm -rf /Library/Developer/CommandLineTools && xcode-select --install` |
+| XC3 | Xcode installed + CLT not installed | Xcode present but CLI build fails | CLT may need to be installed separately even with Xcode | `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` or install CLT separately |
+| XC4 | CLT version mismatch | `Agreeing to the Xcode/iOS license requires admin privileges` | License agreement needed after Xcode update | `sudo xcodebuild -license accept` |
+| XC5 | CLT update not available via `softwareupdate` | CLT update not in software update list | Apple software update catalog issue | Download directly from Apple Developer site: https://developer.apple.com/download/all/ |
 
-**CLT 상태 확인**:
+**CLT Status Check**:
 ```bash
-# CLT 설치 확인
-xcode-select -p                    # 설치 경로 표시
-xcode-select --version             # 버전 확인
-pkgutil --pkg-info=com.apple.pkg.CLTools_Executables  # 상세 정보
+# Check CLT installation
+xcode-select -p                    # Display installation path
+xcode-select --version             # Check version
+pkgutil --pkg-info=com.apple.pkg.CLTools_Executables  # Detailed info
 
-# CLT에 포함된 도구 확인
+# Check tools included in CLT
 gcc --version     # Apple clang version
 make --version    # GNU Make
 ```
 
 ---
 
-### 3.6 Python 의존성 문제 (node-gyp)
+### 3.6 Python Dependency Issues (node-gyp)
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| PY1 | Python 3.12+ (Homebrew) | `ModuleNotFoundError: No module named 'distutils'` | Python 3.12에서 `distutils` 제거됨. node-gyp가 의존 | `npm install -g node-gyp@latest` (v10+는 distutils 불필요) 또는 `pip3 install setuptools` |
-| PY2 | Python 미설치 | `gyp ERR! find Python - Python is not set` | macOS에 Python이 없음 (최신 macOS는 Python 2 제거됨) | `brew install python@3.11` 또는 Xcode CLT 설치 (Python 3 포함) |
-| PY3 | 다중 Python 버전 | node-gyp가 잘못된 Python 버전 사용 | PATH에 여러 Python이 있어 node-gyp가 호환되지 않는 버전 선택 | `npm config set python /usr/bin/python3` 또는 `export npm_config_python=$(which python3)` |
-| PY4 | Python 2 / Python 3 혼재 | `gyp ERR! stack Error: Could not find any Python installation to use` | node-gyp v5+는 Python 3.6+ 필요. Python 2만 있으면 실패 | Python 3 설치: `brew install python` |
-| PY5 | macOS 시스템 Python 제거됨 | `/usr/bin/python: No such file or directory` | macOS 12.3+에서 Python 2(`/usr/bin/python`) 제거 | `brew install python` 후 `npm config set python $(which python3)` |
+| PY1 | Python 3.12+ (Homebrew) | `ModuleNotFoundError: No module named 'distutils'` | `distutils` removed in Python 3.12. node-gyp depends on it | `npm install -g node-gyp@latest` (v10+ does not need distutils) or `pip3 install setuptools` |
+| PY2 | Python not installed | `gyp ERR! find Python - Python is not set` | No Python on macOS (recent macOS removed Python 2) | `brew install python@3.11` or install Xcode CLT (includes Python 3) |
+| PY3 | Multiple Python versions | node-gyp uses wrong Python version | Multiple Python in PATH, node-gyp selects incompatible version | `npm config set python /usr/bin/python3` or `export npm_config_python=$(which python3)` |
+| PY4 | Python 2 / Python 3 mixed | `gyp ERR! stack Error: Could not find any Python installation to use` | node-gyp v5+ requires Python 3.6+. Fails if only Python 2 available | Install Python 3: `brew install python` |
+| PY5 | macOS system Python removed | `/usr/bin/python: No such file or directory` | Python 2 (`/usr/bin/python`) removed in macOS 12.3+ | `brew install python` then `npm config set python $(which python3)` |
 
 ---
 
-### 3.7 PATH 충돌 (다중 Node.js 설치)
+### 3.7 PATH Conflicts (Multiple Node.js Installations)
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| PA1 | nvm + Homebrew node | `node -v` 결과가 예상과 다름 | `~/.nvm` 경로가 PATH에서 Homebrew보다 앞에 있음 | 하나만 사용. `brew uninstall node` 권장 (nvm 사용 시) |
-| PA2 | Intel Homebrew + ARM Homebrew | 두 개의 `node` 바이너리 존재 | `/usr/local/bin/node` (Intel)과 `/opt/homebrew/bin/node` (ARM) 충돌 | Intel Homebrew 제거: `/usr/local/Homebrew` 삭제 |
-| PA3 | 수동 설치 + Homebrew | `env: node: No such file or directory` (스크립트에서) | non-interactive shell에서 PATH가 달라서 node를 못 찾음 | `~/.zshenv`에 PATH 설정 추가 (`.zshrc` 대신) |
-| PA4 | npm global bin과 PATH | `npm install -g`로 설치한 명령어 실행 안됨 | npm global bin 경로가 PATH에 없음 | `export PATH="$(npm config get prefix)/bin:$PATH"` 를 shell rc에 추가 |
-| PA5 | volta shim 충돌 | `volta`로 설치한 패키지가 Homebrew node에서 안 보임 | volta가 자체 shim 디렉토리(`~/.volta/bin`) 사용 | volta와 Homebrew node 중 하나만 사용 |
+| PA1 | nvm + Homebrew node | `node -v` result differs from expected | `~/.nvm` path precedes Homebrew in PATH | Use only one. `brew uninstall node` recommended (when using nvm) |
+| PA2 | Intel Homebrew + ARM Homebrew | Two `node` binaries exist | `/usr/local/bin/node` (Intel) and `/opt/homebrew/bin/node` (ARM) conflict | Remove Intel Homebrew: delete `/usr/local/Homebrew` |
+| PA3 | Manual install + Homebrew | `env: node: No such file or directory` (in scripts) | PATH differs in non-interactive shell, cannot find node | Add PATH settings to `~/.zshenv` (instead of `.zshrc`) |
+| PA4 | npm global bin and PATH | Commands installed via `npm install -g` won't run | npm global bin path not in PATH | Add `export PATH="$(npm config get prefix)/bin:$PATH"` to shell rc |
+| PA5 | volta shim conflict | Packages installed via `volta` not visible from Homebrew node | volta uses its own shim directory (`~/.volta/bin`) | Use only one of volta or Homebrew node |
 
-**PATH 디버깅 명령**:
+**PATH Debugging Commands**:
 ```bash
-# 현재 node 위치와 버전 확인
-which -a node          # 모든 node 경로 표시
-node -v                # 현재 활성 버전
-npm config get prefix  # npm global 설치 경로
+# Check current node location and version
+which -a node          # Show all node paths
+node -v                # Current active version
+npm config get prefix  # npm global install path
 
-# PATH 순서 확인
+# Check PATH order
 echo $PATH | tr ':' '\n'
 
-# 어떤 shell 설정 파일이 PATH를 변경하는지 확인
+# Check which shell config files modify PATH
 grep -n 'PATH\|nvm\|fnm\|volta' ~/.zshrc ~/.zprofile ~/.zshenv ~/.bash_profile 2>/dev/null
 ```
 
 ---
 
-### 3.8 npm 레지스트리 접근 문제 (기업 프록시/VPN)
+### 3.8 npm Registry Access Issues (Corporate Proxy/VPN)
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| NR1 | 기업 프록시 | `npm ERR! network request to https://registry.npmjs.org failed, reason: connect ETIMEDOUT` | HTTP/HTTPS 프록시가 직접 연결 차단 | `npm config set proxy http://proxy.company.com:8080` 및 `npm config set https-proxy http://proxy.company.com:8080` |
-| NR2 | SSL 검사 프록시 (MITM) | `npm ERR! code UNABLE_TO_VERIFY_LEAF_SIGNATURE` | 기업 보안 솔루션이 SSL 트래픽 가로채기하여 인증서 교체 | **권장**: `npm config set cafile /path/to/corporate-ca.pem`. **임시 우회**: `npm config set strict-ssl false` (보안 위험) |
-| NR3 | VPN + split tunneling | `npm ERR! code ECONNREFUSED` 또는 매우 느린 설치 | VPN이 npm 레지스트리 트래픽을 잘못 라우팅 | VPN split tunneling 설정에서 `registry.npmjs.org` 제외 요청 |
-| NR4 | DNS 해석 실패 | `npm ERR! code EAI_AGAIN` 또는 `getaddrinfo ENOTFOUND registry.npmjs.org` | DNS 서버가 응답 안 함 | DNS 확인: `nslookup registry.npmjs.org`. DNS 서버 변경 (8.8.8.8 등) |
-| NR5 | 방화벽이 443 포트 차단 | `npm ERR! network socket hang up` | 기업 방화벽이 특정 도메인/포트 차단 | IT 관리자에게 `registry.npmjs.org:443` 허용 요청 |
-| NR6 | 사내 npm 레지스트리 | 공용 패키지 못 찾음 | `.npmrc`에 사내 레지스트리만 설정됨 | `npm config set registry https://registry.npmjs.org/` 또는 사내 레지스트리에서 공용 패키지 미러링 확인 |
+| NR1 | Corporate proxy | `npm ERR! network request to https://registry.npmjs.org failed, reason: connect ETIMEDOUT` | HTTP/HTTPS proxy blocks direct connection | `npm config set proxy http://proxy.company.com:8080` and `npm config set https-proxy http://proxy.company.com:8080` |
+| NR2 | SSL inspection proxy (MITM) | `npm ERR! code UNABLE_TO_VERIFY_LEAF_SIGNATURE` | Corporate security solution intercepts SSL traffic and replaces certificates | **Recommended**: `npm config set cafile /path/to/corporate-ca.pem`. **Temporary workaround**: `npm config set strict-ssl false` (security risk) |
+| NR3 | VPN + split tunneling | `npm ERR! code ECONNREFUSED` or very slow installation | VPN misroutes npm registry traffic | Request `registry.npmjs.org` exclusion in VPN split tunneling settings |
+| NR4 | DNS resolution failure | `npm ERR! code EAI_AGAIN` or `getaddrinfo ENOTFOUND registry.npmjs.org` | DNS server not responding | Check DNS: `nslookup registry.npmjs.org`. Change DNS server (8.8.8.8 etc.) |
+| NR5 | Firewall blocks port 443 | `npm ERR! network socket hang up` | Corporate firewall blocks specific domain/port | Request IT admin to allow `registry.npmjs.org:443` |
+| NR6 | Internal npm registry | Public packages not found | `.npmrc` only configured with internal registry | `npm config set registry https://registry.npmjs.org/` or verify public package mirroring on internal registry |
 
-**프록시 설정 확인 및 해결**:
+**Proxy Settings Check and Resolution**:
 ```bash
-# 현재 npm 설정 확인
+# Check current npm settings
 npm config list
 npm config get proxy
 npm config get https-proxy
 npm config get registry
 
-# 기업 CA 인증서 설정
+# Corporate CA certificate configuration
 npm config set cafile /etc/ssl/certs/corporate-ca-bundle.crt
 
-# 프록시 설정
+# Proxy settings
 npm config set proxy http://proxy.company.com:8080
 npm config set https-proxy http://proxy.company.com:8080
 ```
 
 ---
 
-### 3.9 npm 캐시 손상
+### 3.9 npm Cache Corruption
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| NC1 | 설치 중 네트워크 끊김 | `npm ERR! code EINTEGRITY` `sha512-... integrity checksum failed` | 다운로드가 불완전하여 캐시된 패키지의 해시가 불일치 | `npm cache clean --force && npm install` |
-| NC2 | npm 버전 업그레이드 후 | `npm ERR! Unexpected end of JSON input` | 구버전 npm 캐시 형식이 신버전과 호환 안됨 | `npm cache verify` 또는 `npm cache clean --force` |
-| NC3 | 디스크 공간 부족으로 캐시 손상 | `ENOSPC: no space left on device` 반복 | npm 캐시(`~/.npm/_cacache`)가 디스크 공간 소진 | 디스크 공간 확보 후 `npm cache clean --force` |
-| NC4 | `package-lock.json` 불일치 | `EINTEGRITY` 에러가 특정 패키지에서만 발생 | package-lock.json의 integrity 해시가 현재 레지스트리 버전과 불일치 | `rm package-lock.json && npm install` |
-| NC5 | 권한 문제로 캐시 쓰기 실패 | `EACCES: permission denied, open '/Users/<user>/.npm/_cacache/...'` | `~/.npm` 디렉토리 일부가 root 소유 | `sudo chown -R $(whoami) ~/.npm` |
+| NC1 | Network disconnected during install | `npm ERR! code EINTEGRITY` `sha512-... integrity checksum failed` | Download incomplete, cached package hash mismatch | `npm cache clean --force && npm install` |
+| NC2 | After npm version upgrade | `npm ERR! Unexpected end of JSON input` | Old npm cache format incompatible with new version | `npm cache verify` or `npm cache clean --force` |
+| NC3 | Cache corrupted due to disk space shortage | `ENOSPC: no space left on device` repeated | npm cache (`~/.npm/_cacache`) exhausted disk space | Free disk space then `npm cache clean --force` |
+| NC4 | `package-lock.json` mismatch | `EINTEGRITY` error only on specific packages | package-lock.json integrity hash mismatches current registry version | `rm package-lock.json && npm install` |
+| NC5 | Cache write failed due to permissions | `EACCES: permission denied, open '/Users/<user>/.npm/_cacache/...'` | Parts of `~/.npm` directory owned by root | `sudo chown -R $(whoami) ~/.npm` |
 
-**캐시 관리 명령**:
+**Cache Management Commands**:
 ```bash
-# 캐시 상태 확인
+# Check cache status
 npm cache verify
 
-# 캐시 강제 정리
+# Force clean cache
 npm cache clean --force
 
-# 캐시 위치 확인
-npm config get cache    # 기본: ~/.npm
+# Check cache location
+npm config get cache    # Default: ~/.npm
 
-# 완전 클린 설치
+# Complete clean install
 rm -rf node_modules package-lock.json
 npm cache clean --force
 npm install
@@ -558,95 +558,95 @@ npm install
 
 ---
 
-### 3.10 brew link 에러
+### 3.10 brew link Errors
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| BL1 | 이전 Node.js 설치 잔존 | `Error: Could not symlink bin/node. Target /opt/homebrew/bin/node already exists.` | 이전 수동 설치 또는 다른 방법으로 설치된 파일이 남아있음 | `brew link --overwrite node` |
-| BL2 | keg-only 수식 | `Warning: node is keg-only and must be linked with --force` | 특정 버전의 node가 keg-only로 설치됨 (예: `node@18`) | `brew link --force node@18` 후 PATH에 추가: `export PATH="$(brew --prefix node@18)/bin:$PATH"` |
-| BL3 | 디렉토리 권한 문제 | `Error: Could not symlink share/man/man1/node.1. /opt/homebrew/share/man/man1 is not writable.` | Homebrew 디렉토리의 소유권이 현재 사용자가 아님 | `sudo chown -R $(whoami) $(brew --prefix)/share/man` |
-| BL4 | 다른 node 버전이 이미 link됨 | `Error: node conflicts with node@20` | 여러 node 버전이 설치되어 충돌 | `brew unlink node@20 && brew link node` |
-| BL5 | Homebrew prefix 불일치 | `Error: Could not symlink` 반복 실패 | ARM/Intel Homebrew 혼재로 prefix 경로 충돌 | `brew doctor` 실행하여 문제 진단 후 하나의 Homebrew만 사용 |
+| BL1 | Previous Node.js installation remains | `Error: Could not symlink bin/node. Target /opt/homebrew/bin/node already exists.` | Files remain from previous manual or alternative installation | `brew link --overwrite node` |
+| BL2 | keg-only formula | `Warning: node is keg-only and must be linked with --force` | Specific version of node installed as keg-only (e.g., `node@18`) | `brew link --force node@18` then add to PATH: `export PATH="$(brew --prefix node@18)/bin:$PATH"` |
+| BL3 | Directory permission issue | `Error: Could not symlink share/man/man1/node.1. /opt/homebrew/share/man/man1 is not writable.` | Homebrew directory not owned by current user | `sudo chown -R $(whoami) $(brew --prefix)/share/man` |
+| BL4 | Another node version already linked | `Error: node conflicts with node@20` | Multiple node versions installed, causing conflict | `brew unlink node@20 && brew link node` |
+| BL5 | Homebrew prefix mismatch | `Error: Could not symlink` repeated failure | ARM/Intel Homebrew coexistence causing prefix path conflict | Run `brew doctor` to diagnose, then use only one Homebrew |
 
-**brew link 진단 및 해결**:
+**brew link Diagnosis and Resolution**:
 ```bash
-# Homebrew 상태 진단
+# Diagnose Homebrew status
 brew doctor
 
-# 현재 link 상태 확인
+# Check current link status
 brew list --versions node
 brew info node
 
-# link 강제 수행
+# Force link
 brew link --overwrite --force node
 
-# 모든 link 해제 후 재연결
+# Unlink all then re-link
 brew unlink node && brew link node
 ```
 
 ---
 
-## 4. Git 에러 케이스
+## 4. Git Error Cases
 
-### 4.1 Apple 기본 Git vs Homebrew Git 충돌
+### 4.1 Apple Default Git vs Homebrew Git Conflict
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| AG1 | brew install git 후 | `which git`가 여전히 `/usr/bin/git` 표시 | macOS 기본 `/usr/bin/git`이 PATH에서 Homebrew보다 앞에 있음 | shell 재시작 또는 `eval "$(/opt/homebrew/bin/brew shellenv)"` 확인. PATH에서 Homebrew가 `/usr/bin`보다 앞에 와야 함 |
-| AG2 | Apple Silicon에서 | `git --version` 이 Apple Git 표시 (예: `git version 2.39.5 (Apple Git-154)`) | `/opt/homebrew/bin`이 PATH에 없음 | `~/.zprofile`에 `eval "$(/opt/homebrew/bin/brew shellenv)"` 추가 |
-| AG3 | 두 Git 버전 혼재 사용 | Git 설정/hook이 예상과 다르게 동작 | Apple Git과 Homebrew Git이 다른 설정 경로를 참조할 수 있음 | `which -a git`으로 모든 git 경로 확인 후 원하는 것만 PATH에 유지 |
-| AG4 | IDE/에디터에서 다른 Git 사용 | VS Code 등이 시스템 Git(`/usr/bin/git`) 사용 | IDE가 별도 PATH 또는 하드코딩된 경로 사용 | VS Code: `"git.path": "/opt/homebrew/bin/git"` 설정 |
+| AG1 | After brew install git | `which git` still shows `/usr/bin/git` | macOS default `/usr/bin/git` precedes Homebrew in PATH | Restart shell or verify `eval "$(/opt/homebrew/bin/brew shellenv)"`. Homebrew must precede `/usr/bin` in PATH |
+| AG2 | On Apple Silicon | `git --version` shows Apple Git (e.g., `git version 2.39.5 (Apple Git-154)`) | `/opt/homebrew/bin` not in PATH | Add `eval "$(/opt/homebrew/bin/brew shellenv)"` to `~/.zprofile` |
+| AG3 | Mixed use of two Git versions | Git settings/hooks behave unexpectedly | Apple Git and Homebrew Git may reference different config paths | Check all git paths with `which -a git` then keep only desired one in PATH |
+| AG4 | IDE/editor uses different Git | VS Code etc. use system Git (`/usr/bin/git`) | IDE uses separate PATH or hardcoded path | VS Code: set `"git.path": "/opt/homebrew/bin/git"` |
 
 ---
 
-### 4.2 Xcode Git vs 독립 Git
+### 4.2 Xcode Git vs Standalone Git
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| XG1 | Xcode 설치됨 | `/usr/bin/git`이 Xcode의 Git shim | `/usr/bin/git`은 실제 바이너리가 아닌 Xcode CLT로의 shim | Homebrew Git 사용 시 PATH 우선순위 확인 |
-| XG2 | Xcode 업데이트 후 | `xcrun: error: invalid active developer path` | Xcode 업데이트가 developer path를 변경 | `sudo xcode-select --reset` |
-| XG3 | Xcode 삭제 후 | `git` 명령 실행 시 Xcode 설치 다이얼로그 표시 | `/usr/bin/git` shim이 Xcode/CLT를 요구 | `xcode-select --install` 또는 `brew install git` |
-| XG4 | Xcode CLT 버전 < Git 최소 요구사항 | 특정 Git 기능 미작동 | Apple이 CLT에 포함하는 Git 버전이 최신이 아닐 수 있음 (보통 3~6개월 지연) | `brew install git`으로 최신 버전 설치 |
+| XG1 | Xcode installed | `/usr/bin/git` is Xcode's Git shim | `/usr/bin/git` is not the actual binary but a shim to Xcode CLT | Verify PATH priority when using Homebrew Git |
+| XG2 | After Xcode update | `xcrun: error: invalid active developer path` | Xcode update changed the developer path | `sudo xcode-select --reset` |
+| XG3 | After Xcode deletion | Running `git` command shows Xcode installation dialog | `/usr/bin/git` shim requires Xcode/CLT | `xcode-select --install` or `brew install git` |
+| XG4 | Xcode CLT version < Git minimum requirement | Certain Git features not working | Git version included in Apple's CLT may not be latest (usually 3-6 months behind) | Install latest version with `brew install git` |
 
 ---
 
-### 4.3 Git Credential Helper 문제 (Keychain)
+### 4.3 Git Credential Helper Issues (Keychain)
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| GC1 | 비밀번호 변경 후 | `remote: Invalid username or password. fatal: Authentication failed` | macOS Keychain에 저장된 이전 자격 증명이 만료/변경됨 | Keychain Access.app에서 `github.com` 항목 삭제 또는 `git credential-osxkeychain erase` |
-| GC2 | GitHub 2FA 활성화 후 | `remote: Support for password authentication was removed` | 비밀번호 대신 Personal Access Token(PAT) 또는 SSH 키 필요 | SSH 키 설정 또는 Git Credential Manager(GCM) 설치: `brew install --cask git-credential-manager` |
-| GC3 | credential.helper 미설정 | 매번 비밀번호 입력 요구 | Git이 macOS Keychain을 사용하도록 설정되지 않음 | `git config --global credential.helper osxkeychain` 또는 GCM 사용 |
-| GC4 | Homebrew Git + osxkeychain | `git: 'credential-osxkeychain' is not a git command` | Homebrew Git에 osxkeychain helper가 포함되지 않았거나 경로 불일치 | `brew install git` (최신 버전은 포함됨) 또는 GCM 설치 |
-| GC5 | 원격 접속 시 Keychain 미잠금 | `error: unable to read askpass response` | SSH/원격 세션에서 macOS Keychain이 잠겨있음 | `security unlock-keychain ~/Library/Keychains/login.keychain` 또는 SSH 키 기반 인증 사용 |
+| GC1 | After password change | `remote: Invalid username or password. fatal: Authentication failed` | Previous credentials stored in macOS Keychain expired/changed | Delete `github.com` entry in Keychain Access.app or `git credential-osxkeychain erase` |
+| GC2 | After enabling GitHub 2FA | `remote: Support for password authentication was removed` | Personal Access Token (PAT) or SSH key required instead of password | Set up SSH key or install Git Credential Manager (GCM): `brew install --cask git-credential-manager` |
+| GC3 | credential.helper not set | Password prompt every time | Git not configured to use macOS Keychain | `git config --global credential.helper osxkeychain` or use GCM |
+| GC4 | Homebrew Git + osxkeychain | `git: 'credential-osxkeychain' is not a git command` | Homebrew Git does not include osxkeychain helper or path mismatch | `brew install git` (latest version includes it) or install GCM |
+| GC5 | Keychain locked during remote access | `error: unable to read askpass response` | macOS Keychain locked in SSH/remote session | `security unlock-keychain ~/Library/Keychains/login.keychain` or use SSH key-based authentication |
 
-**Credential 설정 권장사항**:
+**Credential Configuration Recommendations**:
 ```bash
-# 방법 1: Git Credential Manager (권장, 2FA/OAuth 지원)
+# Method 1: Git Credential Manager (recommended, 2FA/OAuth support)
 brew install --cask git-credential-manager
 git config --global credential.helper manager
 
-# 방법 2: macOS Keychain (기본)
+# Method 2: macOS Keychain (default)
 git config --global credential.helper osxkeychain
 
-# 자격 증명 초기화
+# Reset credentials
 echo -e "protocol=https\nhost=github.com" | git credential-osxkeychain erase
 ```
 
 ---
 
-### 4.4 SSH 키 문제 (macOS Keychain 통합)
+### 4.4 SSH Key Issues (macOS Keychain Integration)
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| SK1 | macOS 재시작 후 SSH 키 분실 | `Permission denied (publickey)` (재부팅 후 발생) | ssh-agent가 재시작 시 키를 잊음 | `~/.ssh/config`에 `AddKeysToAgent yes` 및 `UseKeychain yes` 추가 |
-| SK2 | `ssh-add --apple-use-keychain` 미작동 | `ssh-add: illegal option -- apple-use-keychain` | Homebrew에서 설치한 OpenSSH가 Apple 확장 옵션 미지원 | Apple 기본 `/usr/bin/ssh-add` 사용: `/usr/bin/ssh-add --apple-use-keychain ~/.ssh/id_ed25519` |
-| SK3 | `-K` / `-A` 플래그 deprecated | `WARNING: -K and -A flags are deprecated` | macOS Monterey+에서 플래그 이름 변경 | `-K` -> `--apple-use-keychain`, `-A` -> `--apple-load-keychain` 사용 |
-| SK4 | SSH config 미설정 | 매번 passphrase 입력 요구 | SSH config에 Keychain 통합 미설정 | 아래 SSH config 추가 |
-| SK5 | 잘못된 키 알고리즘 | `no mutual signature algorithm` | 구버전 RSA 키 (1024bit) 미지원 | ED25519 키 생성: `ssh-keygen -t ed25519 -C "email@example.com"` |
-| SK6 | `~/.ssh` 디렉토리 권한 | `Permissions 0777 for '/Users/<user>/.ssh/id_ed25519' are too open.` | SSH 키 파일 권한이 너무 열려있음 | `chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_* && chmod 644 ~/.ssh/*.pub` |
+| SK1 | SSH key lost after macOS restart | `Permission denied (publickey)` (occurs after reboot) | ssh-agent forgets keys on restart | Add `AddKeysToAgent yes` and `UseKeychain yes` to `~/.ssh/config` |
+| SK2 | `ssh-add --apple-use-keychain` not working | `ssh-add: illegal option -- apple-use-keychain` | OpenSSH installed via Homebrew does not support Apple extension options | Use Apple default `/usr/bin/ssh-add`: `/usr/bin/ssh-add --apple-use-keychain ~/.ssh/id_ed25519` |
+| SK3 | `-K` / `-A` flags deprecated | `WARNING: -K and -A flags are deprecated` | Flag names changed in macOS Monterey+ | Use `-K` -> `--apple-use-keychain`, `-A` -> `--apple-load-keychain` |
+| SK4 | SSH config not configured | Passphrase prompt every time | Keychain integration not configured in SSH config | Add SSH config below |
+| SK5 | Incorrect key algorithm | `no mutual signature algorithm` | Old RSA key (1024bit) not supported | Generate ED25519 key: `ssh-keygen -t ed25519 -C "email@example.com"` |
+| SK6 | `~/.ssh` directory permissions | `Permissions 0777 for '/Users/<user>/.ssh/id_ed25519' are too open.` | SSH key file permissions are too open | `chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_* && chmod 644 ~/.ssh/*.pub` |
 
-**SSH config 권장 설정** (`~/.ssh/config`):
+**Recommended SSH config** (`~/.ssh/config`):
 ```
 Host *
   AddKeysToAgent yes
@@ -659,211 +659,211 @@ Host github.com
   IdentityFile ~/.ssh/id_ed25519
 ```
 
-**SSH 키 생성 및 등록**:
+**SSH Key Generation and Registration**:
 ```bash
-# ED25519 키 생성 (권장)
+# Generate ED25519 key (recommended)
 ssh-keygen -t ed25519 -C "your_email@example.com"
 
-# macOS Keychain에 추가 (Apple SSH 사용 필수)
+# Add to macOS Keychain (must use Apple SSH)
 /usr/bin/ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 
-# 연결 테스트
+# Test connection
 ssh -T git@github.com
 ```
 
 ---
 
-### 4.5 Git LFS 문제
+### 4.5 Git LFS Issues
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| LF1 | Git LFS 미설치 | `git: 'lfs' is not a git command. See 'git --help'.` | git-lfs가 설치되지 않음 | `brew install git-lfs && git lfs install` |
-| LF2 | Homebrew Git + Xcode Git 경로 불일치 | 터미널에서 `git lfs` 작동하나 스크립트/IDE에서 안됨 | 스크립트가 `/usr/bin/git`을 사용하는데 git-lfs가 Homebrew 경로에만 있음 | symlink 생성: `sudo ln -s "$(which git-lfs)" "$(git --exec-path)/git-lfs"` |
-| LF3 | `git lfs install` 미실행 | LFS 파일이 포인터 파일로만 다운로드됨 (수 바이트 텍스트) | `git lfs install`로 hooks 등록 안됨 | `git lfs install && git lfs pull` |
-| LF4 | LFS 대역폭/저장소 한도 초과 | `batch response: This repository is over its data quota` | GitHub LFS 무료 한도 (1GB 저장소, 1GB/월 대역폭) 초과 | LFS 데이터 팩 구매 또는 불필요한 LFS 파일 정리 |
-| LF5 | LFS + 기업 프록시 | `LFS: client error 407` | 프록시 인증 필요 | `git config --global http.proxy http://user:pass@proxy:8080` |
+| LF1 | Git LFS not installed | `git: 'lfs' is not a git command. See 'git --help'.` | git-lfs is not installed | `brew install git-lfs && git lfs install` |
+| LF2 | Homebrew Git + Xcode Git path mismatch | `git lfs` works in terminal but not in scripts/IDE | Scripts use `/usr/bin/git` but git-lfs only exists in Homebrew path | Create symlink: `sudo ln -s "$(which git-lfs)" "$(git --exec-path)/git-lfs"` |
+| LF3 | `git lfs install` not executed | LFS files downloaded as pointer files only (few bytes of text) | Hooks not registered via `git lfs install` | `git lfs install && git lfs pull` |
+| LF4 | LFS bandwidth/storage limit exceeded | `batch response: This repository is over its data quota` | GitHub LFS free limit (1GB storage, 1GB/month bandwidth) exceeded | Purchase LFS data pack or clean up unnecessary LFS files |
+| LF5 | LFS + corporate proxy | `LFS: client error 407` | Proxy authentication required | `git config --global http.proxy http://user:pass@proxy:8080` |
 
 ---
 
-### 4.6 기업 프록시/SSL 인증서 문제
+### 4.6 Corporate Proxy/SSL Certificate Issues
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| GS1 | SSL 검사 프록시 | `SSL certificate problem: unable to get local issuer certificate` | 기업 프록시가 SSL 트래픽을 가로채고 자체 인증서로 교체 | `git config --global http.sslCAInfo /path/to/corporate-ca.pem` |
-| GS2 | 자체 서명 인증서 | `SSL certificate problem: self-signed certificate in certificate chain` | 사내 Git 서버가 자체 서명 인증서 사용 | 기업 CA 인증서를 시스템 키체인에 추가 또는 `git config --global http.sslCAInfo` 설정 |
-| GS3 | 기업 프록시 인증 | `Proxy Authentication Required (407)` | 프록시가 NTLM/Basic 인증 요구 | `git config --global http.proxy http://user:password@proxy.company.com:8080` |
-| GS4 | SSL 비활성화 (비권장) | 보안 경고 무시 | SSL 검증을 비활성화 | `git config --global http.sslVerify false` (**보안 위험! 임시 디버깅 용도로만 사용**) |
-| GS5 | macOS Keychain + 기업 CA | `SecTrustEvaluateWithError: The certificate chain is not trusted` | macOS 시스템 신뢰 저장소에 기업 CA가 없음 | Keychain Access.app > 시스템 키체인에 기업 CA 인증서 추가 후 "항상 신뢰" 설정 |
+| GS1 | SSL inspection proxy | `SSL certificate problem: unable to get local issuer certificate` | Corporate proxy intercepts SSL traffic and replaces with its own certificate | `git config --global http.sslCAInfo /path/to/corporate-ca.pem` |
+| GS2 | Self-signed certificate | `SSL certificate problem: self-signed certificate in certificate chain` | Internal Git server uses self-signed certificate | Add corporate CA certificate to system Keychain or set `git config --global http.sslCAInfo` |
+| GS3 | Corporate proxy authentication | `Proxy Authentication Required (407)` | Proxy requires NTLM/Basic authentication | `git config --global http.proxy http://user:password@proxy.company.com:8080` |
+| GS4 | Disable SSL (not recommended) | Ignore security warning | SSL verification disabled | `git config --global http.sslVerify false` (**Security risk! Use only for temporary debugging**) |
+| GS5 | macOS Keychain + corporate CA | `SecTrustEvaluateWithError: The certificate chain is not trusted` | Corporate CA not in macOS system trust store | Keychain Access.app > Add corporate CA certificate to system Keychain and set to "Always Trust" |
 
-**기업 환경 SSL 설정**:
+**Corporate Environment SSL Configuration**:
 ```bash
-# 기업 CA 인증서 내보내기 (브라우저에서)
-# 1. 브라우저로 Git 서버 접속
-# 2. 자물쇠 아이콘 > 인증서 보기 > 루트 CA 내보내기 (PEM 형식)
+# Export corporate CA certificate (from browser)
+# 1. Access Git server via browser
+# 2. Lock icon > View certificate > Export root CA (PEM format)
 
-# Git에 CA 인증서 등록
+# Register CA certificate with Git
 git config --global http.sslCAInfo /usr/local/share/ca-certificates/corporate-ca.pem
 
-# 특정 호스트에만 적용
+# Apply to specific host only
 git config --global http.https://git.company.com/.sslCAInfo /path/to/corporate-ca.pem
 ```
 
 ---
 
-### 4.7 대소문자 비구분 파일시스템 (APFS)
+### 4.7 Case-Insensitive Filesystem (APFS)
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| CF1 | 파일명 대소문자만 변경 | `git mv README.md Readme.md` 가 변경 감지 안됨 | macOS APFS는 기본적으로 case-insensitive | 2단계로 이름 변경: `git mv README.md temp.md && git mv temp.md Readme.md` |
-| CF2 | Linux에서 만든 repo clone | 같은 이름 다른 대소문자 파일 (예: `File.js`와 `file.js`)이 하나만 보임 | APFS가 대소문자를 구분하지 않아 파일 덮어쓰기 | `git config --global core.ignorecase false` 설정 (감지는 가능하나 파일시스템 제한 해결 불가) |
-| CF3 | CI/CD (Linux)에서 실패 | macOS에서는 빌드 성공하나 Linux CI에서 import 경로 에러 | `import './Component'` vs `'./component'` 가 macOS에서는 같지만 Linux에서는 다름 | 임포트 경로 대소문자를 파일명과 정확히 일치시킴. ESLint `import/no-unresolved` 규칙 활성화 |
-| CF4 | 대소문자 다른 디렉토리 | `src/Components/` 와 `src/components/` 충돌 | APFS에서 같은 디렉토리로 취급됨 | 디렉토리 이름 통일. 대소문자 구분 볼륨 생성 (Disk Utility > APFS Case-sensitive 볼륨) |
+| CF1 | Changing only filename case | `git mv README.md Readme.md` not detected as a change | macOS APFS is case-insensitive by default | Rename in two steps: `git mv README.md temp.md && git mv temp.md Readme.md` |
+| CF2 | Cloning repo created on Linux | Files with same name but different case (e.g., `File.js` and `file.js`) only one visible | APFS does not distinguish case, causing file overwrite | Set `git config --global core.ignorecase false` (can detect but cannot resolve filesystem limitation) |
+| CF3 | Failure in CI/CD (Linux) | Build succeeds on macOS but import path error on Linux CI | `import './Component'` vs `'./component'` are the same on macOS but different on Linux | Match import path case exactly with filename. Enable ESLint `import/no-unresolved` rule |
+| CF4 | Directories with different case | `src/Components/` and `src/components/` conflict | Treated as the same directory in APFS | Unify directory names. Create case-sensitive volume (Disk Utility > APFS Case-sensitive volume) |
 
-**예방 조치**:
+**Preventive Measures**:
 ```bash
-# Git 대소문자 감지 활성화
+# Enable Git case detection
 git config --global core.ignorecase false
 
-# 대소문자 구분 볼륨 생성 (개발 전용)
-# Disk Utility > 볼륨 추가 > APFS (Case-sensitive)
-# 또는 CLI:
+# Create case-sensitive volume (for development only)
+# Disk Utility > Add Volume > APFS (Case-sensitive)
+# Or via CLI:
 diskutil apfs addVolume disk1 "APFS (Case-sensitive)" DevCode
 ```
 
 ---
 
-### 4.8 .gitconfig 위치 문제
+### 4.8 .gitconfig Location Issues
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| GF1 | XDG_CONFIG_HOME 설정 사용 | `~/.gitconfig` 설정이 무시됨 | `$XDG_CONFIG_HOME/git/config`가 존재하면 `~/.gitconfig`보다 우선 | 하나의 위치만 사용. `git config --list --show-origin`으로 어떤 파일이 적용되는지 확인 |
-| GF2 | `~/.config/git/config` 존재 | 설정이 예상과 다르게 적용됨 | XDG_CONFIG_HOME이 설정되지 않으면 `~/.config`가 기본값. `~/.gitconfig`가 없으면 이 파일 사용 | `git config --list --show-origin --show-scope`로 설정 출처 확인 |
-| GF3 | 시스템 gitconfig 충돌 | `includeIf` 등이 예상대로 안됨 | `/etc/gitconfig` 또는 Homebrew의 `$(brew --prefix)/etc/gitconfig`이 존재 | `git config --list --show-origin`으로 모든 설정 파일 위치 확인 |
-| GF4 | 기업 MDM이 gitconfig 배포 | 사용자 설정이 덮어씌워짐 | MDM이 `/etc/gitconfig` 또는 시스템 레벨 설정을 관리 | `--local` 플래그로 프로젝트별 설정 사용: `git config --local user.email "email@example.com"` |
+| GF1 | Using XDG_CONFIG_HOME setting | `~/.gitconfig` settings ignored | `$XDG_CONFIG_HOME/git/config` takes priority over `~/.gitconfig` if it exists | Use only one location. Check which file is applied with `git config --list --show-origin` |
+| GF2 | `~/.config/git/config` exists | Settings applied differently than expected | If XDG_CONFIG_HOME is not set, `~/.config` is the default. This file is used if `~/.gitconfig` does not exist | Check setting source with `git config --list --show-origin --show-scope` |
+| GF3 | System gitconfig conflict | `includeIf` etc. not working as expected | `/etc/gitconfig` or Homebrew's `$(brew --prefix)/etc/gitconfig` exists | Check all config file locations with `git config --list --show-origin` |
+| GF4 | Corporate MDM deploys gitconfig | User settings overwritten | MDM manages `/etc/gitconfig` or system-level settings | Use per-project settings with `--local` flag: `git config --local user.email "email@example.com"` |
 
-**gitconfig 위치 우선순위** (낮은 우선순위 -> 높은 우선순위):
+**gitconfig Location Priority** (low priority -> high priority):
 ```
-1. $(brew --prefix)/etc/gitconfig          # Homebrew 시스템
-2. /etc/gitconfig                           # 시스템
-3. ~/.gitconfig 또는 $XDG_CONFIG_HOME/git/config  # 글로벌
-4. .git/config                              # 로컬 (프로젝트)
+1. $(brew --prefix)/etc/gitconfig          # Homebrew system
+2. /etc/gitconfig                           # System
+3. ~/.gitconfig or $XDG_CONFIG_HOME/git/config  # Global
+4. .git/config                              # Local (project)
 5. .git/config.worktree                     # Worktree
-6. 명령줄 옵션 (-c)                          # 일회성
+6. Command line option (-c)                  # One-time
 ```
 
 ```bash
-# 모든 설정과 출처 확인
+# Check all settings and their sources
 git config --list --show-origin --show-scope
 
-# 특정 설정 출처 확인
+# Check source of specific setting
 git config --show-origin --show-scope user.email
 ```
 
 ---
 
-### 4.9 Git 버전 구식 문제
+### 4.9 Outdated Git Version Issues
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| GV1 | Apple 기본 Git 사용 | 최신 Git 기능 (예: `git switch`, `git restore` 초기 지원) 미작동 | Apple이 제공하는 Git은 최신 릴리즈보다 3~6개월 뒤처질 수 있음 | `brew install git` 으로 최신 버전 설치 |
-| GV2 | `git` 첫 실행 시 설치 팝업 | "The git command requires the command line developer tools. Would you like to install them?" | Git 미설치 (깨끗한 macOS). `/usr/bin/git`이 CLT shim | "Install" 클릭하여 Xcode CLT 설치 또는 `brew install git` |
-| GV3 | macOS 메이저 업그레이드 후 | `xcrun: error: invalid active developer path` | OS 업그레이드가 CLT를 무효화하여 git shim 동작 중단 | `xcode-select --install` 재실행 |
-| GV4 | CLT 업데이트 안됨 | `softwareupdate -l`에 CLT 업데이트 안 보임 | Apple 소프트웨어 업데이트 카탈로그 문제 | Apple Developer 사이트에서 직접 다운로드: https://developer.apple.com/download/all/ |
-| GV5 | `git -C` 등 상대적으로 새로운 옵션 미지원 | `unknown option: -C` | Apple Git 버전이 너무 오래됨 | `brew install git` |
+| GV1 | Using Apple default Git | Latest Git features (e.g., early support for `git switch`, `git restore`) not working | Git provided by Apple can be 3-6 months behind latest release | Install latest version with `brew install git` |
+| GV2 | Installation popup on first `git` run | "The git command requires the command line developer tools. Would you like to install them?" | Git not installed (clean macOS). `/usr/bin/git` is a CLT shim | Click "Install" to install Xcode CLT or `brew install git` |
+| GV3 | After macOS major upgrade | `xcrun: error: invalid active developer path` | OS upgrade invalidated CLT, breaking git shim | Re-run `xcode-select --install` |
+| GV4 | CLT update not available | CLT update not shown in `softwareupdate -l` | Apple software update catalog issue | Download directly from Apple Developer site: https://developer.apple.com/download/all/ |
+| GV5 | Relatively new options like `git -C` not supported | `unknown option: -C` | Apple Git version is too old | `brew install git` |
 
-**Git 버전 확인 및 업데이트**:
+**Git Version Check and Update**:
 ```bash
-# Apple Git 버전 확인
+# Check Apple Git version
 /usr/bin/git --version          # git version 2.x.x (Apple Git-xxx)
 
-# Homebrew Git 버전 확인
-/opt/homebrew/bin/git --version  # git version 2.x.x (Homebrew 최신)
-# 또는 Intel Mac:
+# Check Homebrew Git version
+/opt/homebrew/bin/git --version  # git version 2.x.x (Homebrew latest)
+# Or Intel Mac:
 /usr/local/bin/git --version
 
-# Homebrew로 최신 Git 설치
+# Install latest Git via Homebrew
 brew install git
 
-# 현재 사용 중인 Git 확인
+# Check currently active Git
 which git && git --version
 ```
 
 ---
 
-## 5. VS Code 설치 에러
+## 5. VS Code Installation Errors
 
-### 5.1 Homebrew Cask 설치 실패
+### 5.1 Homebrew Cask Installation Failure
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| VC1 | Homebrew 미설치 | `zsh: command not found: brew` | macOS에 Homebrew가 설치되지 않음 | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` 실행. Apple Silicon의 경우 설치 후 `eval "$(/opt/homebrew/bin/brew shellenv)"` 를 `~/.zprofile` 에 추가 |
-| VC2 | Homebrew 버전 오래됨 | `Error: Cask 'visual-studio-code' is unreadable` 또는 다운로드 URL 404 | 로컬 Homebrew 메타데이터가 최신 cask 정보와 맞지 않음 | `brew update` 실행 후 재시도 |
-| VC3 | SHA256 mismatch | `Error: SHA256 mismatch. Expected: ... Actual: ...` | 소스 서버에서 파일이 업데이트되었으나 Homebrew 캐시가 이전 해시를 참조 | `brew update-reset && brew update` 후 재시도. 또는 `brew install --cask visual-studio-code --force` |
-| VC4 | 기존 VS Code 존재 | `Error: It seems there is already an App at '/Applications/Visual Studio Code.app'` | 수동 설치 등으로 이미 VS Code가 존재 | `brew install --cask visual-studio-code --force` 또는 기존 앱 삭제 후 재시도 |
-| VC5 | VSCodium과 충돌 | `Error: Cask 'vscodium' conflicts with 'visual-studio-code'` | VSCodium과 VS Code cask가 상호 충돌로 정의됨 | 둘 중 하나를 uninstall 후 원하는 것을 설치 |
-| VC6 | Xcode CLT 미설치 | `Error: No developer tools installed. Install the Command Line Tools` | Homebrew 동작에 필요한 Xcode Command Line Tools 없음 | `xcode-select --install` 실행 |
-| VC7 | 디스크 공간 부족 | `Error: No space left on device` | VS Code ~500MB, 확장 포함 시 더 필요 | 디스크 공간 확보 후 재시도 |
-| VC8 | macOS Catalina (10.15) 이하 | 설치는 되지만 실행 불가 또는 설치 실패 | VS Code 1.97 이후 macOS 10.15 지원 종료 | macOS 업그레이드 또는 VS Code 1.97 이하 수동 설치 |
-| VC9 | Apple Silicon + 잘못된 아키텍처 | Rosetta 에뮬레이션 경고, 느린 성능 | Intel(x64) 버전을 Apple Silicon에서 실행 중 | `brew install --cask visual-studio-code`는 자동으로 ARM64 버전 설치. 수동 설치 시 "Apple Silicon" 빌드 다운로드 확인 |
-| VC10 | 기업 프록시/방화벽 | `curl: (35) SSL connect error` 또는 다운로드 타임아웃 | 기업 네트워크에서 CDN 차단 | `export HOMEBREW_PROXY=http://proxy:port` 설정. 또는 `ALL_PROXY` 환경변수 설정 |
+| VC1 | Homebrew not installed | `zsh: command not found: brew` | Homebrew is not installed on macOS | Run `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`. For Apple Silicon, add `eval "$(/opt/homebrew/bin/brew shellenv)"` to `~/.zprofile` after installation |
+| VC2 | Outdated Homebrew version | `Error: Cask 'visual-studio-code' is unreadable` or download URL 404 | Local Homebrew metadata does not match latest cask information | Run `brew update` then retry |
+| VC3 | SHA256 mismatch | `Error: SHA256 mismatch. Expected: ... Actual: ...` | File updated on source server but Homebrew cache references old hash | Retry after `brew update-reset && brew update`. Or `brew install --cask visual-studio-code --force` |
+| VC4 | Existing VS Code present | `Error: It seems there is already an App at '/Applications/Visual Studio Code.app'` | VS Code already exists from manual installation | `brew install --cask visual-studio-code --force` or delete existing app then retry |
+| VC5 | Conflict with VSCodium | `Error: Cask 'vscodium' conflicts with 'visual-studio-code'` | VSCodium and VS Code cask defined as mutually conflicting | Uninstall one then install the desired one |
+| VC6 | Xcode CLT not installed | `Error: No developer tools installed. Install the Command Line Tools` | Xcode Command Line Tools required for Homebrew not present | Run `xcode-select --install` |
+| VC7 | Insufficient disk space | `Error: No space left on device` | VS Code ~500MB, more needed with extensions | Free up disk space then retry |
+| VC8 | macOS Catalina (10.15) or below | Installation succeeds but cannot run, or installation fails | VS Code 1.97+ dropped macOS 10.15 support | Upgrade macOS or manually install VS Code 1.97 or below |
+| VC9 | Apple Silicon + wrong architecture | Rosetta emulation warning, slow performance | Running Intel (x64) version on Apple Silicon | `brew install --cask visual-studio-code` automatically installs ARM64 version. For manual installation, verify "Apple Silicon" build download |
+| VC10 | Corporate proxy/firewall | `curl: (35) SSL connect error` or download timeout | CDN blocked by corporate network | Set `export HOMEBREW_PROXY=http://proxy:port`. Or set `ALL_PROXY` environment variable |
 
 ---
 
-### 5.2 `code` 명령어 PATH 문제
+### 5.2 `code` Command PATH Issues
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| VP1 | 설치 직후 | `zsh: command not found: code` | VS Code가 `code` symlink를 자동 생성하지 않음 (macOS 전용 동작) | VS Code 내에서 `Cmd+Shift+P` > "Shell Command: Install 'code' command in PATH" 실행 |
-| VP2 | Applications 폴더 외 실행 | `code` 명령이 재부팅 후 동작 안 함 | macOS App Translocation이 임시 경로에서 앱을 실행하여 symlink 경로가 깨짐 | VS Code를 반드시 `/Applications/` 폴더로 이동 후 Shell Command 재설치 |
-| VP3 | PATH 수동 설정 | 터미널 재시작 후 `code` 동작 안 함 | `~/.zshrc` 에 PATH 추가를 안 했거나 잘못된 경로 사용 | `~/.zshrc`에 `export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"` 추가 |
-| VP4 | 여러 쉘 사용 | bash에서는 되는데 zsh에서 안 됨 | 쉘별로 다른 프로파일 파일 사용 | zsh: `~/.zshrc`, bash: `~/.bash_profile`, fish: `~/.config/fish/config.fish` 각각에 PATH 추가 |
-| VP5 | 영구 symlink 생성 | 재부팅/업데이트마다 `code` 사라짐 | VS Code 업데이트 시 내부 경로가 변경될 수 있음 | `sudo ln -sf "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" /usr/local/bin/code` 로 영구 symlink 생성 |
+| VP1 | Right after installation | `zsh: command not found: code` | VS Code does not automatically create `code` symlink (macOS-specific behavior) | In VS Code, run `Cmd+Shift+P` > "Shell Command: Install 'code' command in PATH" |
+| VP2 | Running outside Applications folder | `code` command stops working after reboot | macOS App Translocation runs app from temporary path, breaking symlink path | Move VS Code to `/Applications/` folder then reinstall Shell Command |
+| VP3 | Manual PATH configuration | `code` stops working after terminal restart | PATH not added to `~/.zshrc` or incorrect path used | Add `export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"` to `~/.zshrc` |
+| VP4 | Using multiple shells | Works in bash but not in zsh | Different profile files used per shell | Add PATH to each: zsh: `~/.zshrc`, bash: `~/.bash_profile`, fish: `~/.config/fish/config.fish` |
+| VP5 | Persistent symlink creation | `code` disappears after every reboot/update | VS Code internal path may change during updates | Create persistent symlink: `sudo ln -sf "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" /usr/local/bin/code` |
 
 ---
 
-### 5.3 Gatekeeper / Quarantine 문제
+### 5.3 Gatekeeper / Quarantine Issues
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| VG1 | 직접 다운로드 (비 Homebrew) | `"Visual Studio Code" is damaged and can't be opened` | macOS가 다운로드한 .app에 quarantine 속성을 부여 | `sudo xattr -r -d com.apple.quarantine "/Applications/Visual Studio Code.app"` |
-| VG2 | Gatekeeper 차단 | `"Visual Studio Code" can't be opened because Apple cannot check it for malicious software` | Gatekeeper가 서명 검증 실패 | 시스템 환경설정 > 보안 및 개인 정보 > "확인 없이 열기" 클릭. 또는 Control+클릭 > 열기 |
-| VG3 | macOS Sequoia 강화된 보안 | 이전 방법으로 우회 불가 | Sequoia에서 `spctl --master-disable` 후에도 시스템 설정에서 확인 필요 | 시스템 설정 > 개인정보 및 보안에서 직접 허용. Homebrew `--no-quarantine` 플래그 사용: `brew install --cask visual-studio-code --no-quarantine` |
-| VG4 | Full Disk Access 필요 | `Operation not permitted` (xattr 제거 시) | 최신 macOS에서 Terminal에 Full Disk Access 권한 없음 | 시스템 설정 > 개인정보 및 보안 > Full Disk Access > Terminal.app 추가 |
+| VG1 | Direct download (non-Homebrew) | `"Visual Studio Code" is damaged and can't be opened` | macOS assigns quarantine attribute to downloaded .app | `sudo xattr -r -d com.apple.quarantine "/Applications/Visual Studio Code.app"` |
+| VG2 | Gatekeeper blocking | `"Visual Studio Code" can't be opened because Apple cannot check it for malicious software` | Gatekeeper signature verification failed | System Preferences > Security & Privacy > Click "Open Anyway". Or Control+click > Open |
+| VG3 | macOS Sequoia enhanced security | Previous bypass methods no longer work | On Sequoia, confirmation still required in System Settings even after `spctl --master-disable` | Allow directly in System Settings > Privacy & Security. Use Homebrew `--no-quarantine` flag: `brew install --cask visual-studio-code --no-quarantine` |
+| VG4 | Full Disk Access required | `Operation not permitted` (when removing xattr) | Terminal does not have Full Disk Access permission on latest macOS | System Settings > Privacy & Security > Full Disk Access > Add Terminal.app |
 
 ---
 
-### 5.4 확장 (Extension) 설치 실패
+### 5.4 Extension Installation Failure
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| VE1 | `code` 명령 미등록 | `code: command not found` 이후 확장 설치 불가 | CLI에서 확장 설치하려면 `code` 명령이 PATH에 있어야 함 | 위 VP1 해결 후 재시도 |
-| VE2 | 네트워크 오류 | `Error: connect ENOENT` 또는 `Failed to fetch extension` | 마켓플레이스 서버 연결 불가 (프록시, DNS) | VS Code 설정에서 `http.proxy` 설정. 또는 기업 방화벽에서 `marketplace.visualstudio.com` 허용 |
-| VE3 | 권한 문제 | `EACCES: permission denied, open '.../.vscode/extensions/extensions.json'` | `~/.vscode/extensions` 디렉토리 소유권 문제 (sudo로 VS Code 실행 이력 등) | `sudo chown -R $USER:staff ~/.vscode && chmod -R u+rwX ~/.vscode` |
-| VE4 | VSIX 파일 손상 | `End of central directory record signature not found` | 번들 확장 VSIX 파일이 손상됨 | VSIX 파일 재다운로드 후 `code --install-extension <path>.vsix` |
-| VE5 | 마켓플레이스 미서명 확장 | `Extension is not signed by the marketplace` | 확장 발행자가 서명하지 않은 확장 | VS Code 설정에서 `extensions.verifySignature` 를 `false` 로 변경 (보안 위험 인지 필요) |
-| VE6 | 기업 확장 제한 정책 | 확장 설치 차단 메시지 | MDM 정책으로 `extensions.allowed` 에 포함되지 않은 확장 차단 | IT 관리자에게 해당 확장 허용 요청 |
-| VE7 | 호환성 문제 | `Incompatible: requires VS Code ^x.y.z` | 확장이 요구하는 VS Code 버전이 설치된 버전보다 높음 | VS Code 업데이트 후 재시도 |
+| VE1 | `code` command not registered | Cannot install extensions after `code: command not found` | `code` command must be in PATH to install extensions from CLI | Resolve VP1 above then retry |
+| VE2 | Network error | `Error: connect ENOENT` or `Failed to fetch extension` | Cannot connect to marketplace server (proxy, DNS) | Set `http.proxy` in VS Code settings. Or allow `marketplace.visualstudio.com` in corporate firewall |
+| VE3 | Permission issue | `EACCES: permission denied, open '.../.vscode/extensions/extensions.json'` | `~/.vscode/extensions` directory ownership issue (history of running VS Code with sudo, etc.) | `sudo chown -R $USER:staff ~/.vscode && chmod -R u+rwX ~/.vscode` |
+| VE4 | Corrupted VSIX file | `End of central directory record signature not found` | Bundled extension VSIX file is corrupted | Re-download VSIX file then `code --install-extension <path>.vsix` |
+| VE5 | Unsigned marketplace extension | `Extension is not signed by the marketplace` | Extension not signed by publisher | Change `extensions.verifySignature` to `false` in VS Code settings (be aware of security risk) |
+| VE6 | Corporate extension restriction policy | Extension installation blocked message | MDM policy blocks extensions not included in `extensions.allowed` | Request IT admin to allow the extension |
+| VE7 | Compatibility issue | `Incompatible: requires VS Code ^x.y.z` | Extension requires higher VS Code version than installed | Update VS Code then retry |
 
 ---
 
-### 5.5 VS Code Insiders vs Stable 충돌
+### 5.5 VS Code Insiders vs Stable Conflict
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| VI1 | 양립 설치 시 CLI 충돌 | `code` 명령이 항상 Stable 실행 | Insiders는 `code-insiders`, Stable은 `code` 명령 사용 | Insiders 사용자를 위해 `code-insiders` 명령어도 검사에 추가 |
-| VI2 | Settings Sync 충돌 | 설정 동기화 데이터 호환성 문제 | Insiders와 Stable이 다른 Sync 서비스 사용 | 동시 Sync 비활성화 또는 한쪽만 Sync 사용 |
-| VI3 | 확장 호환성 | Insiders에서 확장이 동작하나 Stable에서 실패 (또는 반대) | Insiders가 더 최신 API를 사용하여 확장 호환성 차이 | 한쪽에서만 사용하거나 양쪽 모두에서 테스트 |
+| VI1 | CLI conflict with both installed | `code` command always runs Stable | Insiders uses `code-insiders`, Stable uses `code` command | Add `code-insiders` command to checks for Insiders users |
+| VI2 | Settings Sync conflict | Settings sync data compatibility issue | Insiders and Stable use different Sync services | Disable simultaneous Sync or use Sync on only one |
+| VI3 | Extension compatibility | Extension works in Insiders but fails in Stable (or vice versa) | Insiders uses newer API, causing extension compatibility differences | Use only one or test on both |
 
 ---
 
-### 5.6 기업 MDM 차단
+### 5.6 Enterprise MDM Blocking
 
-| # | 환경/조건 | 에러 메시지/증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message/Symptom | Cause | Solution |
 |---|----------|----------------|------|----------|
-| VM1 | MDM으로 앱 설치 차단 | 설치 자체 불가 | JAMF/Intune 등에서 승인되지 않은 앱 설치 차단 | IT 관리자에게 VS Code 앱 승인 요청 |
-| VM2 | PKG 인스톨러 미제공 | JAMF/Intune으로 대량 배포 불가 | Microsoft가 macOS용 VS Code를 .app 형태로만 제공 (PKG 없음) | ZIP 파일을 래핑하여 MDM으로 배포하거나, Homebrew cask를 스크립트로 감싸서 배포 |
-| VM3 | "Managed by Organization" 표시 | 특정 설정이 잠겨 있음 | MDM 프로필이 VS Code 정책을 설정함 (`com.microsoft.VSCode` plist) | IT 관리자에게 필요 설정 해제 요청 |
-| VM4 | 업데이트 차단 | VS Code 자동 업데이트 실패 | MDM이 앱 수정을 차단 | IT 관리자가 배포한 버전만 사용 가능 |
+| VM1 | MDM blocks app installation | Installation itself impossible | JAMF/Intune etc. block unauthorized app installation | Request IT admin to approve VS Code app |
+| VM2 | No PKG installer provided | Cannot mass deploy via JAMF/Intune | Microsoft provides macOS VS Code only as .app (no PKG) | Wrap ZIP file for MDM deployment, or wrap Homebrew cask in a script for deployment |
+| VM3 | "Managed by Organization" displayed | Certain settings are locked | MDM profile sets VS Code policies (`com.microsoft.VSCode` plist) | Request IT admin to unlock required settings |
+| VM4 | Update blocked | VS Code auto-update fails | MDM blocks app modification | Only the version deployed by IT admin can be used |
 
 ---
 

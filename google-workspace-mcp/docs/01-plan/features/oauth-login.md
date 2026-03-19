@@ -1,23 +1,23 @@
-# Feature Plan: OAuth 로그인 방식 인증
+# Feature Plan: OAuth Login Authentication
 
-## 개요
-- **기능명**: Google OAuth 로그인 인증
-- **목표**: 토큰 복사/붙여넣기 없이 Google 로그인만으로 인증
+## Overview
+- **Feature Name**: Google OAuth Login Authentication
+- **Goal**: Authenticate with just Google login, without copying/pasting tokens
 
-## 요구사항
+## Requirements
 
-### 사용자 경험
-1. 처음 사용 시 브라우저에서 Google 로그인 창 열림
-2. 본인 계정 선택 및 권한 허용
-3. 자동으로 토큰 저장
-4. 다음부터는 자동 로그인
+### User Experience
+1. On first use, a Google login window opens in the browser
+2. Select your account and grant permissions
+3. Token is saved automatically
+4. Automatic login from next time onwards
 
-### 기술 요구사항
+### Technical Requirements
 - OAuth 2.0 Authorization Code Flow
-- Refresh Token으로 자동 갱신
-- 토큰 로컬 저장 (credentials.json)
+- Automatic refresh via Refresh Token
+- Token stored locally (credentials.json)
 
-## 필요한 Google API Scopes
+## Required Google API Scopes
 ```
 https://www.googleapis.com/auth/gmail.modify
 https://www.googleapis.com/auth/calendar
@@ -27,13 +27,13 @@ https://www.googleapis.com/auth/spreadsheets
 https://www.googleapis.com/auth/presentations
 ```
 
-## 사전 준비 (사용자)
-1. Google Cloud Console에서 프로젝트 생성
-2. OAuth 동의 화면 설정
-3. OAuth 2.0 클라이언트 ID 생성 (Desktop App)
-4. client_secret.json 다운로드
+## Prerequisites (User)
+1. Create a project in Google Cloud Console
+2. Configure OAuth consent screen
+3. Create OAuth 2.0 Client ID (Desktop App)
+4. Download client_secret.json
 
-## 구현 계획
-1. OAuth 인증 모듈 작성
-2. 토큰 저장/로드/갱신 로직
-3. MCP 서버 시작 시 인증 체크
+## Implementation Plan
+1. Write OAuth authentication module
+2. Token save/load/refresh logic
+3. Authentication check on MCP server startup

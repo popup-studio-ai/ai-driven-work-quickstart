@@ -1,61 +1,61 @@
-# ADW 종합 테스트 설계서
+# ADW Comprehensive Test Design Document
 
-**문서 버전**: v1.0
-**작성일**: 2026-02-13
-**프로젝트**: popup-claude (AI-Driven Work Installer + Google Workspace MCP Server)
-**참조 문서**: `docs/01-plan/features/comprehensive-test-plan.md` (v1.0, 310개 TC)
-**상태**: 초안
+**Document Version**: v1.0
+**Created**: 2026-02-13
+**Project**: popup-claude (AI-Driven Work Installer + Google Workspace MCP Server)
+**Reference Document**: `docs/01-plan/features/comprehensive-test-plan.md` (v1.0, 310 TCs)
+**Status**: Draft
 
 ---
 
-## 1. 개요
+## 1. Overview
 
-### 1.1 목적
+### 1.1 Purpose
 
-본 문서는 `comprehensive-test-plan.md`(310개 TC)의 모든 테스트 케이스에 대해 실행 가능한 수준의 상세 테스트 설계를 제공한다. 테스트 엔지니어가 본 문서만으로 테스트를 수행할 수 있도록 구체적인 절차, 명령어, 기대 결과, 테스트 데이터, 자동화 방법을 기술한다.
+This document provides detailed, executable test designs for all test cases in `comprehensive-test-plan.md` (310 TCs). It describes specific procedures, commands, expected results, test data, and automation methods so that test engineers can perform testing using this document alone.
 
-### 1.2 설계 원칙
+### 1.2 Design Principles
 
-| 원칙 | 설명 |
-|------|------|
-| **실행 가능성** | 모든 TC에 단계별 절차(Step-by-Step)와 실제 명령어를 포함한다 |
-| **코드 기반** | 실제 소스코드의 함수명, 파라미터, 반환값을 참조하여 기대 결과를 정의한다 |
-| **OS별 분리** | 동일 TC라도 OS별로 다른 절차가 있으면 각각 기술한다 |
-| **자동화 우선** | Vitest 기반 자동 테스트를 우선 설계하고, 자동화 불가한 항목만 수동 절차를 기술한다 |
-| **재현성** | Mock 데이터와 픽스처를 명시하여 동일 결과를 재현할 수 있도록 한다 |
+| Principle | Description |
+|-----------|-------------|
+| **Executability** | All TCs include step-by-step procedures and actual commands |
+| **Code-Based** | Expected results are defined by referencing actual source code function names, parameters, and return values |
+| **OS-Specific Separation** | Even for the same TC, if OS-specific procedures differ, each is documented separately |
+| **Automation First** | Vitest-based automated tests are designed first; manual procedures are documented only for items that cannot be automated |
+| **Reproducibility** | Mock data and fixtures are specified to ensure identical results can be reproduced |
 
-### 1.3 참조 문서 (계획서 대응)
+### 1.3 Reference Documents (Plan Correspondence)
 
-| 문서 | 경로 | 역할 |
-|------|------|------|
-| 종합 테스트 계획서 | `docs/01-plan/features/comprehensive-test-plan.md` | 310개 TC 정의, 우선순위, 전제조건 |
-| 기능 계획서 | `docs/01-plan/features/adw-improvement.plan.md` | FR 요구사항 원본 |
-| 설계 문서 | `docs/02-design/features/adw-improvement.design.md` | 아키텍처 및 상세 설계 |
-| 보안 사양서 | `docs/02-design/security-spec.md` | OWASP 기반 보안 요구사항 |
-| 요구사항 추적 매트릭스 | `docs/03-analysis/adw-requirements-traceability-matrix.md` | FR-TC 매핑 |
-| 보안 검증 보고서 | `docs/03-analysis/security-verification-report.md` | 보안 테스트 근거 |
-| 공유 유틸리티 설계 | `docs/03-analysis/shared-utilities-design.md` | 공유 모듈 함수 사양 |
+| Document | Path | Role |
+|----------|------|------|
+| Comprehensive Test Plan | `docs/01-plan/features/comprehensive-test-plan.md` | 310 TC definitions, priorities, preconditions |
+| Feature Plan | `docs/01-plan/features/adw-improvement.plan.md` | FR requirements original |
+| Design Document | `docs/02-design/features/adw-improvement.design.md` | Architecture and detailed design |
+| Security Specification | `docs/02-design/security-spec.md` | OWASP-based security requirements |
+| Requirements Traceability Matrix | `docs/03-analysis/adw-requirements-traceability-matrix.md` | FR-TC mapping |
+| Security Verification Report | `docs/03-analysis/security-verification-report.md` | Security test evidence |
+| Shared Utilities Design | `docs/03-analysis/shared-utilities-design.md` | Shared module function specifications |
 
-### 1.4 용어 정의
+### 1.4 Terminology
 
-| 용어 | 정의 |
-|------|------|
-| ADW | AI-Driven Work -- 본 프로젝트의 브랜드명 |
-| MCP | Model Context Protocol -- Claude와 외부 서비스 연동 프로토콜 |
-| TC | Test Case -- 테스트 케이스 |
-| SUT | System Under Test -- 테스트 대상 시스템 |
-| Mock | 실제 외부 의존성을 대체하는 가짜 객체 |
-| Fixture | 테스트 실행에 필요한 사전 준비된 데이터 |
-| P0/P1/P2/P3 | 우선순위 (Critical/High/Medium/Low) |
-| withRetry | `src/utils/retry.ts`의 지수 백오프 재시도 래퍼 함수 |
-| sanitize | `src/utils/sanitize.ts`의 입력 검증/정화 함수 모음 (7개) |
-| SHARED_DIR | 인스톨러 공유 스크립트 디렉토리 경로 환경변수 |
+| Term | Definition |
+|------|------------|
+| ADW | AI-Driven Work -- Brand name for this project |
+| MCP | Model Context Protocol -- Protocol for integrating Claude with external services |
+| TC | Test Case |
+| SUT | System Under Test |
+| Mock | Fake object that replaces actual external dependencies |
+| Fixture | Pre-prepared data required for test execution |
+| P0/P1/P2/P3 | Priority (Critical/High/Medium/Low) |
+| withRetry | Exponential backoff retry wrapper function in `src/utils/retry.ts` |
+| sanitize | Collection of 7 input validation/sanitization functions in `src/utils/sanitize.ts` |
+| SHARED_DIR | Environment variable for the installer shared scripts directory path |
 
-### 1.5 TC 커버리지 요약
+### 1.5 TC Coverage Summary
 
-| 영역 | TC 수 | P0 | P1 | P2 | P3 | 자동화 가능 | 수동 전용 |
+| Area | TC Count | P0 | P1 | P2 | P3 | Automatable | Manual Only |
 |------|------:|---:|---:|---:|---:|----------:|--------:|
-| INS (인스톨러) | 52 | 14 | 22 | 12 | 4 | 20 | 32 |
+| INS (Installer) | 52 | 14 | 22 | 12 | 4 | 20 | 32 |
 | AUT (OAuth) | 22 | 11 | 9 | 2 | 0 | 18 | 4 |
 | GML (Gmail) | 22 | 3 | 10 | 9 | 0 | 22 | 0 |
 | DRV (Drive) | 20 | 4 | 8 | 8 | 0 | 20 | 0 |
@@ -68,237 +68,237 @@
 | NOT (Notion) | 4 | 3 | 1 | 0 | 0 | 1 | 3 |
 | GIT (GitHub) | 6 | 2 | 3 | 1 | 0 | 2 | 4 |
 | PEN (Pencil) | 5 | 2 | 1 | 1 | 1 | 1 | 4 |
-| SHR (공유 유틸리티) | 16 | 1 | 8 | 5 | 2 | 8 | 8 |
+| SHR (Shared Utilities) | 16 | 1 | 8 | 5 | 2 | 8 | 8 |
 | DOK (Docker) | 7 | 1 | 4 | 2 | 0 | 3 | 4 |
-| SEC (보안) | 38 | 22 | 12 | 4 | 0 | 30 | 8 |
-| PER (성능) | 25 | 4 | 10 | 11 | 0 | 20 | 5 |
-| E2E (시나리오) | 19 | 5 | 8 | 6 | 0 | 4 | 15 |
-| REG (회귀) | 10 | 6 | 3 | 1 | 0 | 10 | 0 |
-| **합계** | **314** | **94** | **121** | **90** | **8** | **216** | **98** |
+| SEC (Security) | 38 | 22 | 12 | 4 | 0 | 30 | 8 |
+| PER (Performance) | 25 | 4 | 10 | 11 | 0 | 20 | 5 |
+| E2E (Scenario) | 19 | 5 | 8 | 6 | 0 | 4 | 15 |
+| REG (Regression) | 10 | 6 | 3 | 1 | 0 | 10 | 0 |
+| **Total** | **314** | **94** | **121** | **90** | **8** | **216** | **98** |
 
 ---
 
-## 2. 테스트 환경 설계
+## 2. Test Environment Design
 
-### 2.1 macOS 테스트 환경 구축 절차
+### 2.1 macOS Test Environment Setup Procedures
 
 #### MAC-ENV-01: macOS Ventura 13.x (Intel)
 
-**목적**: 하위 호환성 검증 (Docker Desktop 4.41 이하 권장)
+**Purpose**: Backward compatibility verification (Docker Desktop 4.41 or lower recommended)
 
-**하드웨어/VM 준비**:
+**Hardware/VM Preparation**:
 ```
-1. UTM 또는 VMware Fusion에서 macOS Ventura 13.x VM 생성
-   - RAM: 8GB 이상
-   - 디스크: 60GB 이상
-   - CPU: 4코어 이상
+1. Create macOS Ventura 13.x VM in UTM or VMware Fusion
+   - RAM: 8GB or more
+   - Disk: 60GB or more
+   - CPU: 4 cores or more
 
-2. 클린 설치 스냅샷 생성
-   $ sudo tmutil disablelocal  # 로컬 스냅샷 비활성화
-   $ # VM 소프트웨어에서 "Clean Ventura" 스냅샷 생성
+2. Create clean install snapshot
+   $ sudo tmutil disablelocal  # Disable local snapshots
+   $ # Create "Clean Ventura" snapshot in VM software
 ```
 
-**필수 소프트웨어 설치**:
+**Required Software Installation**:
 ```bash
-# Homebrew (클린 테스트 시에는 설치하지 않음)
+# Homebrew (do not install for clean testing)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Intel Mac PATH 확인
+# Intel Mac PATH verification
 echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
 eval "$(/usr/local/bin/brew shellenv)"
 
-# Docker Desktop 4.41 (Ventura 호환 버전)
-# https://docs.docker.com/desktop/release-notes/ 에서 4.41 다운로드
-brew install --cask docker  # 또는 수동 설치
+# Docker Desktop 4.41 (Ventura compatible version)
+# Download 4.41 from https://docs.docker.com/desktop/release-notes/
+brew install --cask docker  # or manual installation
 
-# 검증
+# Verification
 brew --version     # Homebrew 4.x
 docker --version   # Docker 24.x ~ 25.x
 ```
 
-**스냅샷 포인트**:
-- `SNAP-MAC01-CLEAN`: Homebrew 미설치, Docker 미설치 (클린 상태)
-- `SNAP-MAC01-BREW`: Homebrew만 설치
-- `SNAP-MAC01-FULL`: Homebrew + Docker Desktop 4.41 설치 + 미실행
+**Snapshot Points**:
+- `SNAP-MAC01-CLEAN`: Homebrew not installed, Docker not installed (clean state)
+- `SNAP-MAC01-BREW`: Homebrew only installed
+- `SNAP-MAC01-FULL`: Homebrew + Docker Desktop 4.41 installed + not running
 
 #### MAC-ENV-02: macOS Sonoma 14.x (Apple M1/M2)
 
-**목적**: 주력 테스트 환경
+**Purpose**: Primary test environment
 
-**하드웨어 준비**:
+**Hardware Preparation**:
 ```
 Apple Silicon Mac (M1/M2/M3)
-- RAM: 16GB 권장
-- 디스크: 10GB 여유 공간
-- 별도 사용자 계정 생성 (테스트 전용)
+- RAM: 16GB recommended
+- Disk: 10GB free space
+- Create separate user account (test-dedicated)
   $ sudo dscl . -create /Users/testuser
 ```
 
-**필수 소프트웨어 설치**:
+**Required Software Installation**:
 ```bash
-# Apple Silicon Homebrew PATH (중요: /opt/homebrew/)
+# Apple Silicon Homebrew PATH (important: /opt/homebrew/)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Docker Desktop 최신 (4.42+ -- Sonoma 14+ 필요)
+# Docker Desktop latest (4.42+ -- requires Sonoma 14+)
 brew install --cask docker
 
-# 검증
+# Verification
 which brew           # /opt/homebrew/bin/brew (Apple Silicon)
 docker --version     # Docker 27.x+
 python3 --version    # Python 3.12+
 ```
 
-**스냅샷 포인트**:
-- `SNAP-MAC02-CLEAN`: 클린 사용자 계정
-- `SNAP-MAC02-DOCKER-OFF`: Docker 설치 + 미실행
-- `SNAP-MAC02-READY`: Docker 실행 중 + 인터넷 연결 확인
+**Snapshot Points**:
+- `SNAP-MAC02-CLEAN`: Clean user account
+- `SNAP-MAC02-DOCKER-OFF`: Docker installed + not running
+- `SNAP-MAC02-READY`: Docker running + internet connection verified
 
 #### MAC-ENV-03: macOS Sequoia 15.x (Apple M3/M4)
 
-**목적**: 최신 OS 호환성 검증
+**Purpose**: Latest OS compatibility verification
 
-**구축**: MAC-ENV-02와 동일 절차, OS 버전만 Sequoia 15.x
+**Setup**: Same procedure as MAC-ENV-02, only OS version is Sequoia 15.x
 
-### 2.2 Windows 테스트 환경 구축 절차
+### 2.2 Windows Test Environment Setup Procedures
 
 #### WIN-ENV-01: Windows 10 21H2
 
-**목적**: 최소 지원 버전 검증
+**Purpose**: Minimum supported version verification
 
-**VM 준비**:
+**VM Preparation**:
 ```
-1. Hyper-V 또는 VMware에서 Windows 10 21H2 VM 생성
+1. Create Windows 10 21H2 VM in Hyper-V or VMware
    - RAM: 8GB
-   - 디스크: 60GB
-   - 가상화 중첩(Nested Virtualization) 활성화 (WSL2용)
+   - Disk: 60GB
+   - Enable Nested Virtualization (for WSL2)
 
-2. Windows Update 적용 후 21H2 상태 유지
-   $ winver  # 버전 확인: 21H2 (빌드 19044)
+2. Apply Windows Update and maintain 21H2 state
+   $ winver  # Version check: 21H2 (Build 19044)
 ```
 
-**PowerShell 환경 설정**:
+**PowerShell Environment Setup**:
 ```powershell
-# PowerShell 버전 확인
+# PowerShell version check
 $PSVersionTable.PSVersion  # 5.1.x
 
-# 실행 정책 확인
-Get-ExecutionPolicy  # Restricted (기본)
+# Check execution policy
+Get-ExecutionPolicy  # Restricted (default)
 
-# 테스트를 위해 Bypass 설정 (관리자 PowerShell)
+# Set Bypass for testing (Administrator PowerShell)
 Set-ExecutionPolicy Bypass -Scope Process -Force
 ```
 
-**WSL2 설정 절차**:
+**WSL2 Setup Procedure**:
 ```powershell
-# WSL2 활성화 (관리자 PowerShell)
-wsl --install  # Windows 10 21H2+에서 지원
+# Enable WSL2 (Administrator PowerShell)
+wsl --install  # Supported on Windows 10 21H2+
 
-# 재부팅 후
+# After reboot
 wsl --set-default-version 2
 wsl --install -d Ubuntu-22.04
 
-# 검증
+# Verification
 wsl --version
 wsl -l -v  # Ubuntu-22.04 VERSION 2
 ```
 
-**스냅샷 포인트**:
-- `SNAP-WIN01-CLEAN`: WSL2 미설치, Docker 미설치
-- `SNAP-WIN01-WSL`: WSL2 + Ubuntu 22.04 설치
-- `SNAP-WIN01-FULL`: WSL2 + Docker Desktop (WSL2 백엔드)
+**Snapshot Points**:
+- `SNAP-WIN01-CLEAN`: WSL2 not installed, Docker not installed
+- `SNAP-WIN01-WSL`: WSL2 + Ubuntu 22.04 installed
+- `SNAP-WIN01-FULL`: WSL2 + Docker Desktop (WSL2 backend)
 
 #### WIN-ENV-02: Windows 10 22H2
 
-**구축**: WIN-ENV-01과 동일, OS 빌드만 22H2 (19045)
+**Setup**: Same as WIN-ENV-01, only OS build is 22H2 (19045)
 
 #### WIN-ENV-03: Windows 11 23H2+
 
-**구축**: WIN-ENV-01과 동일, PowerShell 7.x 추가 설치
+**Setup**: Same as WIN-ENV-01, with additional PowerShell 7.x installation
 
 ```powershell
-# PowerShell 7 설치
+# PowerShell 7 installation
 winget install Microsoft.PowerShell
 
-# 검증
+# Verification
 pwsh -Version  # 7.x.x
 ```
 
-### 2.3 Linux 테스트 환경 구축 절차
+### 2.3 Linux Test Environment Setup Procedures
 
 #### LNX-ENV-01: Ubuntu 22.04 LTS (apt)
 
-**VM/컨테이너 준비**:
+**VM/Container Preparation**:
 ```bash
-# Docker 기반 테스트 환경 (빠른 구축)
+# Docker-based test environment (quick setup)
 docker run -it --name lnx-env-01 ubuntu:22.04 /bin/bash
 
-# 또는 VM (완전 테스트용)
-# UTM/VirtualBox에서 Ubuntu 22.04 LTS 설치
-# 최소 설치 선택, 사용자: testuser
+# Or VM (for full testing)
+# Install Ubuntu 22.04 LTS in UTM/VirtualBox
+# Select minimal installation, user: testuser
 
-# 기본 패키지 확인
+# Basic package verification
 apt update && apt install -y curl openssl
 which curl      # /usr/bin/curl
 which openssl   # /usr/bin/openssl
 ```
 
-**스냅샷 포인트**:
-- `SNAP-LNX01-CLEAN`: curl, openssl만 설치, Node.js/Docker 없음
-- `SNAP-LNX01-NODE`: Node.js 22 사전 설치
-- `SNAP-LNX01-DOCKER`: Docker Engine 설치 + docker 그룹 추가
+**Snapshot Points**:
+- `SNAP-LNX01-CLEAN`: Only curl, openssl installed, no Node.js/Docker
+- `SNAP-LNX01-NODE`: Node.js 22 pre-installed
+- `SNAP-LNX01-DOCKER`: Docker Engine installed + docker group added
 
 #### LNX-ENV-02: Ubuntu 24.04 LTS (apt)
 
-**구축**: LNX-ENV-01과 동일, Ubuntu 24.04 사용
+**Setup**: Same as LNX-ENV-01, using Ubuntu 24.04
 
 #### LNX-ENV-03: Fedora 39+ (dnf)
 
 ```bash
-# Docker 기반
+# Docker-based
 docker run -it --name lnx-env-03 fedora:39 /bin/bash
 dnf install -y curl openssl
 
-# 검증
+# Verification
 dnf --version
 ```
 
 #### LNX-ENV-04: Arch Linux (pacman)
 
 ```bash
-# Docker 기반
+# Docker-based
 docker run -it --name lnx-env-04 archlinux:latest /bin/bash
 pacman -Sy --noconfirm curl openssl
 
-# 검증
+# Verification
 pacman --version
 ```
 
 #### LNX-ENV-05: WSL2 Ubuntu 22.04
 
 ```powershell
-# Windows 호스트에서
+# From Windows host
 wsl --install -d Ubuntu-22.04
 
-# WSL2 내부에서
-cat /proc/version  # Microsoft 문자열 포함 확인
+# Inside WSL2
+cat /proc/version  # Verify Microsoft string is included
 ```
 
-### 2.4 Docker 테스트 환경 구축 절차
+### 2.4 Docker Test Environment Setup Procedures
 
-#### DOK-ENV-01 ~ DOK-ENV-04 공통 절차
+#### DOK-ENV-01 ~ DOK-ENV-04 Common Procedures
 
 ```bash
-# 1. Docker 버전 확인
+# 1. Docker version check
 docker --version
 docker info
 
-# 2. 테스트 이미지 Pull
+# 2. Pull test images
 docker pull ghcr.io/popup-jacob/google-workspace-mcp:latest
 docker pull ghcr.io/sooperset/mcp-atlassian:latest
 
-# 3. 이미지 검증
+# 3. Image verification
 docker inspect ghcr.io/popup-jacob/google-workspace-mcp:latest \
   --format='{{.Config.User}}'  # mcp (non-root)
 
@@ -306,30 +306,30 @@ docker inspect ghcr.io/popup-jacob/google-workspace-mcp:latest \
   --format='{{range .Config.Env}}{{println .}}{{end}}'  # NODE_ENV=production
 
 docker images ghcr.io/popup-jacob/google-workspace-mcp:latest \
-  --format='{{.Size}}'  # 500MB 이하 확인
+  --format='{{.Size}}'  # Verify 500MB or less
 ```
 
-**로컬 빌드 테스트**:
+**Local Build Test**:
 ```bash
 cd /Users/popup-kay/Documents/GitHub/popup/popup-claude/google-workspace-mcp
 docker build -t google-workspace-mcp:test .
 
-# non-root 사용자 확인
+# Verify non-root user
 docker run --rm google-workspace-mcp:test id -u  # 1001 (mcp)
 
-# HEALTHCHECK 확인
+# Verify HEALTHCHECK
 docker inspect google-workspace-mcp:test \
   --format='{{json .Config.Healthcheck}}'
 ```
 
-### 2.5 Google API 테스트 환경
+### 2.5 Google API Test Environment
 
-#### OAuth 자격 증명 준비
+#### OAuth Credentials Preparation
 
 ```
-1. Google Cloud Console (https://console.cloud.google.com) 접속
-2. 새 프로젝트 생성: "ADW-Test-YYYY-MM"
-3. APIs & Services > Library에서 활성화:
+1. Access Google Cloud Console (https://console.cloud.google.com)
+2. Create new project: "ADW-Test-YYYY-MM"
+3. Enable in APIs & Services > Library:
    - Gmail API
    - Google Drive API
    - Google Calendar API
@@ -339,110 +339,110 @@ docker inspect google-workspace-mcp:test \
 4. APIs & Services > Credentials > Create Credentials > OAuth client ID
    - Application type: Desktop app
    - Name: "ADW Test Client"
-5. JSON 다운로드 -> client_secret.json으로 저장
+5. Download JSON -> save as client_secret.json
 6. OAuth consent screen:
-   - User Type: Internal (Google Workspace) 또는 External (테스트 모드)
-   - 테스트 사용자 추가
+   - User Type: Internal (Google Workspace) or External (test mode)
+   - Add test users
 ```
 
-**테스트 계정 준비**:
+**Test Account Preparation**:
 ```
-- 계정 1 (주 테스트): test-adw-primary@gmail.com
-  - Gmail: 테스트 이메일 50건 이상
-  - Drive: 파일 20개, 폴더 5개, 공유 파일 포함
-  - Calendar: 이벤트 10건, 반복 이벤트 2건
+- Account 1 (primary test): test-adw-primary@gmail.com
+  - Gmail: 50+ test emails
+  - Drive: 20 files, 5 folders, including shared files
+  - Calendar: 10 events, 2 recurring events
 
-- 계정 2 (공유 테스트): test-adw-secondary@gmail.com
-  - Drive 공유 수신자
-  - Calendar 초대 수신자
+- Account 2 (sharing test): test-adw-secondary@gmail.com
+  - Drive sharing recipient
+  - Calendar invitation recipient
 ```
 
-**client_secret.json 배치**:
+**client_secret.json Placement**:
 ```bash
-# Docker 볼륨 마운트 경로
+# Docker volume mount path
 mkdir -p ~/.google-workspace
 cp client_secret.json ~/.google-workspace/
 chmod 600 ~/.google-workspace/client_secret.json
 chmod 700 ~/.google-workspace/
 ```
 
-### 2.6 테스트 데이터 설계
+### 2.6 Test Data Design
 
-#### 2.6.1 Gmail 테스트 데이터
+#### 2.6.1 Gmail Test Data
 
-| 데이터 ID | 설명 | 준비 방법 |
-|-----------|------|----------|
-| GML-DATA-001 | 일반 텍스트 이메일 (from:boss@example.com) | 사전 발송 또는 API로 생성 |
-| GML-DATA-002 | HTML 본문 이메일 | 사전 발송 |
-| GML-DATA-003 | 멀티파트 이메일 (text/plain + text/html) | 사전 발송 |
-| GML-DATA-004 | 첨부파일 포함 이메일 (PDF 1MB) | 사전 발송 |
-| GML-DATA-005 | 대용량 첨부파일 이메일 (10MB+) | 사전 발송 |
-| GML-DATA-006 | 한글 제목 이메일 ("테스트 메일") | 사전 발송 |
-| GML-DATA-007 | CC/BCC 포함 이메일 | 사전 발송 |
-| GML-DATA-008 | 5000자 초과 본문 이메일 | 사전 발송 |
-| GML-DATA-009 | 드래프트 이메일 3건 | API로 생성 |
-| GML-DATA-010 | 커스텀 라벨 ("TestLabel") | API로 생성 |
+| Data ID | Description | Preparation Method |
+|---------|-------------|-------------------|
+| GML-DATA-001 | Plain text email (from:boss@example.com) | Pre-send or create via API |
+| GML-DATA-002 | HTML body email | Pre-send |
+| GML-DATA-003 | Multipart email (text/plain + text/html) | Pre-send |
+| GML-DATA-004 | Email with attachment (PDF 1MB) | Pre-send |
+| GML-DATA-005 | Large attachment email (10MB+) | Pre-send |
+| GML-DATA-006 | Korean subject email ("테스트 메일") | Pre-send |
+| GML-DATA-007 | Email with CC/BCC | Pre-send |
+| GML-DATA-008 | Email body exceeding 5000 characters | Pre-send |
+| GML-DATA-009 | 3 draft emails | Create via API |
+| GML-DATA-010 | Custom label ("TestLabel") | Create via API |
 
-#### 2.6.2 Drive 테스트 데이터
+#### 2.6.2 Drive Test Data
 
-| 데이터 ID | 설명 | 준비 방법 |
-|-----------|------|----------|
-| DRV-DATA-001 | 루트 폴더 내 파일 5개 | API로 생성 |
-| DRV-DATA-002 | "Test Folder" 폴더 + 하위 파일 3개 | API로 생성 |
-| DRV-DATA-003 | PDF 파일 (application/pdf) | 업로드 |
-| DRV-DATA-004 | 공유 설정된 파일 (viewer 권한) | API로 공유 설정 |
-| DRV-DATA-005 | Shared Drive 내 파일 | 조직 계정 필요 |
-| DRV-DATA-006 | 휴지통 파일 1건 | API로 trash 처리 |
-| DRV-DATA-007 | 작은따옴표 포함 파일명 ("test's file.txt") | API로 생성 |
+| Data ID | Description | Preparation Method |
+|---------|-------------|-------------------|
+| DRV-DATA-001 | 5 files in root folder | Create via API |
+| DRV-DATA-002 | "Test Folder" folder + 3 child files | Create via API |
+| DRV-DATA-003 | PDF file (application/pdf) | Upload |
+| DRV-DATA-004 | Shared file (viewer permission) | Set sharing via API |
+| DRV-DATA-005 | File in Shared Drive | Organization account required |
+| DRV-DATA-006 | 1 trashed file | Trash via API |
+| DRV-DATA-007 | Filename with single quote ("test's file.txt") | Create via API |
 
-#### 2.6.3 Calendar 테스트 데이터
+#### 2.6.3 Calendar Test Data
 
-| 데이터 ID | 설명 | 준비 방법 |
-|-----------|------|----------|
-| CAL-DATA-001 | 향후 7일 내 이벤트 5건 | API로 생성 |
-| CAL-DATA-002 | 참석자 포함 이벤트 1건 | API로 생성 |
-| CAL-DATA-003 | 반복 이벤트 1건 (매주) | API로 생성 |
-| CAL-DATA-004 | 종일 이벤트 1건 | API로 생성 |
-| CAL-DATA-005 | 초대받은 이벤트 1건 (다른 계정에서 생성) | 계정 2에서 생성 |
+| Data ID | Description | Preparation Method |
+|---------|-------------|-------------------|
+| CAL-DATA-001 | 5 events within the next 7 days | Create via API |
+| CAL-DATA-002 | 1 event with attendees | Create via API |
+| CAL-DATA-003 | 1 recurring event (weekly) | Create via API |
+| CAL-DATA-004 | 1 all-day event | Create via API |
+| CAL-DATA-005 | 1 invited event (created from another account) | Create from Account 2 |
 
-#### 2.6.4 Docs/Sheets/Slides 테스트 데이터
+#### 2.6.4 Docs/Sheets/Slides Test Data
 
-| 데이터 ID | 설명 | 준비 방법 |
-|-----------|------|----------|
-| DOC-DATA-001 | 빈 Google Docs 문서 | API로 생성 |
-| DOC-DATA-002 | 10000자+ 긴 문서 | API로 생성 |
-| DOC-DATA-003 | 테이블 포함 문서 | API로 생성 |
-| DOC-DATA-004 | 코멘트 포함 문서 | API로 생성 |
-| SHT-DATA-001 | 빈 스프레드시트 | API로 생성 |
-| SHT-DATA-002 | Sheet1!A1:D10 데이터 있는 시트 | API로 생성 |
-| SHT-DATA-003 | 시트 2개 이상인 스프레드시트 | API로 생성 |
-| SLD-DATA-001 | 빈 프레젠테이션 | API로 생성 |
-| SLD-DATA-002 | 슬라이드 3개 + 텍스트 포함 프레젠테이션 | API로 생성 |
+| Data ID | Description | Preparation Method |
+|---------|-------------|-------------------|
+| DOC-DATA-001 | Empty Google Docs document | Create via API |
+| DOC-DATA-002 | Long document with 10000+ characters | Create via API |
+| DOC-DATA-003 | Document with table | Create via API |
+| DOC-DATA-004 | Document with comments | Create via API |
+| SHT-DATA-001 | Empty spreadsheet | Create via API |
+| SHT-DATA-002 | Sheet with data in Sheet1!A1:D10 | Create via API |
+| SHT-DATA-003 | Spreadsheet with 2+ sheets | Create via API |
+| SLD-DATA-001 | Empty presentation | Create via API |
+| SLD-DATA-002 | Presentation with 3 slides + text | Create via API |
 
 ---
 
-## 3. 인스톨러 테스트 설계
+## 3. Installer Test Design
 
-### 3.1 macOS 인스톨러 테스트 (TC-INS-MAC-001 ~ TC-INS-MAC-026)
+### 3.1 macOS Installer Tests (TC-INS-MAC-001 ~ TC-INS-MAC-026)
 
-#### TC-INS-MAC-001: 인수 파싱 -- --modules 옵션
+#### TC-INS-MAC-001: Argument Parsing -- --modules Option
 
-**우선순위**: P0
-**자동화**: 가능 (Bash 스크립트)
-**환경**: MAC-ENV-02 (SNAP-MAC02-READY)
+**Priority**: P0
+**Automation**: Possible (Bash script)
+**Environment**: MAC-ENV-02 (SNAP-MAC02-READY)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
-|------|-----------|----------|
-| 1 | `cd /Users/popup-kay/Documents/GitHub/popup/popup-claude/installer` | 인스톨러 디렉토리 이동 |
-| 2 | `bash -x install.sh --modules "google,atlassian" 2>&1 \| head -50` | 디버그 출력에서 변수 확인 |
-| 3 | MODULES 변수 확인 | `MODULES="google,atlassian"` |
-| 4 | SELECTED_MODULES 변수 확인 | `SELECTED_MODULES="google atlassian"` (쉼표가 공백으로 변환) |
+| Step | Command/Action | Expected Result |
+|------|---------------|-----------------|
+| 1 | `cd /Users/popup-kay/Documents/GitHub/popup/popup-claude/installer` | Navigate to installer directory |
+| 2 | `bash -x install.sh --modules "google,atlassian" 2>&1 \| head -50` | Verify variables in debug output |
+| 3 | Check MODULES variable | `MODULES="google,atlassian"` |
+| 4 | Check SELECTED_MODULES variable | `SELECTED_MODULES="google atlassian"` (commas converted to spaces) |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
-# install.sh의 인수 파싱 부분만 단독 테스트
+# Standalone test of install.sh argument parsing section
 bash -c '
   source <(sed -n "1,/^# 3\. List Mode/p" install.sh | head -n -1)
   echo "MODULES=$MODULES"
@@ -450,16 +450,16 @@ bash -c '
 ' -- --modules "google,atlassian"
 ```
 
-**기대 출력**:
+**Expected Output**:
 ```
 MODULES=google,atlassian
 SELECTED_MODULES=google atlassian
 ```
 
-**자동화 스크립트** (`installer/tests/test_ins_mac_001.sh`):
+**Automation Script** (`installer/tests/test_ins_mac_001.sh`):
 ```bash
 #!/bin/bash
-# TC-INS-MAC-001: --modules 옵션 파싱
+# TC-INS-MAC-001: --modules option parsing
 RESULT=$(bash -c '
   MODULES=""; INSTALL_ALL=false; SKIP_BASE=false; LIST_ONLY=false
   while [[ $# -gt 0 ]]; do
@@ -485,23 +485,23 @@ fi
 
 ---
 
-#### TC-INS-MAC-002: 인수 파싱 -- --all 옵션
+#### TC-INS-MAC-002: Argument Parsing -- --all Option
 
-**우선순위**: P0
-**자동화**: 가능 (Bash 스크립트)
-**환경**: MAC-ENV-02
+**Priority**: P0
+**Automation**: Possible (Bash script)
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `./install.sh --all` 실행 | INSTALL_ALL=true 설정 |
-| 2 | 모듈 목록 확인 | required=true인 base를 제외한 나머지 6개 모듈 선택 |
-| 3 | SELECTED_MODULES 확인 | google, atlassian, figma, notion, github, pencil 포함 |
+| 1 | Run `./install.sh --all` | INSTALL_ALL=true is set |
+| 2 | Check module list | 6 modules selected excluding base where required=true |
+| 3 | Check SELECTED_MODULES | Includes google, atlassian, figma, notion, github, pencil |
 
-**검증**: `install.sh`의 341~346행 로직 확인
+**Verification**: Verify logic at lines 341~346 of `install.sh`
 ```bash
-# install.sh:340-346 로직
+# install.sh:340-346 logic
 if [ "$INSTALL_ALL" = true ]; then
     for i in "${!MODULE_NAMES[@]}"; do
         if [ "${MODULE_REQUIRED[$i]}" != "true" ]; then
@@ -511,31 +511,31 @@ if [ "$INSTALL_ALL" = true ]; then
 fi
 ```
 
-**기대 결과**: `SELECTED_MODULES`에 "google atlassian figma notion github pencil"이 포함 (base 제외, required=true가 아닌 모든 모듈)
+**Expected Result**: `SELECTED_MODULES` contains "google atlassian figma notion github pencil" (excluding base, all modules where required=true is not set)
 
 ---
 
-#### TC-INS-MAC-003: 인수 파싱 -- --list 옵션
+#### TC-INS-MAC-003: Argument Parsing -- --list Option
 
-**우선순위**: P1
-**자동화**: 가능 (Bash 스크립트)
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible (Bash script)
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `./install.sh --list` 실행 | 모듈 목록 표시 |
-| 2 | 출력 내용 확인 | 7개 모듈(base, google, atlassian, figma, notion, github, pencil) 표시 |
-| 3 | 종료 코드 확인 | exit 0 |
+| 1 | Run `./install.sh --list` | Display module list |
+| 2 | Check output content | 7 modules displayed (base, google, atlassian, figma, notion, github, pencil) |
+| 3 | Check exit code | exit 0 |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
 ./install.sh --list
 echo "Exit code: $?"
 ```
 
-**기대 출력** (부분):
+**Expected Output** (partial):
 ```
 ========================================
   Available Modules
@@ -554,164 +554,164 @@ Usage:
 
 ---
 
-#### TC-INS-MAC-004: 인수 파싱 -- --skip-base 옵션
+#### TC-INS-MAC-004: Argument Parsing -- --skip-base Option
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | `bash -x install.sh --modules "google" --skip-base 2>&1 \| grep SKIP_BASE` | SKIP_BASE=true |
-| 2 | base 모듈 실행 여부 확인 | base 모듈 건너뜀 |
+| 2 | Check if base module executes | base module skipped |
 
-**검증**: `install.sh`의 186행에서 `SKIP_BASE=true` 설정 확인
+**Verification**: Verify `SKIP_BASE=true` is set at line 186 of `install.sh`
 
 ---
 
-#### TC-INS-MAC-005: 인수 파싱 -- 알 수 없는 옵션
+#### TC-INS-MAC-005: Argument Parsing -- Unknown Option
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `./install.sh --unknown 2>&1` | "Unknown option: --unknown" 출력 |
-| 2 | 종료 코드 확인 | exit 1 |
+| 1 | `./install.sh --unknown 2>&1` | "Unknown option: --unknown" output |
+| 2 | Check exit code | exit 1 |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
 output=$(./install.sh --unknown 2>&1)
 exit_code=$?
 echo "$output" | grep -q "Unknown option" && [ $exit_code -eq 1 ] && echo "PASS" || echo "FAIL"
 ```
 
-**코드 참조**: `install.sh:195` -- `*) echo "Unknown option: $1"; exit 1 ;;`
+**Code Reference**: `install.sh:195` -- `*) echo "Unknown option: $1"; exit 1 ;;`
 
 ---
 
-#### TC-INS-MAC-006: 모듈 스캔 -- 로컬 실행
+#### TC-INS-MAC-006: Module Scan -- Local Execution
 
-**우선순위**: P0
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P0
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `cd installer && ls modules/*/module.json` | 7개 module.json 파일 존재 |
-| 2 | `./install.sh --list` 실행 | USE_LOCAL=true 설정 |
-| 3 | 모듈 목록 확인 | 7개 모듈 전체 파싱 성공 |
+| 1 | `cd installer && ls modules/*/module.json` | 7 module.json files exist |
+| 2 | Run `./install.sh --list` | USE_LOCAL=true is set |
+| 3 | Check module list | All 7 modules parsed successfully |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
-# module.json 파일 수 확인
+# Check number of module.json files
 ls installer/modules/*/module.json | wc -l  # 7
 
-# 각 module.json 유효성 확인
+# Validate each module.json
 for f in installer/modules/*/module.json; do
   node -e "JSON.parse(require('fs').readFileSync('$f', 'utf8'))" && echo "OK: $f" || echo "FAIL: $f"
 done
 ```
 
-**코드 참조**: `install.sh:92-96` -- `BASH_SOURCE[0]` 존재 + `modules/` 디렉토리 존재 시 `USE_LOCAL=true`
+**Code Reference**: `install.sh:92-96` -- `USE_LOCAL=true` when `BASH_SOURCE[0]` exists + `modules/` directory exists
 
 ---
 
-#### TC-INS-MAC-007: 모듈 스캔 -- 원격 실행
+#### TC-INS-MAC-007: Module Scan -- Remote Execution
 
-**우선순위**: P0
-**자동화**: 부분 가능 (네트워크 의존)
-**환경**: MAC-ENV-02
+**Priority**: P0
+**Automation**: Partially possible (network dependent)
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `curl -sSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.sh \| bash -s -- --list` | 원격 실행 |
-| 2 | USE_LOCAL 확인 | USE_LOCAL=false |
-| 3 | modules.json 다운로드 확인 | 원격 modules.json에서 모듈 목록 획득 |
+| 1 | `curl -sSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.sh \| bash -s -- --list` | Remote execution |
+| 2 | Check USE_LOCAL | USE_LOCAL=false |
+| 3 | Verify modules.json download | Module list obtained from remote modules.json |
 
-**코드 참조**: `install.sh:229-241` -- `curl -sSL "$BASE_URL/modules.json"` 다운로드 후 `download_and_verify`로 검증
+**Code Reference**: `install.sh:229-241` -- Download `curl -sSL "$BASE_URL/modules.json"` then verify with `download_and_verify`
 
 ---
 
-#### TC-INS-MAC-008: 모듈 검증 -- 잘못된 모듈명
+#### TC-INS-MAC-008: Module Verification -- Invalid Module Name
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `./install.sh --modules "nonexistent" 2>&1` | "Unknown module: nonexistent" 출력 |
-| 2 | 종료 코드 | exit 1 |
+| 1 | `./install.sh --modules "nonexistent" 2>&1` | "Unknown module: nonexistent" output |
+| 2 | Exit code | exit 1 |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
 output=$(./install.sh --modules "nonexistent" 2>&1)
 echo "$output" | grep -q "Unknown module" && echo "PASS" || echo "FAIL"
 ```
 
-**코드 참조**: `install.sh:352-358` -- `get_module_index` 반환값 `-1`일 때 에러
+**Code Reference**: `install.sh:352-358` -- Error when `get_module_index` returns `-1`
 
 ---
 
-#### TC-INS-MAC-009: 스마트 상태 감지
+#### TC-INS-MAC-009: Smart Status Detection
 
-**우선순위**: P0
-**자동화**: 부분 가능
-**환경**: MAC-ENV-02 (SNAP-MAC02-CLEAN)
+**Priority**: P0
+**Automation**: Partially possible
+**Environment**: MAC-ENV-02 (SNAP-MAC02-CLEAN)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | 클린 환경에서 `./install.sh --modules "google"` 실행 | 상태 표시 |
-| 2 | 출력에서 "Current Status:" 확인 | 각 도구별 [OK] 또는 [  ] 표시 |
-| 3 | Node.js 미설치 시 | `Node.js:  [  ]` |
-| 4 | Git 설치 시 | `Git:      [OK]` |
-| 5 | Docker 실행 중 | `Docker:   [OK] (Running)` |
+| 1 | Run `./install.sh --modules "google"` in clean environment | Status display |
+| 2 | Check "Current Status:" in output | [OK] or [  ] shown for each tool |
+| 3 | When Node.js is not installed | `Node.js:  [  ]` |
+| 4 | When Git is installed | `Git:      [OK]` |
+| 5 | When Docker is running | `Docker:   [OK] (Running)` |
 
-**코드 참조**: `install.sh:364-418` -- `get_install_status()` 함수
+**Code Reference**: `install.sh:364-418` -- `get_install_status()` function
 
-**검증 포인트**:
-- `command -v node` -- Node.js 감지
-- `command -v git` -- Git 감지
-- `command -v code` 또는 `/Applications/Visual Studio Code.app` 존재 -- VS Code 감지
-- `command -v docker` + `docker info` -- Docker 감지 + 실행 상태
-- `command -v claude` -- Claude CLI 감지
-- `claude plugin list | grep bkit` -- bkit 플러그인 감지
+**Verification Points**:
+- `command -v node` -- Node.js detection
+- `command -v git` -- Git detection
+- `command -v code` or `/Applications/Visual Studio Code.app` exists -- VS Code detection
+- `command -v docker` + `docker info` -- Docker detection + running state
+- `command -v claude` -- Claude CLI detection
+- `claude plugin list | grep bkit` -- bkit plugin detection
 
 ---
 
-#### TC-INS-MAC-010: Base 자동 스킵
+#### TC-INS-MAC-010: Base Auto-Skip
 
-**우선순위**: P1
-**자동화**: 부분 가능
-**환경**: MAC-ENV-02 (모든 기본 도구 설치 상태)
+**Priority**: P1
+**Automation**: Partially possible
+**Environment**: MAC-ENV-02 (all base tools installed state)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | Node.js, Git, Claude, bkit 모두 설치 확인 | 모두 설치됨 |
-| 2 | `./install.sh --modules "google"` 실행 | |
-| 3 | 출력 확인 | "All base tools are already installed. Skipping base." 메시지 |
-| 4 | SKIP_BASE 확인 | true |
+| 1 | Verify Node.js, Git, Claude, bkit all installed | All installed |
+| 2 | Run `./install.sh --modules "google"` | |
+| 3 | Check output | "All base tools are already installed. Skipping base." message |
+| 4 | Check SKIP_BASE | true |
 
-**코드 참조**: `install.sh:444-456`
+**Code Reference**: `install.sh:444-456`
 ```bash
-# 조건: HAS_NODE=true AND HAS_GIT=true AND HAS_CLAUDE=true AND HAS_BKIT=true
-# Docker 필요 모듈 선택 시 HAS_DOCKER=true도 필요
+# Condition: HAS_NODE=true AND HAS_GIT=true AND HAS_CLAUDE=true AND HAS_BKIT=true
+# HAS_DOCKER=true also required when Docker-requiring modules are selected
 if [ "$BASE_INSTALLED" = true ] && [ "$SKIP_BASE" = false ] && [ -n "$SELECTED_MODULES" ]; then
     echo -e "${GREEN}All base tools are already installed. Skipping base.${NC}"
     SKIP_BASE=true
@@ -720,43 +720,43 @@ fi
 
 ---
 
-#### TC-INS-MAC-011: Docker 미실행 경고
+#### TC-INS-MAC-011: Docker Not Running Warning
 
-**우선순위**: P1
-**자동화**: 부분 가능 (사용자 입력 필요)
-**환경**: MAC-ENV-02 (SNAP-MAC02-DOCKER-OFF)
+**Priority**: P1
+**Automation**: Partially possible (requires user input)
+**Environment**: MAC-ENV-02 (SNAP-MAC02-DOCKER-OFF)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | Docker Desktop 중지 상태 확인 | `docker info` 실패 |
-| 2 | `./install.sh --modules "google"` 실행 | Docker 미실행 경고 표시 |
-| 3 | 출력 확인 | "Docker Desktop is not running!" 메시지 |
-| 4 | 사용자 입력 대기 | "Press Enter after starting Docker (or 'q' to quit):" 프롬프트 |
-| 5 | 'q' 입력 | exit 0 |
+| 1 | Verify Docker Desktop is stopped | `docker info` fails |
+| 2 | Run `./install.sh --modules "google"` | Docker not running warning displayed |
+| 3 | Check output | "Docker Desktop is not running!" message |
+| 4 | Wait for user input | "Press Enter after starting Docker (or 'q' to quit):" prompt |
+| 5 | Enter 'q' | exit 0 |
 
-**코드 참조**: `install.sh:420-441` -- Docker 실행 대기 블록
+**Code Reference**: `install.sh:420-441` -- Docker wait block
 
 ---
 
-#### TC-INS-MAC-012: 모듈 실행 순서
+#### TC-INS-MAC-012: Module Execution Order
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | 각 module.json의 order 값 확인 | base:1, github:2, atlassian:5, google:6, figma:7, notion:8, pencil:9 |
-| 2 | `./install.sh --modules "google,atlassian,github"` 실행 | |
-| 3 | 실행 순서 확인 | github(2) -> atlassian(5) -> google(6) |
+| 1 | Check order values in each module.json | base:1, github:2, atlassian:5, google:6, figma:7, notion:8, pencil:9 |
+| 2 | Run `./install.sh --modules "google,atlassian,github"` | |
+| 3 | Verify execution order | github(2) -> atlassian(5) -> google(6) |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
-# module.json order 필드 추출
+# Extract module.json order field
 for dir in installer/modules/*/; do
   name=$(node -e "console.log(JSON.parse(require('fs').readFileSync('${dir}module.json','utf8')).name)")
   order=$(node -e "console.log(JSON.parse(require('fs').readFileSync('${dir}module.json','utf8')).order)")
@@ -764,87 +764,87 @@ for dir in installer/modules/*/; do
 done | sort -n
 ```
 
-**코드 참조**: `install.sh:641-647` -- 모듈 order 기준 정렬
+**Code Reference**: `install.sh:641-647` -- Sorting by module order
 ```bash
 SORTED_MODULES=$(echo "$SORTED_MODULES" | tr ' ' '\n' | sort -t: -k1 -n | cut -d: -f2 | tr '\n' ' ')
 ```
 
 ---
 
-#### TC-INS-MAC-013: MCP 설정 백업
+#### TC-INS-MAC-013: MCP Configuration Backup
 
-**우선순위**: P0
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P0
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `~/.claude/mcp.json` 존재 확인 | 파일 존재 |
-| 2 | 모듈 설치 시작 | `backup_mcp_config()` 호출 |
-| 3 | 백업 파일 확인 | `~/.claude/mcp.json.bak.{timestamp}` 생성 |
-| 4 | 백업 내용 확인 | 원본과 동일 |
+| 1 | Verify `~/.claude/mcp.json` exists | File exists |
+| 2 | Start module installation | `backup_mcp_config()` called |
+| 3 | Verify backup file | `~/.claude/mcp.json.bak.{timestamp}` created |
+| 4 | Verify backup contents | Identical to original |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
-# 백업 파일 존재 확인
+# Verify backup file exists
 ls -la ~/.claude/mcp.json.bak.* 2>/dev/null
 
-# 내용 비교
+# Compare contents
 diff ~/.claude/mcp.json ~/.claude/mcp.json.bak.*
 ```
 
-**코드 참조**: `install.sh:496-502` -- `backup_mcp_config()` 함수
+**Code Reference**: `install.sh:496-502` -- `backup_mcp_config()` function
 
 ---
 
-#### TC-INS-MAC-014: 모듈 실패 시 롤백
+#### TC-INS-MAC-014: Rollback on Module Failure
 
-**우선순위**: P0
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P0
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | MCP 설정 백업 완료 상태 | 백업 파일 존재 |
-| 2 | 모듈 install.sh가 exit 1 반환하도록 설정 | 인위적 실패 유발 |
-| 3 | 롤백 확인 | "Rolling back MCP configuration..." 메시지 |
-| 4 | MCP 설정 확인 | 백업에서 복원됨 |
+| 1 | MCP configuration backup completed | Backup file exists |
+| 2 | Configure module install.sh to return exit 1 | Induce intentional failure |
+| 3 | Verify rollback | "Rolling back MCP configuration..." message |
+| 4 | Verify MCP configuration | Restored from backup |
 
-**테스트 방법**:
+**Test Method**:
 ```bash
-# 인위적 실패를 위한 임시 모듈 스크립트
+# Temporary module script for intentional failure
 mkdir -p /tmp/test-module
 echo '#!/bin/bash
 echo "Intentional failure"
 exit 1' > /tmp/test-module/install.sh
 chmod +x /tmp/test-module/install.sh
 
-# 백업 확인 후 롤백 메시지 확인
+# Verify backup then check rollback message
 ```
 
-**코드 참조**: `install.sh:504-509` -- `rollback_mcp_config()`, `install.sh:611-619` -- 실패 시 롤백 호출
+**Code Reference**: `install.sh:504-509` -- `rollback_mcp_config()`, `install.sh:611-619` -- rollback invoked on failure
 
 ---
 
-#### TC-INS-MAC-015: 설치 성공 시 백업 정리
+#### TC-INS-MAC-015: Backup Cleanup on Successful Installation
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | 전체 설치 성공 | 모든 모듈 exit 0 |
-| 2 | 백업 파일 확인 | `mcp.json.bak.*` 삭제됨 |
-| 3 | 완료 메시지 확인 | "Installation Complete!" 출력 |
+| 1 | Full installation succeeds | All modules exit 0 |
+| 2 | Check backup file | `mcp.json.bak.*` deleted |
+| 3 | Check completion message | "Installation Complete!" output |
 
-**코드 참조**: `install.sh:660-662`
+**Code Reference**: `install.sh:660-662`
 ```bash
 if [ -n "$MCP_BACKUP_FILE" ] && [ -f "$MCP_BACKUP_FILE" ]; then
     rm -f "$MCP_BACKUP_FILE"
@@ -853,217 +853,217 @@ fi
 
 ---
 
-#### TC-INS-MAC-016: 설치 후 검증
+#### TC-INS-MAC-016: Post-Installation Verification
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | 모듈 설치 완료 | `verify_module_installation()` 자동 호출 |
-| 2 | MCP config 확인 | "[Verify] MCP config: OK" 출력 |
-| 3 | Docker 이미지 확인 (Docker 모듈) | "[Verify] Docker image: OK" 출력 |
+| 1 | Module installation complete | `verify_module_installation()` automatically called |
+| 2 | Check MCP config | "[Verify] MCP config: OK" output |
+| 3 | Check Docker image (Docker module) | "[Verify] Docker image: OK" output |
 
-**코드 참조**: `install.sh:514-545` -- `verify_module_installation()` 함수
+**Code Reference**: `install.sh:514-545` -- `verify_module_installation()` function
 
 ---
 
-#### TC-INS-MAC-017: parse_json -- node 우선
+#### TC-INS-MAC-017: parse_json -- Node Priority
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02 (Node.js 설치 상태)
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02 (Node.js installed)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | Node.js 설치 확인 | `command -v node` 성공 |
-| 2 | `parse_json '{"name":"test","order":5}' "name"` | "test" 반환 |
-| 3 | `parse_json '{"name":"test","order":5}' "order"` | "5" 반환 |
+| 1 | Verify Node.js installed | `command -v node` succeeds |
+| 2 | `parse_json '{"name":"test","order":5}' "name"` | Returns "test" |
+| 3 | `parse_json '{"name":"test","order":5}' "order"` | Returns "5" |
 
-**검증 스크립트**:
+**Verification Script**:
 ```bash
-source installer/install.sh --list 2>/dev/null  # parse_json 함수 로드
+source installer/install.sh --list 2>/dev/null  # load parse_json function
 result=$(parse_json '{"name":"google","order":6}' "name")
 [ "$result" = "google" ] && echo "PASS" || echo "FAIL: $result"
 ```
 
-**코드 참조**: `install.sh:31-53` -- node -e stdin 기반 파싱
+**Code Reference**: `install.sh:31-53` -- stdin-based parsing via node -e
 
 ---
 
-#### TC-INS-MAC-018: parse_json -- python3 폴백
+#### TC-INS-MAC-018: parse_json -- python3 Fallback
 
-**우선순위**: P2
-**자동화**: 가능
-**환경**: MAC-ENV-02 (Node.js 없음, Python3 있음)
+**Priority**: P2
+**Automation**: Possible
+**Environment**: MAC-ENV-02 (No Node.js, Python3 available)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | Node.js 임시 제거 또는 PATH에서 제외 | `command -v node` 실패 |
-| 2 | Python3 확인 | `command -v python3` 성공 |
-| 3 | parse_json 호출 | python3으로 파싱 성공 |
+| 1 | Temporarily remove Node.js or exclude from PATH | `command -v node` fails |
+| 2 | Verify Python3 | `command -v python3` succeeds |
+| 3 | Call parse_json | Parsing succeeds via python3 |
 
-**검증 스크립트**:
+**Verification Script**:
 ```bash
 PATH_BACKUP=$PATH
 export PATH=$(echo "$PATH" | sed 's|/usr/local/bin:||;s|/opt/homebrew/bin:||')
-# node가 없는 PATH에서 테스트
+# test in PATH without node
 result=$(bash -c 'source install.sh; parse_json "{\"name\":\"test\"}" "name"')
 export PATH=$PATH_BACKUP
 ```
 
 ---
 
-#### TC-INS-MAC-019: parse_json -- osascript 폴백
+#### TC-INS-MAC-019: parse_json -- osascript Fallback
 
-**우선순위**: P3
-**자동화**: 가능 (macOS만)
-**환경**: MAC-ENV-02 (Node.js/Python3 모두 없음)
+**Priority**: P3
+**Automation**: Possible (macOS only)
+**Environment**: MAC-ENV-02 (Neither Node.js nor Python3 available)
 
-**상세 절차**: TC-INS-MAC-018과 동일하나, python3도 PATH에서 제거. macOS에서 osascript JavaScript 실행기로 파싱.
+**Detailed Procedure**: Same as TC-INS-MAC-018, but python3 is also removed from PATH. Parsing via osascript JavaScript runner on macOS.
 
-**코드 참조**: `install.sh:73-84` -- osascript stdin 기반 JavaScript 파싱
+**Code Reference**: `install.sh:73-84` -- stdin-based JavaScript parsing via osascript
 
 ---
 
-#### TC-INS-MAC-020: SHA-256 체크섬 검증
+#### TC-INS-MAC-020: SHA-256 Checksum Verification
 
-**우선순위**: P0
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P0
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | 원격 실행 모드 | `USE_LOCAL=false` |
-| 2 | `download_and_verify` 호출 | checksums.json 다운로드 |
-| 3 | 파일 다운로드 + SHA-256 계산 | shasum -a 256 사용 |
-| 4 | 해시 일치 확인 | "Integrity verified: {path}" 메시지 |
+| 1 | Remote execution mode | `USE_LOCAL=false` |
+| 2 | `download_and_verify` call | checksums.json downloaded |
+| 3 | File download + SHA-256 calculation | Uses shasum -a 256 |
+| 4 | Verify hash match | "Integrity verified: {path}" message |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
-# 수동 검증
+# Manual verification
 curl -sSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/checksums.json | node -e "
   let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{
     const c=JSON.parse(d);
     console.log(JSON.stringify(c.files, null, 2));
   })"
 
-# 특정 파일 해시 비교
+# Compare hash of a specific file
 curl -sSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/modules/google/install.sh | shasum -a 256
 ```
 
-**코드 참조**: `install.sh:118-178` -- `download_and_verify()` 함수
+**Code Reference**: `install.sh:118-178` -- `download_and_verify()` function
 
 ---
 
-#### TC-INS-MAC-021: SHA-256 체크섬 불일치
+#### TC-INS-MAC-021: SHA-256 Checksum Mismatch
 
-**우선순위**: P0
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P0
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | 변조된 파일 준비 (1바이트 수정) | 해시 불일치 |
-| 2 | `download_and_verify` 호출 시뮬레이션 | |
-| 3 | 출력 확인 | "[SECURITY] Integrity verification failed!" 메시지 |
-| 4 | 임시 파일 확인 | `rm -f "$tmpfile"` 호출로 삭제됨 |
-| 5 | 반환 코드 | return 1 |
+| 1 | Prepare tampered file (1 byte modified) | Hash mismatch |
+| 2 | Simulate `download_and_verify` call | |
+| 3 | Check output | "[SECURITY] Integrity verification failed!" message |
+| 4 | Check temporary file | Deleted via `rm -f "$tmpfile"` call |
+| 5 | Return code | return 1 |
 
-**테스트 스크립트**:
+**Test Script**:
 ```bash
-# 변조 파일 생성
+# Create tampered file
 tmpfile=$(mktemp)
 echo "tampered content" > "$tmpfile"
-expected_hash="abc123..."  # 원본 해시
+expected_hash="abc123..."  # original hash
 actual_hash=$(shasum -a 256 "$tmpfile" | awk '{print $1}')
-[ "$actual_hash" != "$expected_hash" ] && echo "PASS: 변조 감지" || echo "FAIL"
+[ "$actual_hash" != "$expected_hash" ] && echo "PASS: tampering detected" || echo "FAIL"
 rm -f "$tmpfile"
 ```
 
 ---
 
-#### TC-INS-MAC-022: checksums.json 불가 시
+#### TC-INS-MAC-022: When checksums.json Is Unavailable
 
-**우선순위**: P2
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P2
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | checksums.json 404 시뮬레이션 | CHECKSUMS_JSON="" |
-| 2 | `download_and_verify` 호출 | |
-| 3 | 출력 확인 | "[WARN] checksums.json not available" 경고 |
-| 4 | 설치 계속 여부 | 설치 계속 진행 (return 0) |
+| 1 | Simulate checksums.json 404 | CHECKSUMS_JSON="" |
+| 2 | `download_and_verify` call | |
+| 3 | Check output | "[WARN] checksums.json not available" warning |
+| 4 | Installation continuation | Installation continues (return 0) |
 
-**코드 참조**: `install.sh:110-113`
+**Code Reference**: `install.sh:110-113`
 
 ---
 
-#### TC-INS-MAC-023: 공유 스크립트 원격 다운로드
+#### TC-INS-MAC-023: Shared Scripts Remote Download
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | 원격 실행 모드 (USE_LOCAL=false) | |
-| 2 | `setup_shared_dir()` 호출 | SHARED_TMP 디렉토리 생성 |
-| 3 | 다운로드된 파일 확인 | colors.sh, browser-utils.sh, docker-utils.sh, mcp-config.sh |
+| 1 | Remote execution mode (USE_LOCAL=false) | |
+| 2 | `setup_shared_dir()` call | SHARED_TMP directory created |
+| 3 | Check downloaded files | colors.sh, browser-utils.sh, docker-utils.sh, mcp-config.sh |
 
-**코드 참조**: `install.sh:555-567` -- `setup_shared_dir()` 함수
+**Code Reference**: `install.sh:555-567` -- `setup_shared_dir()` function
 
 ---
 
-#### TC-INS-MAC-024: 임시 파일 정리 (trap)
+#### TC-INS-MAC-024: Temporary File Cleanup (trap)
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P1
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | 원격 실행으로 SHARED_TMP 생성 | 임시 디렉토리 존재 |
-| 2 | 설치 완료 또는 Ctrl+C로 중단 | EXIT trap 발동 |
-| 3 | SHARED_TMP 확인 | 디렉토리 삭제됨 |
+| 1 | SHARED_TMP created via remote execution | Temporary directory exists |
+| 2 | Installation completes or interrupted with Ctrl+C | EXIT trap triggered |
+| 3 | Check SHARED_TMP | Directory deleted |
 
-**코드 참조**: `install.sh:561` -- `trap 'rm -rf "$SHARED_TMP"' EXIT`
+**Code Reference**: `install.sh:561` -- `trap 'rm -rf "$SHARED_TMP"' EXIT`
 
 ---
 
-#### TC-INS-MAC-025: 환경변수 지원
+#### TC-INS-MAC-025: Environment Variable Support
 
-**우선순위**: P2
-**자동화**: 가능
-**환경**: MAC-ENV-02
+**Priority**: P2
+**Automation**: Possible
+**Environment**: MAC-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `MODULES="google" INSTALL_ALL=false ./install.sh` 실행 | |
-| 2 | MODULES 변수 확인 | "google" |
-| 3 | 동작 확인 | 명령줄 `--modules "google"`과 동일 |
+| 1 | Run `MODULES="google" INSTALL_ALL=false ./install.sh` | |
+| 2 | Check MODULES variable | "google" |
+| 3 | Verify behavior | Same as command-line `--modules "google"` |
 
-**코드 참조**: `install.sh:184-187` -- 환경변수 기본값 설정
+**Code Reference**: `install.sh:184-187` -- environment variable defaults
 ```bash
 MODULES="${MODULES:-}"
 INSTALL_ALL="${INSTALL_ALL:-false}"
@@ -1073,69 +1073,69 @@ INSTALL_ALL="${INSTALL_ALL:-false}"
 
 #### TC-INS-MAC-026: Apple Silicon Homebrew PATH
 
-**우선순위**: P1
-**자동화**: 부분 가능 (Apple Silicon 필요)
-**환경**: MAC-ENV-02 (Apple M1+)
+**Priority**: P1
+**Automation**: Partially possible (requires Apple Silicon)
+**Environment**: MAC-ENV-02 (Apple M1+)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | Apple Silicon Mac 확인 | `uname -m` = "arm64" |
-| 2 | Homebrew 설치 후 PATH 확인 | `/opt/homebrew/bin/brew` |
-| 3 | `eval "$(/opt/homebrew/bin/brew shellenv)"` 적용 확인 | brew 명령어 사용 가능 |
+| 1 | Verify Apple Silicon Mac | `uname -m` = "arm64" |
+| 2 | Check PATH after Homebrew installation | `/opt/homebrew/bin/brew` |
+| 3 | Verify `eval "$(/opt/homebrew/bin/brew shellenv)"` applied | brew command available |
 
-**코드 참조**: `modules/base/install.sh` 에서 Homebrew shellenv 설정
+**Code Reference**: Homebrew shellenv configuration in `modules/base/install.sh`
 
 ---
 
-### 3.2 Windows 인스톨러 테스트 (TC-INS-WIN-001 ~ TC-INS-WIN-016)
+### 3.2 Windows Installer Tests (TC-INS-WIN-001 ~ TC-INS-WIN-016)
 
-#### TC-INS-WIN-001: 매개변수 파싱 -- -modules
+#### TC-INS-WIN-001: Parameter Parsing -- -modules
 
-**우선순위**: P0
-**자동화**: 가능 (PowerShell 스크립트)
-**환경**: WIN-ENV-03
+**Priority**: P0
+**Automation**: Possible (PowerShell script)
+**Environment**: WIN-ENV-03
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `.\install.ps1 -modules "google,atlassian"` 실행 | |
-| 2 | $selectedModules 확인 | @("google", "atlassian") |
+| 1 | Run `.\install.ps1 -modules "google,atlassian"` | |
+| 2 | Check $selectedModules | @("google", "atlassian") |
 
-**검증 명령어** (PowerShell):
+**Verification Commands** (PowerShell):
 ```powershell
-# install.ps1 파라미터 테스트
+# install.ps1 parameter test
 $result = & .\install.ps1 -modules "google,atlassian" -list 2>&1
 $result | Select-String "google"
 ```
 
 ---
 
-#### TC-INS-WIN-002: 매개변수 파싱 -- -all
+#### TC-INS-WIN-002: Parameter Parsing -- -all
 
-**우선순위**: P0
-**자동화**: 가능
-**환경**: WIN-ENV-03
+**Priority**: P0
+**Automation**: Possible
+**Environment**: WIN-ENV-03
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
-| 1 | `.\install.ps1 -all` 실행 | required=false인 모든 모듈 선택 |
+| 1 | Run `.\install.ps1 -all` | All modules with required=false selected |
 
 ---
 
 #### TC-INS-WIN-003: 매개변수 파싱 -- -list
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: WIN-ENV-03
+**Priority**: P1
+**Automation**: Possible
+**Environment**: WIN-ENV-03
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | `.\install.ps1 -list` 실행 | 모듈 목록 표시, 관리자 권한 불필요 |
 | 2 | 일반 사용자 계정에서 실행 | UAC 프롬프트 없이 동작 |
@@ -1144,11 +1144,11 @@ $result | Select-String "google"
 
 #### TC-INS-WIN-004: 환경변수 지원
 
-**우선순위**: P2
-**자동화**: 가능
-**환경**: WIN-ENV-03
+**Priority**: P2
+**Automation**: Possible
+**Environment**: WIN-ENV-03
 
-**상세 절차**:
+**Detailed Procedure**:
 ```powershell
 $env:MODULES = 'google'
 .\install.ps1 -list
@@ -1159,31 +1159,31 @@ $env:MODULES = 'google'
 
 #### TC-INS-WIN-005: 관리자 권한 감지
 
-**우선순위**: P0
-**자동화**: 불가 (UAC 프롬프트)
-**환경**: WIN-ENV-03 (비관리자)
+**Priority**: P0
+**Automation**: Not possible (UAC prompt)
+**Environment**: WIN-ENV-03 (비관리자)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | 비관리자 계정으로 PowerShell 열기 | |
 | 2 | Node.js 미설치 상태에서 install.ps1 실행 | |
 | 3 | UAC 프롬프트 확인 | 관리자 권한 요청 팝업 |
 
-**코드 참조**: `install.ps1:131-169` -- 조건부 권한 상승 로직
+**Code Reference**: `install.ps1:131-169` -- 조건부 권한 상승 로직
 
 ---
 
 #### TC-INS-WIN-006: 조건부 권한 상승
 
-**우선순위**: P1
-**자동화**: 부분 가능
-**환경**: WIN-ENV-03 (기본 도구 모두 설치)
+**Priority**: P1
+**Automation**: Partially possible
+**Environment**: WIN-ENV-03 (기본 도구 모두 설치)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | Node.js, Git, VS Code, Docker 모두 설치 확인 | |
 | 2 | `.\install.ps1 -modules "notion" -skipBase` 실행 | |
@@ -1210,13 +1210,13 @@ $env:MODULES = 'google'
 
 #### TC-INS-LNX-001: apt 기반 설치
 
-**우선순위**: P0
-**자동화**: 가능 (Docker 컨테이너)
-**환경**: LNX-ENV-01
+**Priority**: P0
+**Automation**: Possible (Docker container)
+**Environment**: LNX-ENV-01
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | Ubuntu 22.04 클린 환경 | Node.js, Git 미설치 |
 | 2 | `./install.sh --modules "github" --skip-base` 실행 시 내부 base 로직 | |
@@ -1224,7 +1224,7 @@ $env:MODULES = 'google'
 | 4 | Node.js 설치 확인 | NodeSource 스크립트로 apt-get 설치 |
 | 5 | Git 설치 확인 | `sudo apt-get install -y git` |
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
 # Docker 컨테이너에서 테스트
 docker run -it --rm ubuntu:22.04 bash -c '
@@ -1233,19 +1233,19 @@ docker run -it --rm ubuntu:22.04 bash -c '
 '
 ```
 
-**코드 참조**: `modules/base/install.sh:49-59` -- Linux Node.js 설치 로직
+**Code Reference**: `modules/base/install.sh:49-59` -- Linux Node.js 설치 로직
 
 ---
 
 #### TC-INS-LNX-002: dnf 기반 설치
 
-**우선순위**: P1
-**자동화**: 가능 (Docker 컨테이너)
-**환경**: LNX-ENV-03
+**Priority**: P1
+**Automation**: Possible (Docker container)
+**Environment**: LNX-ENV-03
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | Fedora 39 클린 환경 | |
 | 2 | install.sh 실행 | `dnf` 감지 |
@@ -1255,23 +1255,23 @@ docker run -it --rm ubuntu:22.04 bash -c '
 
 #### TC-INS-LNX-003: pacman 기반 설치
 
-**우선순위**: P2
-**자동화**: 가능
-**환경**: LNX-ENV-04
+**Priority**: P2
+**Automation**: Possible
+**Environment**: LNX-ENV-04
 
-**상세 절차**: Arch Linux에서 `pacman -S --noconfirm nodejs` 확인
+**Detailed Procedure**: Arch Linux에서 `pacman -S --noconfirm nodejs` 확인
 
 ---
 
 #### TC-INS-LNX-004: Docker 그룹 추가
 
-**우선순위**: P1
-**자동화**: 가능
-**환경**: LNX-ENV-01
+**Priority**: P1
+**Automation**: Possible
+**Environment**: LNX-ENV-01
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | Docker 설치 후 | `docker` 그룹 존재 |
 | 2 | base 모듈 실행 | `sudo usermod -aG docker $USER` |
@@ -1375,13 +1375,13 @@ const mockToken = {
 
 #### TC-AUT-ALL-001: 최초 인증 흐름
 
-**우선순위**: P0
-**자동화**: 수동 (브라우저 흐름)
-**환경**: DOK-ENV-02
+**Priority**: P0
+**Automation**: Manual (browser flow)
+**Environment**: DOK-ENV-02
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | `~/.google-workspace/client_secret.json` 존재 확인 | 파일 존재 |
 | 2 | `~/.google-workspace/token.json` 삭제 | 파일 없음 |
@@ -1394,7 +1394,7 @@ const mockToken = {
 | 9 | 파일 권한 확인 | `-rw-------` (0600) |
 | 10 | token.json 내용 확인 | access_token, refresh_token, expiry_date 포함 |
 
-**코드 참조**:
+**Code Reference**:
 - `oauth.ts:342-397` -- `getAuthenticatedClient()`
 - `oauth.ts:223-334` -- `getTokenFromBrowser()`
 - `oauth.ts:200-215` -- `saveToken()` (mode 0600)
@@ -1403,11 +1403,11 @@ const mockToken = {
 
 #### TC-AUT-ALL-002: 토큰 재사용
 
-**우선순위**: P0
-**자동화**: 가능 (Vitest)
-**환경**: 모든 환경
+**Priority**: P0
+**Automation**: Possible (Vitest)
+**Environment**: 모든 환경
 
-**Vitest 테스트 코드**:
+**Vitest Test Code**:
 ```typescript
 describe('TC-AUT-ALL-002: Token Reuse', () => {
   it('should use cached token without browser flow', async () => {
@@ -1441,10 +1441,10 @@ describe('TC-AUT-ALL-002: Token Reuse', () => {
 
 #### TC-AUT-ALL-003: 토큰 만료 갱신
 
-**우선순위**: P0
-**자동화**: 가능 (Vitest)
+**Priority**: P0
+**Automation**: Possible (Vitest)
 
-**Vitest 테스트 코드**:
+**Vitest Test Code**:
 ```typescript
 describe('TC-AUT-ALL-003: Token Refresh', () => {
   it('should refresh token when expiry_date < now + 5min', async () => {
@@ -1460,27 +1460,27 @@ describe('TC-AUT-ALL-003: Token Refresh', () => {
 });
 ```
 
-**코드 참조**: `oauth.ts:362-383` -- 5분 버퍼 (`expiryBuffer = 5 * 60 * 1000`)
+**Code Reference**: `oauth.ts:362-383` -- 5분 버퍼 (`expiryBuffer = 5 * 60 * 1000`)
 
 ---
 
 #### TC-AUT-ALL-004: 토큰 갱신 실패 시 재인증
 
-**우선순위**: P0
-**자동화**: 가능 (Vitest)
+**Priority**: P0
+**Automation**: Possible (Vitest)
 
 **테스트 시나리오**: `refreshAccessToken()` 에서 에러 throw -> `getTokenFromBrowser()` 호출
 
-**코드 참조**: `oauth.ts:374-382` -- catch 블록에서 재인증
+**Code Reference**: `oauth.ts:374-382` -- catch 블록에서 재인증
 
 ---
 
 #### TC-AUT-ALL-005: refresh_token 누락 검증
 
-**우선순위**: P1
-**자동화**: 가능 (Vitest)
+**Priority**: P1
+**Automation**: Possible (Vitest)
 
-**Vitest 테스트 코드**:
+**Vitest Test Code**:
 ```typescript
 describe('TC-AUT-ALL-005: Missing refresh_token', () => {
   it('should return null when refresh_token is missing', () => {
@@ -1496,18 +1496,18 @@ describe('TC-AUT-ALL-005: Missing refresh_token', () => {
 });
 ```
 
-**코드 참조**: `oauth.ts:171-186` -- `loadToken()` 함수
+**Code Reference**: `oauth.ts:171-186` -- `loadToken()` 함수
 
 ---
 
 #### TC-AUT-ALL-006: CSRF 방지 -- state 불일치
 
-**우선순위**: P0
-**자동화**: 부분 가능 (HTTP 요청 시뮬레이션)
+**Priority**: P0
+**Automation**: Partially possible (HTTP request simulation)
 
 **수동 테스트 절차**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | OAuth 흐름 시작 (브라우저 URL 표시) | state 파라미터 포함 URL |
 | 2 | 콜백 URL 수동 조작: `http://localhost:3000/callback?code=xxx&state=WRONG` | |
@@ -1515,14 +1515,14 @@ describe('TC-AUT-ALL-005: Missing refresh_token', () => {
 | 4 | 응답 본문 확인 | "Authentication failed: Invalid state parameter" |
 | 5 | 로그 확인 | `[SECURITY] {...,"event_type":"oauth_callback","result":"failure","detail":"State mismatch..."}` |
 
-**코드 참조**: `oauth.ts:248-268` -- state 검증 블록
+**Code Reference**: `oauth.ts:248-268` -- state 검증 블록
 
 ---
 
 #### TC-AUT-ALL-007: CSRF 방지 -- state 일치
 
-**우선순위**: P0
-**자동화**: 가능 (통합 테스트)
+**Priority**: P0
+**Automation**: Possible (integration test)
 
 **테스트 시나리오**: 올바른 state 값으로 콜백 -> HTTP 200 + 토큰 발급
 
@@ -1530,21 +1530,21 @@ describe('TC-AUT-ALL-005: Missing refresh_token', () => {
 
 #### TC-AUT-ALL-008: 인증 코드 미수신
 
-**우선순위**: P1
-**자동화**: 가능
+**Priority**: P1
+**Automation**: Possible
 
 **테스트**: `http://localhost:3000/callback?state=CORRECT` (code 파라미터 없음) -> HTTP 400, "No authorization code"
 
-**코드 참조**: `oauth.ts:271-281`
+**Code Reference**: `oauth.ts:271-281`
 
 ---
 
 #### TC-AUT-ALL-009: 로그인 타임아웃
 
-**우선순위**: P1
-**자동화**: 가능 (타임아웃 시뮬레이션)
+**Priority**: P1
+**Automation**: Possible (timeout simulation)
 
-**Vitest 테스트 코드**:
+**Vitest Test Code**:
 ```typescript
 describe('TC-AUT-ALL-009: Login Timeout', () => {
   it('should reject after 5 minutes', async () => {
@@ -1557,16 +1557,16 @@ describe('TC-AUT-ALL-009: Login Timeout', () => {
 });
 ```
 
-**코드 참조**: `oauth.ts:329-332` -- `setTimeout 5 * 60 * 1000`
+**Code Reference**: `oauth.ts:329-332` -- `setTimeout 5 * 60 * 1000`
 
 ---
 
 #### TC-AUT-ALL-010: 뮤텍스 -- 동시 인증 방지
 
-**우선순위**: P0
-**자동화**: 가능 (Vitest)
+**Priority**: P0
+**Automation**: Possible (Vitest)
 
-**Vitest 테스트 코드**:
+**Vitest Test Code**:
 ```typescript
 describe('TC-AUT-ALL-010: Auth Mutex', () => {
   it('should reuse in-progress auth promise', async () => {
@@ -1580,16 +1580,16 @@ describe('TC-AUT-ALL-010: Auth Mutex', () => {
 });
 ```
 
-**코드 참조**: `oauth.ts:102, 344-346` -- `authInProgress` Promise 공유
+**Code Reference**: `oauth.ts:102, 344-346` -- `authInProgress` Promise 공유
 
 ---
 
 #### TC-AUT-ALL-011: 서비스 캐싱
 
-**우선순위**: P1
-**자동화**: 가능 (Vitest)
+**Priority**: P1
+**Automation**: Possible (Vitest)
 
-**Vitest 테스트 코드**:
+**Vitest Test Code**:
 ```typescript
 describe('TC-AUT-ALL-011: Service Caching', () => {
   it('should return cached services within 50 minutes', async () => {
@@ -1600,14 +1600,14 @@ describe('TC-AUT-ALL-011: Service Caching', () => {
 });
 ```
 
-**코드 참조**: `oauth.ts:83-99` -- `CACHE_TTL_MS = 50 * 60 * 1000`, `serviceCache`
+**Code Reference**: `oauth.ts:83-99` -- `CACHE_TTL_MS = 50 * 60 * 1000`, `serviceCache`
 
 ---
 
 #### TC-AUT-ALL-012: 서비스 캐시 만료
 
-**우선순위**: P1
-**자동화**: 가능
+**Priority**: P1
+**Automation**: Possible
 
 **테스트**: 50분 경과 시뮬레이션 -> 새 서비스 인스턴스 생성
 
@@ -1615,8 +1615,8 @@ describe('TC-AUT-ALL-011: Service Caching', () => {
 
 #### TC-AUT-ALL-013: clearServiceCache
 
-**우선순위**: P2
-**자동화**: 가능
+**Priority**: P2
+**Automation**: Possible
 
 **테스트**: `clearServiceCache()` 호출 후 `getGoogleServices()` -> 새 인스턴스
 
@@ -1624,10 +1624,10 @@ describe('TC-AUT-ALL-011: Service Caching', () => {
 
 #### TC-AUT-ALL-014: 설정 디렉토리 생성
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
-**Vitest 테스트 코드**:
+**Vitest Test Code**:
 ```typescript
 describe('TC-AUT-ALL-014: Config Dir Creation', () => {
   it('should create CONFIG_DIR with mode 0700', () => {
@@ -1644,13 +1644,13 @@ describe('TC-AUT-ALL-014: Config Dir Creation', () => {
 });
 ```
 
-**코드 참조**: `oauth.ts:115-131` -- `ensureConfigDir()`
+**Code Reference**: `oauth.ts:115-131` -- `ensureConfigDir()`
 
 ---
 
 #### TC-AUT-ALL-015 ~ TC-AUT-ALL-022
 
-| TC ID | 핵심 검증 | 자동화 | 테스트 방법 |
+| TC ID | Key Verification | Automation | 테스트 방법 |
 |-------|----------|--------|-----------|
 | TC-AUT-ALL-015 | 설정 디렉토리 권한 0755 -> 0700 복구 | Vitest | chmodSync 호출 + logSecurityEvent 확인 |
 | TC-AUT-ALL-016 | `GOOGLE_SCOPES="gmail,drive"` -> 2개 스코프만 | Vitest | `resolveScopes()` 반환값 확인 |
@@ -1696,10 +1696,10 @@ vi.mock('../../auth/oauth', () => ({
 
 #### TC-GML-ALL-001: gmail_search -- 기본 검색
 
-**우선순위**: P0
-**자동화**: 가능 (Vitest)
+**Priority**: P0
+**Automation**: Possible (Vitest)
 
-**Vitest 테스트 코드**:
+**Vitest Test Code**:
 ```typescript
 describe('TC-GML-ALL-001: gmail_search basic', () => {
   it('should return messages with id/from/subject/date/snippet', async () => {
@@ -1736,13 +1736,13 @@ describe('TC-GML-ALL-001: gmail_search basic', () => {
 });
 ```
 
-**코드 참조**: `gmail.ts:18-57` -- `gmail_search` handler
+**Code Reference**: `gmail.ts:18-57` -- `gmail_search` handler
 
 ---
 
 #### TC-GML-ALL-002: gmail_search -- 빈 결과
 
-**자동화**: 가능 (Vitest)
+**Automation**: Possible (Vitest)
 
 ```typescript
 it('should return empty array when no results', async () => {
@@ -1762,8 +1762,8 @@ it('should return empty array when no results', async () => {
 
 #### TC-GML-ALL-003: gmail_read -- 전체 읽기
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 ```typescript
 it('should return full email with id, from, to, cc, subject, date, body, attachments, labels', async () => {
@@ -1799,19 +1799,19 @@ it('should return full email with id, from, to, cc, subject, date, body, attachm
 
 #### TC-GML-ALL-004: gmail_read -- MIME 파싱
 
-**우선순위**: P1
-**자동화**: 가능
+**Priority**: P1
+**Automation**: Possible
 
 **테스트**: multipart/mixed > multipart/alternative > text/plain 구조에서 `extractTextBody()` 올바른 추출
 
-**코드 참조**: `mime.ts:33-73` -- `extractTextBody()` 재귀 파싱
+**Code Reference**: `mime.ts:33-73` -- `extractTextBody()` 재귀 파싱
 
 ---
 
 #### TC-GML-ALL-005: gmail_read -- 첨부파일 목록
 
-**우선순위**: P1
-**자동화**: 가능
+**Priority**: P1
+**Automation**: Possible
 
 ```typescript
 it('should extract attachments with filename, mimeType, attachmentId, size', async () => {
@@ -1842,14 +1842,14 @@ it('should extract attachments with filename, mimeType, attachmentId, size', asy
 });
 ```
 
-**코드 참조**: `mime.ts:80-101` -- `extractAttachments()` 함수
+**Code Reference**: `mime.ts:80-101` -- `extractAttachments()` 함수
 
 ---
 
 #### TC-GML-ALL-006: gmail_read -- 본문 5000자 제한
 
-**우선순위**: P2
-**자동화**: 가능
+**Priority**: P2
+**Automation**: Possible
 
 ```typescript
 it('should truncate body to 5000 chars', async () => {
@@ -1861,13 +1861,13 @@ it('should truncate body to 5000 chars', async () => {
 });
 ```
 
-**코드 참조**: `gmail.ts:95` -- `body: body.slice(0, 5000)`
+**Code Reference**: `gmail.ts:95` -- `body: body.slice(0, 5000)`
 
 ---
 
 #### TC-GML-ALL-007 ~ TC-GML-ALL-022
 
-| TC ID | 핵심 검증 | Mock 설정 | 기대 결과 |
+| TC ID | Key Verification | Mock 설정 | 기대 결과 |
 |-------|----------|----------|----------|
 | TC-GML-ALL-007 | gmail_send 이메일 발송 | `messages.send` mock | `success=true, messageId` |
 | TC-GML-ALL-008 | gmail_send CC/BCC | 헤더에 CC/BCC 포함 | CC/BCC 헤더 존재 |
@@ -1888,7 +1888,7 @@ it('should truncate body to 5000 chars', async () => {
 
 ### 4.3 Drive 도구 테스트 (TC-DRV-ALL-001 ~ TC-DRV-ALL-020)
 
-**공통 Mock**:
+**Common Mocks**:
 ```typescript
 const mockDriveApi = {
   files: {
@@ -1910,8 +1910,8 @@ const mockDriveApi = {
 
 #### TC-DRV-ALL-001: drive_search -- 기본 검색
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 ```typescript
 it('should search with supportsAllDrives=true', async () => {
@@ -1936,14 +1936,14 @@ it('should search with supportsAllDrives=true', async () => {
 });
 ```
 
-**코드 참조**: `drive.ts:30-39` -- `supportsAllDrives: true, corpora: "allDrives"`
+**Code Reference**: `drive.ts:30-39` -- `supportsAllDrives: true, corpora: "allDrives"`
 
 ---
 
 #### TC-DRV-ALL-003: drive_search -- 쿼리 이스케이프
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 ```typescript
 it('should escape single quotes in query', async () => {
@@ -1959,14 +1959,14 @@ it('should escape single quotes in query', async () => {
 });
 ```
 
-**코드 참조**: `drive.ts:25` -- `escapeDriveQuery(query)`, `sanitize.ts:24-26`
+**Code Reference**: `drive.ts:25` -- `escapeDriveQuery(query)`, `sanitize.ts:24-26`
 
 ---
 
 #### TC-DRV-ALL-005: drive_list -- ID 검증
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 ```typescript
 it('should reject invalid folderId format', async () => {
@@ -1978,13 +1978,13 @@ it('should reject invalid folderId format', async () => {
 });
 ```
 
-**코드 참조**: `drive.ts:66` -- `validateDriveId(folderId, "folderId")`, `sanitize.ts:38-44`
+**Code Reference**: `drive.ts:66` -- `validateDriveId(folderId, "folderId")`, `sanitize.ts:38-44`
 
 ---
 
 #### TC-DRV-ALL-002 ~ TC-DRV-ALL-020 요약
 
-| TC ID | 핵심 검증 | 자동화 |
+| TC ID | Key Verification | Automation |
 |-------|----------|--------|
 | TC-DRV-ALL-002 | MIME 필터 (`mimeType="application/pdf"`) | Vitest |
 | TC-DRV-ALL-004 | 루트 폴더 목록 (`folderId="root"`) | Vitest |
@@ -2006,7 +2006,7 @@ it('should reject invalid folderId format', async () => {
 
 ### 4.4 Calendar 도구 테스트 (TC-CAL-ALL-001 ~ TC-CAL-ALL-015)
 
-**공통 Mock**:
+**Common Mocks**:
 ```typescript
 const mockCalendarApi = {
   calendarList: { list: vi.fn() },
@@ -2024,8 +2024,8 @@ const mockCalendarApi = {
 
 #### TC-CAL-ALL-001: calendar_list_calendars
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 ```typescript
 it('should return calendars with id/name/primary/accessRole', async () => {
@@ -2049,8 +2049,8 @@ it('should return calendars with id/name/primary/accessRole', async () => {
 
 #### TC-CAL-ALL-005: calendar_create_event -- 동적 타임존
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 ```typescript
 it('should apply dynamic timezone from getTimezone()', async () => {
@@ -2071,14 +2071,14 @@ it('should apply dynamic timezone from getTimezone()', async () => {
 });
 ```
 
-**코드 참조**: `calendar.ts:3` -- `import { getTimezone, parseTime } from '../utils/time.js'`
+**Code Reference**: `calendar.ts:3` -- `import { getTimezone, parseTime } from '../utils/time.js'`
 
 ---
 
 #### TC-CAL-ALL-007: calendar_create_event -- 시간 파싱
 
-**우선순위**: P1
-**자동화**: 가능 (time.ts 단위 테스트)
+**Priority**: P1
+**Automation**: Possible (time.ts unit test)
 
 ```typescript
 // time.ts 단위 테스트
@@ -2096,13 +2096,13 @@ describe('parseTime()', () => {
 });
 ```
 
-**코드 참조**: `time.ts:44-49` -- `parseTime()` 함수
+**Code Reference**: `time.ts:44-49` -- `parseTime()` 함수
 
 ---
 
 #### TC-CAL-ALL-002 ~ TC-CAL-ALL-015 요약
 
-| TC ID | 핵심 검증 | 자동화 |
+| TC ID | Key Verification | Automation |
 |-------|----------|--------|
 | TC-CAL-ALL-002 | 기본 이벤트 목록 (현재~30일) | Vitest |
 | TC-CAL-ALL-003 | timeMin/timeMax 범위 지정 | Vitest |
@@ -2119,7 +2119,7 @@ describe('parseTime()', () => {
 
 ### 4.5 Docs 도구 테스트 (TC-DOC-ALL-001 ~ TC-DOC-ALL-013)
 
-**공통 Mock**:
+**Common Mocks**:
 ```typescript
 const mockDocsApi = {
   documents: {
@@ -2134,8 +2134,8 @@ const mockDocsComments = { comments: { list: vi.fn(), create: vi.fn() } };
 
 #### TC-DOC-ALL-001: docs_create -- 빈 문서
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 ```typescript
 it('should create empty document and return documentId/title/link', async () => {
@@ -2157,8 +2157,8 @@ it('should create empty document and return documentId/title/link', async () => 
 
 #### TC-DOC-ALL-002: docs_create -- 내용 포함
 
-**우선순위**: P1
-**자동화**: 가능
+**Priority**: P1
+**Automation**: Possible
 
 ```typescript
 it('should insert content via batchUpdate after creation', async () => {
@@ -2184,13 +2184,13 @@ it('should insert content via batchUpdate after creation', async () => {
 });
 ```
 
-**코드 참조**: `docs.ts:30-46` -- content 존재 시 batchUpdate
+**Code Reference**: `docs.ts:30-46` -- content 존재 시 batchUpdate
 
 ---
 
 #### TC-DOC-ALL-003 ~ TC-DOC-ALL-013 요약
 
-| TC ID | 핵심 검증 | 자동화 |
+| TC ID | Key Verification | Automation |
 |-------|----------|--------|
 | TC-DOC-ALL-003 | 폴더 지정 (folderId) | Vitest |
 | TC-DOC-ALL-004 | docs_read (10000자 제한) | Vitest |
@@ -2206,7 +2206,7 @@ it('should insert content via batchUpdate after creation', async () => {
 
 ### 4.6 Sheets 도구 테스트 (TC-SHT-ALL-001 ~ TC-SHT-ALL-014)
 
-**공통 Mock**:
+**Common Mocks**:
 ```typescript
 const mockSheetsApi = {
   spreadsheets: {
@@ -2226,7 +2226,7 @@ const mockSheetsApi = {
 
 #### TC-SHT-ALL-001: sheets_create
 
-**우선순위**: P0
+**Priority**: P0
 
 ```typescript
 it('should create spreadsheet and return spreadsheetId/title/link', async () => {
@@ -2247,7 +2247,7 @@ it('should create spreadsheet and return spreadsheetId/title/link', async () => 
 
 #### TC-SHT-ALL-004: sheets_read
 
-**우선순위**: P0
+**Priority**: P0
 
 ```typescript
 it('should return 2D values array', async () => {
@@ -2268,7 +2268,7 @@ it('should return 2D values array', async () => {
 
 #### TC-SHT-ALL-002 ~ TC-SHT-ALL-014 요약
 
-| TC ID | 핵심 검증 | 자동화 |
+| TC ID | Key Verification | Automation |
 |-------|----------|--------|
 | TC-SHT-ALL-002 | sheetNames 지정 생성 | Vitest |
 | TC-SHT-ALL-003 | sheets_get_info (시트 목록) | Vitest |
@@ -2285,7 +2285,7 @@ it('should return 2D values array', async () => {
 
 ### 4.7 Slides 도구 테스트 (TC-SLD-ALL-001 ~ TC-SLD-ALL-011)
 
-**공통 Mock**:
+**Common Mocks**:
 ```typescript
 const mockSlidesApi = {
   presentations: {
@@ -2297,7 +2297,7 @@ const mockSlidesApi = {
 };
 ```
 
-| TC ID | 핵심 검증 | 자동화 |
+| TC ID | Key Verification | Automation |
 |-------|----------|--------|
 | TC-SLD-ALL-001 | slides_create (presentationId/link/slideCount) | Vitest |
 | TC-SLD-ALL-002 | 폴더 지정 | Vitest |
@@ -2505,13 +2505,13 @@ describe('time utilities', () => {
 
 #### TC-ATL-ALL-001: Docker 모드 선택
 
-**우선순위**: P0
-**자동화**: 불가 (대화형 입력)
-**환경**: MAC-ENV-02 또는 LNX-ENV-01
+**Priority**: P0
+**Automation**: Not possible (interactive input)
+**Environment**: MAC-ENV-02 또는 LNX-ENV-01
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | Docker Desktop 실행 확인 | `docker info` 성공 |
 | 2 | atlassian 모듈 실행 | "Docker is installed!" 표시 |
@@ -2519,16 +2519,16 @@ describe('time utilities', () => {
 | 4 | `docker pull ghcr.io/sooperset/mcp-atlassian:latest` | 이미지 다운로드 |
 | 5 | MCP 설정 확인 | `~/.claude/mcp.json`에 atlassian 서버 등록 |
 
-**코드 참조**: `atlassian/install.sh:39-69` -- Docker 감지 + 선택 로직
+**Code Reference**: `atlassian/install.sh:39-69` -- Docker 감지 + 선택 로직
 
 ---
 
 #### TC-ATL-ALL-003: Docker 모드 -- 자격증명 저장
 
-**우선순위**: P0
-**자동화**: 불가 (대화형)
+**Priority**: P0
+**Automation**: Not possible (interactive)
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
 # 설치 후 확인
 cat ~/.atlassian-mcp/credentials.env
@@ -2544,16 +2544,16 @@ stat -f %Lp ~/.atlassian-mcp/credentials.env  # 600
 stat -f %Lp ~/.atlassian-mcp/                  # 700
 ```
 
-**코드 참조**: `atlassian/install.sh:137-153`
+**Code Reference**: `atlassian/install.sh:137-153`
 
 ---
 
 #### TC-ATL-ALL-005: Docker 모드 -- MCP 설정
 
-**우선순위**: P0
-**자동화**: 가능 (설치 후 검증)
+**Priority**: P0
+**Automation**: Possible (post-installation verification)
 
-**검증 명령어**:
+**Verification Commands**:
 ```bash
 # MCP 설정에서 --env-file 방식 확인
 cat ~/.claude/mcp.json | node -e "
@@ -2571,7 +2571,7 @@ cat ~/.claude/mcp.json | node -e "
 
 #### TC-ATL-ALL-002, 004, 006, 007 요약
 
-| TC ID | 핵심 검증 | 자동화 |
+| TC ID | Key Verification | Automation |
 |-------|----------|--------|
 | TC-ATL-ALL-002 | Rovo 모드: `claude mcp add --transport sse` | 수동 |
 | TC-ATL-ALL-004 | 디렉토리 권한 700 | 자동 (stat 검증) |
@@ -2584,43 +2584,43 @@ cat ~/.claude/mcp.json | node -e "
 
 #### TC-FIG-ALL-001: Claude CLI 확인
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | Claude CLI 미설치 환경 | `command -v claude` 실패 |
 | 2 | figma 모듈 실행 | |
 | 3 | 출력 확인 | "Claude CLI is required. Please install base module first." |
 | 4 | 종료 코드 | exit 1 |
 
-**코드 참조**: `figma/install.sh:27-31`
+**Code Reference**: `figma/install.sh:27-31`
 
 ---
 
 #### TC-FIG-ALL-003: Remote MCP 등록
 
-**우선순위**: P0
-**자동화**: 가능 (claude CLI mock)
+**Priority**: P0
+**Automation**: Possible (claude CLI mock)
 
-**상세 절차**:
+**Detailed Procedure**:
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | claude, python3 설치 확인 | 모두 성공 |
 | 2 | figma 모듈 실행 | |
 | 3 | 실행된 명령 확인 | `claude mcp add --transport http figma https://mcp.figma.com/mcp` |
 | 4 | MCP 설정 확인 | figma 서버 등록 |
 
-**코드 참조**: `figma/install.sh:46`
+**Code Reference**: `figma/install.sh:46`
 
 ---
 
 ### 5.3 Notion MCP 모듈 (TC-NOT-ALL-001 ~ TC-NOT-ALL-004)
 
-| TC ID | 핵심 검증 | 자동화 |
+| TC ID | Key Verification | Automation |
 |-------|----------|--------|
 | TC-NOT-ALL-001 | Claude CLI 미설치 -> 에러 | 가능 |
 | TC-NOT-ALL-002 | Python3 미설치 -> 에러 | 가능 |
@@ -2633,21 +2633,21 @@ cat ~/.claude/mcp.json | node -e "
 
 #### TC-GIT-MAC-001: gh 설치 (macOS)
 
-**우선순위**: P0
+**Priority**: P0
 
-| 단계 | 명령어/행동 | 기대 결과 |
+| Step | Command/Action | Expected Result |
 |------|-----------|----------|
 | 1 | macOS + Homebrew 있음 + gh 없음 | |
 | 2 | github 모듈 실행 | `brew install gh` 실행 |
 | 3 | 확인 | `gh --version` 성공 |
 
-**코드 참조**: `github/install.sh:28-35`
+**Code Reference**: `github/install.sh:28-35`
 
 ---
 
 #### TC-GIT-ALL-001: gh 인증
 
-**우선순위**: P0
+**Priority**: P0
 
 ```bash
 # 인증 명령어 확인
@@ -2661,7 +2661,7 @@ gh auth login --hostname github.com --git-protocol https --web
 
 **대상 파일**: `installer/modules/pencil/install.sh`
 
-| TC ID | 핵심 검증 | 코드 참조 |
+| TC ID | Key Verification | Code Reference |
 |-------|----------|----------|
 | TC-PEN-ALL-001 | VS Code/Cursor 모두 미설치 -> exit 1 | `pencil/install.sh:42-45` |
 | TC-PEN-ALL-002 | `code --install-extension highagency.pencildev` | `pencil/install.sh:52-55` |
@@ -2677,9 +2677,9 @@ gh auth login --hostname github.com --git-protocol https --web
 
 #### TC-E2E-MAC-001: macOS 클린 설치 전체
 
-**우선순위**: P0
-**자동화**: 불가 (전체 E2E 수동)
-**환경**: MAC-ENV-02 (SNAP-MAC02-CLEAN)
+**Priority**: P0
+**Automation**: Not possible (full E2E manual)
+**Environment**: MAC-ENV-02 (SNAP-MAC02-CLEAN)
 **예상 소요**: 30분
 
 **완전한 E2E 흐름**:
@@ -2729,12 +2729,12 @@ gh --version
 
 #### TC-E2E-WIN-001: Windows 클린 설치 전체
 
-**우선순위**: P0
-**자동화**: 불가
-**환경**: WIN-ENV-03 (SNAP-WIN03-CLEAN)
+**Priority**: P0
+**Automation**: Not possible
+**Environment**: WIN-ENV-03 (SNAP-WIN03-CLEAN)
 **예상 소요**: 45분
 
-**상세 절차**:
+**Detailed Procedure**:
 
 | 단계 | PowerShell 명령어 | 기대 결과 |
 |------|------------------|----------|
@@ -2756,10 +2756,10 @@ gh --version
 
 #### TC-E2E-LNX-001: Ubuntu 클린 설치 전체
 
-**우선순위**: P0
-**환경**: LNX-ENV-02
+**Priority**: P0
+**Environment**: LNX-ENV-02
 
-| 단계 | 명령어 | 기대 결과 |
+| Step | Command | Expected Result |
 |------|--------|----------|
 | 1 | `curl -sSL .../install.sh \| bash -s -- --all` | |
 | 2 | `sudo` 비밀번호 입력 | apt-get 실행 |
@@ -2776,10 +2776,10 @@ gh --version
 
 #### TC-E2E-WSL-001: WSL2 클린 설치
 
-**우선순위**: P1
+**Priority**: P1
 **특이사항**: 브라우저는 Windows 호스트 브라우저 사용
 
-| 단계 | 검증 포인트 |
+| Step | Verification Point |
 |------|-----------|
 | 1 | WSL2 감지: `grep -qi microsoft /proc/version` = true |
 | 2 | `browser_open()` -> `cmd.exe /c start` 또는 `powershell.exe Start-Process` |
@@ -2789,9 +2789,9 @@ gh --version
 
 #### TC-E2E-ALL-010: 모듈 추가 설치
 
-**우선순위**: P0
+**Priority**: P0
 
-| 단계 | 명령어 | 기대 결과 |
+| Step | Command | Expected Result |
 |------|--------|----------|
 | 1 | Base + Google 설치 상태 확인 | |
 | 2 | `./install.sh --modules "atlassian,github" --skip-base` | |
@@ -2803,9 +2803,9 @@ gh --version
 
 #### TC-E2E-ALL-011: 이미 설치된 모듈 재설치
 
-**우선순위**: P1
+**Priority**: P1
 
-| 단계 | 검증 포인트 |
+| Step | Verification Point |
 |------|-----------|
 | 1 | Docker 이미지 재pull |
 | 2 | MCP 설정 덮어쓰기 (이전 설정 갱신) |
@@ -2815,15 +2815,15 @@ gh --version
 
 #### TC-E2E-ALL-012: Base 도구 업데이트
 
-**우선순위**: P2 -- 이전 Node.js 버전에서 업데이트 확인
+**Priority**: P2 -- 이전 Node.js 버전에서 업데이트 확인
 
 ### 6.3 마이그레이션 시나리오
 
 #### TC-E2E-ALL-020: 레거시 MCP 설정 마이그레이션
 
-**우선순위**: P0
+**Priority**: P0
 
-| 단계 | 명령어 | 기대 결과 |
+| Step | Command | Expected Result |
 |------|--------|----------|
 | 1 | `~/.mcp.json` 생성 (테스트 데이터) | `echo '{"mcpServers":{}}' > ~/.mcp.json` |
 | 2 | `~/.claude/mcp.json` 삭제 | `rm -f ~/.claude/mcp.json` |
@@ -2831,13 +2831,13 @@ gh --version
 | 4 | 마이그레이션 확인 | "Migrated MCP config" 메시지 |
 | 5 | 파일 확인 | `~/.claude/mcp.json` 생성됨 (원본 복사) |
 
-**코드 참조**: `mcp-config.sh:19-24` -- 레거시 경로 마이그레이션
+**Code Reference**: `mcp-config.sh:19-24` -- 레거시 경로 마이그레이션
 
 ---
 
 #### TC-E2E-ALL-021 / TC-E2E-WIN-020
 
-| TC ID | 핵심 검증 |
+| TC ID | Key Verification |
 |-------|----------|
 | TC-E2E-ALL-021 | 양쪽 모두 존재 -> `~/.claude/mcp.json`만 사용 |
 | TC-E2E-WIN-020 | Windows `%USERPROFILE%\.mcp.json` -> `%USERPROFILE%\.claude\mcp.json` |
@@ -2860,10 +2860,10 @@ gh --version
 
 #### TC-E2E-ALL-040: 이메일 검색 및 읽기
 
-**우선순위**: P0
-**환경**: MCP 서버 실행 중
+**Priority**: P0
+**Environment**: MCP 서버 실행 중
 
-**상세 절차**:
+**Detailed Procedure**:
 
 | 단계 | MCP 도구 호출 | 기대 결과 |
 |------|-------------|----------|
@@ -2929,7 +2929,7 @@ echo "=== install.sh --modules 'github' --skip-base ==="
 
 #### TC-SHR-ALL-001 ~ TC-SHR-ALL-006: pkg_detect_manager
 
-**자동화**: 가능 (Docker 컨테이너별 실행)
+**Automation**: Possible (per Docker container execution)
 
 ```bash
 # 패키지 관리자 감지 테스트
@@ -2994,8 +2994,8 @@ docker run --rm fedora:39 bash -c 'source package-manager.sh; pkg_detect_manager
 
 ##### TC-SEC-ALL-001: 토큰 파일 권한
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 **공격 시나리오**: 다른 사용자가 토큰 파일을 읽어 API 접근 권한 탈취
 **기대 방어**: 파일 권한 0600 (소유자만 읽기/쓰기)
@@ -3023,7 +3023,7 @@ it('should save token with mode 0600', () => {
 
 ##### TC-SEC-ALL-005: Docker non-root 실행
 
-**우선순위**: P0
+**Priority**: P0
 
 ```bash
 # 컨테이너 내 사용자 확인
@@ -3034,7 +3034,7 @@ docker run --rm ghcr.io/popup-jacob/google-workspace-mcp:latest whoami
 # 기대: mcp
 ```
 
-**코드 참조**: `Dockerfile:25-26` -- `groupadd -r mcp && useradd -r -g mcp`, `Dockerfile:39` -- `USER mcp`
+**Code Reference**: `Dockerfile:25-26` -- `groupadd -r mcp && useradd -r -g mcp`, `Dockerfile:39` -- `USER mcp`
 
 ---
 
@@ -3042,8 +3042,8 @@ docker run --rm ghcr.io/popup-jacob/google-workspace-mcp:latest whoami
 
 ##### TC-SEC-ALL-010: OAuth state 엔트로피
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 ```typescript
 describe('TC-SEC-ALL-010: OAuth State Entropy', () => {
@@ -3074,8 +3074,8 @@ TC-INS-MAC-020, TC-INS-MAC-021과 동일한 검증을 보안 관점에서 수행
 
 ##### TC-SEC-ALL-020: Drive 쿼리 인젝션 방지
 
-**우선순위**: P0
-**자동화**: 가능 (Vitest)
+**Priority**: P0
+**Automation**: Possible (Vitest)
 
 **공격 시나리오**: Drive API 쿼리 언어에 `'` 주입으로 쿼리 조작
 **테스트 페이로드**: `query="' OR 1=1 --"`
@@ -3099,8 +3099,8 @@ it('should escape Drive query injection', async () => {
 
 ##### TC-SEC-ALL-023: Gmail 헤더 인젝션 방지
 
-**우선순위**: P0
-**자동화**: 가능 (기존 gmail.test.ts 활용)
+**Priority**: P0
+**Automation**: Possible (using existing gmail.test.ts)
 
 **공격 시나리오**: `to` 필드에 CRLF 삽입으로 Bcc 헤더 주입
 **테스트 페이로드**: `to="victim@test.com\r\nBcc: spy@evil.com"`
@@ -3120,8 +3120,8 @@ it('should strip CRLF from email headers', async () => {
 
 ##### TC-SEC-ALL-024: JSON 파싱 인젝션 방지
 
-**우선순위**: P0
-**자동화**: 가능
+**Priority**: P0
+**Automation**: Possible
 
 **공격 시나리오**: module.json에 셸 메타문자 포함 시 코드 실행
 **기대 방어**: stdin 기반 파싱으로 쉘 interpolation 방지
@@ -3143,7 +3143,7 @@ echo '{"name":"test$(whoami)","order":1}' | node -e "
 
 ##### TC-SEC-ALL-025: Atlassian 자격증명 인젝션 방지
 
-**우선순위**: P0
+**Priority**: P0
 
 **공격 시나리오**: API 토큰에 셸 특수문자 포함
 **기대 방어**: `--env-file` 방식으로 쉘 확장 없이 전달
@@ -3158,7 +3158,7 @@ docker run --env-file test-cred.env --rm alpine env | grep JIRA
 
 #### 8.1.4 A05 ~ A08 (TC-SEC-ALL-030 ~ TC-SEC-ALL-061)
 
-| TC ID | 핵심 검증 | 자동화 |
+| TC ID | Key Verification | Automation |
 |-------|----------|--------|
 | TC-SEC-ALL-030 | Dockerfile `npm ci` 사용 | Vitest/CI |
 | TC-SEC-ALL-031 | production 의존성만 | Docker inspect |
@@ -3176,7 +3176,7 @@ docker run --env-file test-cred.env --rm alpine env | grep JIRA
 
 TC-AUT-ALL-006, TC-AUT-ALL-010과 동일한 보안 관점 검증.
 
-| TC ID | 핵심 검증 |
+| TC ID | Key Verification |
 |-------|----------|
 | TC-SEC-ALL-070 | CSRF state 불일치 -> 403 |
 | TC-SEC-ALL-071 | PKCE code_verifier 없이 토큰 교환 실패 |
@@ -3187,7 +3187,7 @@ TC-AUT-ALL-006, TC-AUT-ALL-010과 동일한 보안 관점 검증.
 
 4.8.1절의 sanitize.ts 단위 테스트와 1:1 대응. 모든 TC는 Vitest로 자동화.
 
-| TC ID | 함수 | 입력 | 기대 출력 |
+| TC ID | 함수 | 입력 | Expected Output |
 |-------|------|------|----------|
 | TC-SEC-ALL-080 | `escapeDriveQuery` | `"test's"` | `"test\\'s"` |
 | TC-SEC-ALL-081 | `escapeDriveQuery` | `"test\\path"` | `"test\\\\path"` |
@@ -3205,7 +3205,7 @@ TC-AUT-ALL-006, TC-AUT-ALL-010과 동일한 보안 관점 검증.
 
 ### 8.4 파일 시스템 보안 테스트 (TC-SEC-ALL-100 ~ TC-SEC-ALL-105)
 
-| TC ID | 핵심 검증 | 코드 참조 |
+| TC ID | Key Verification | Code Reference |
 |-------|----------|----------|
 | TC-SEC-ALL-100 | CONFIG_DIR 생성 (0700) | `oauth.ts:116-118` |
 | TC-SEC-ALL-101 | 권한 0755 -> 0700 복구 | `oauth.ts:122-127` |
@@ -3216,7 +3216,7 @@ TC-AUT-ALL-006, TC-AUT-ALL-010과 동일한 보안 관점 검증.
 
 ### 8.5 네트워크 보안 테스트 (TC-SEC-ALL-110 ~ TC-SEC-ALL-113)
 
-| TC ID | 핵심 검증 | 테스트 방법 |
+| TC ID | Key Verification | 테스트 방법 |
 |-------|----------|-----------|
 | TC-SEC-ALL-110 | HTTPS 전용 | 코드 검색: `http://` 없음 (localhost 제외) |
 | TC-SEC-ALL-111 | OAuth 콜백 localhost 전용 | `server.listen(OAUTH_PORT)` -> 127.0.0.1 |
@@ -3462,7 +3462,7 @@ cd installer && bash tests/run_tests.sh
 
 **목표**: 100건, 약 8시간
 
-| 순서 | 영역 | TC 수 | 예상 시간 |
+| Order | Area | TC Count | Estimated Time |
 |------|------|------:|----------|
 | 1 | 인스톨러 부가 | 20 | 1시간 |
 | 2 | MCP 도구 주요 | 35 | 2시간 |
@@ -3475,7 +3475,7 @@ cd installer && bash tests/run_tests.sh
 
 **목표**: 57건, 약 30시간 (장시간 운영 테스트 포함)
 
-| 순서 | 영역 | TC 수 | 예상 시간 |
+| Order | Area | TC Count | Estimated Time |
 |------|------|------:|----------|
 | 1 | MCP 도구 부가 | 30 | 2시간 |
 | 2 | 엣지 케이스 | 15 | 1시간 |
@@ -3679,7 +3679,7 @@ installer/tests/
 
 - **실행일**: YYYY-MM-DD HH:MM
 - **실행자**: (이름)
-- **환경**: (환경 ID)
+- **Environment**: (Environment ID)
 - **결과**: PASS / FAIL / SKIP / BLOCK
 - **소요 시간**: (분)
 
@@ -3704,7 +3704,7 @@ installer/tests/
 
 - **관련 TC**: TC-XXX-YYY-NNN
 - **심각도**: Critical / Major / Minor / Trivial
-- **환경**: (환경 ID)
+- **Environment**: (Environment ID)
 - **발견일**: YYYY-MM-DD
 - **상태**: Open / In Progress / Resolved / Closed
 
@@ -3734,7 +3734,7 @@ installer/tests/
 
 #### F.1 Figma 모듈 누락 TC
 
-| TC ID | 핵심 검증 | 설계 위치 | 자동화 |
+| TC ID | Key Verification | 설계 위치 | 자동화 |
 |-------|----------|----------|--------|
 | TC-FIG-ALL-002 | Python3 미설치 -> "Python 3 is required for OAuth" 에러, exit 1 | 5.2절 TC-FIG-ALL-001 동일 패턴 | 가능 |
 | TC-FIG-ALL-004 | OAuth PKCE: code_verifier/code_challenge 생성 + 브라우저 OAuth | 5.2절 Remote MCP 등록 후 `mcp_oauth_flow "figma"` | 수동 |
@@ -3744,7 +3744,7 @@ installer/tests/
 
 #### F.2 GitHub CLI 누락 TC
 
-| TC ID | 핵심 검증 | 코드 참조 | 자동화 |
+| TC ID | Key Verification | Code Reference | 자동화 |
 |-------|----------|----------|--------|
 | TC-GIT-ALL-002 | gh 이미 인증: "Already logged in." 메시지 | `github/install.sh:79-81` | 수동 |
 | TC-GIT-ALL-003 | gh 인증 실패: "Authentication failed" 에러, exit 1 | `github/install.sh:74-77` | 수동 |
@@ -3753,7 +3753,7 @@ installer/tests/
 
 #### F.3 성능 테스트 누락 TC
 
-| TC ID | 핵심 검증 | Mock 설정 | 자동화 |
+| TC ID | Key Verification | Mock 설정 | 자동화 |
 |-------|----------|----------|--------|
 | TC-PER-ALL-002 | withRetry: 500 재시도 -- 2회 500 -> 성공 | `err.response.status = 500` | Vitest |
 | TC-PER-ALL-003 | withRetry: 502/503/504 재시도 | 각 상태 코드별 Mock | Vitest |
@@ -3787,7 +3787,7 @@ installer/tests/
 
 #### F.5 보안 테스트 누락 TC
 
-| TC ID | 핵심 검증 | 테스트 방법 | 자동화 |
+| TC ID | Key Verification | 테스트 방법 | 자동화 |
 |-------|----------|-----------|--------|
 | TC-SEC-ALL-002 | .google-workspace/ 디렉토리 권한 0700 | `stat` 명령어 | 가능 |
 | TC-SEC-ALL-003 | ~/.claude/mcp.json 파일 권한 0600 | `stat` 명령어 | 가능 |
@@ -3799,7 +3799,7 @@ installer/tests/
 
 #### F.6 공유 유틸리티 누락 TC
 
-| TC ID | 핵심 검증 | 환경 | 자동화 |
+| TC ID | Key Verification | 환경 | 자동화 |
 |-------|----------|------|--------|
 | TC-SHR-ALL-004 | pkg_detect_manager: yum -> CentOS | Docker (centos) | 가능 |
 | TC-SHR-ALL-005 | pkg_detect_manager: pacman -> Arch | Docker (archlinux) | 가능 |

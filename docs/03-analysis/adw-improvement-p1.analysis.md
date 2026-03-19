@@ -185,9 +185,9 @@ Sprint 5 is P2 priority and explicitly excluded from this P0+P1 analysis. For co
 
 | File | Line | Content | Sprint |
 |------|:----:|---------|--------|
-| `index.ts` | 16 | `// 모든 도구 등록` | S3-08 / S5-05 |
-| `index.ts` | 26 | `// 도구 등록` | S3-08 / S5-05 |
-| `index.ts` | 54 | `// 서버 시작` | S3-08 / S5-05 |
+| `index.ts` | 16 | `// 모든 도구 등록` ("Register all tools") | S3-08 / S5-05 |
+| `index.ts` | 26 | `// 도구 등록` ("Register tools") | S3-08 / S5-05 |
+| `index.ts` | 54 | `// 서버 시작` ("Start server") | S3-08 / S5-05 |
 
 **Count**: 3 Korean comments remain (all in `index.ts`). All other `.ts` files in `src/` are English-only.
 

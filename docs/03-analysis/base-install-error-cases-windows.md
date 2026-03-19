@@ -1,401 +1,401 @@
-# Base Module 설치 에러 케이스 종합 보고서
+# Base Module Installation Error Cases Comprehensive Report
 
-> **작성일**: 2026-02-23
-> **대상**: `installer/modules/base/install.ps1`
-> **목적**: 다양한 Windows 환경에서 base 모듈 설치 시 발생 가능한 모든 에러 케이스 정리
+> **Date**: 2026-02-23
+> **Target**: `installer/modules/base/install.ps1`
+> **Purpose**: Comprehensive listing of all possible error cases when installing the base module across various Windows environments
 
 ---
 
-## 목차
+## Table of Contents
 
-1. [개요](#1-개요)
+1. [Overview](#1-overview)
 2. [winget (Step 1)](#2-winget-step-1)
 3. [Node.js (Step 2)](#3-nodejs-step-2)
 4. [Git (Step 3)](#4-git-step-3)
 5. [VS Code / Antigravity (Step 4)](#5-vs-code--antigravity-step-4)
-6. [**VS Code 확장 설치 (Step 4 부속)**](#6-vs-code-확장-설치-step-4-부속)
+6. [**VS Code Extension Installation (Step 4 Sub-step)**](#6-vs-code-extension-installation-step-4-sub-step)
 7. [WSL (Step 5)](#7-wsl-step-5)
 8. [Docker Desktop (Step 6)](#8-docker-desktop-step-6)
 9. [Claude Code CLI / Gemini CLI (Step 7)](#9-claude-code-cli--gemini-cli-step-7)
 10. [bkit Plugin (Step 8)](#10-bkit-plugin-step-8)
-11. [공통 에러 (Cross-cutting)](#11-공통-에러-cross-cutting)
-12. [Top 10 빈출 에러](#12-top-10-빈출-에러)
-13. [환경별 위험도 매트릭스](#13-환경별-위험도-매트릭스)
+11. [Common Errors (Cross-cutting)](#11-common-errors-cross-cutting)
+12. [Top 10 Most Frequent Errors](#12-top-10-most-frequent-errors)
+13. [Risk Matrix by Environment](#13-risk-matrix-by-environment)
 
 ---
 
-## 1. 개요
+## 1. Overview
 
-### 설치 대상 프로그램
+### Programs to Install
 
-| Step | 프로그램 | 설치 방법 | 필수 여부 |
+| Step | Program | Installation Method | Required |
 |------|---------|----------|----------|
-| 1 | winget | 사전 필수 (검증만) | **필수** |
-| 2 | Node.js LTS | `winget install OpenJS.NodeJS.LTS` | **필수** |
-| 3 | Git | `winget install Git.Git` | **필수** |
-| 4 | VS Code / Antigravity | `winget install Microsoft.VisualStudioCode` | **필수** |
-| 5 | WSL | `wsl --install --no-distribution` | Docker 필요 시 |
-| 6 | Docker Desktop | `winget install Docker.DockerDesktop` | 모듈 필요 시 |
-| 7 | Claude Code CLI | `irm https://claude.ai/install.ps1 \| iex` | **필수** |
-| 8 | bkit Plugin | `claude plugin marketplace add ...` | **필수** |
+| 1 | winget | Prerequisite (validation only) | **Required** |
+| 2 | Node.js LTS | `winget install OpenJS.NodeJS.LTS` | **Required** |
+| 3 | Git | `winget install Git.Git` | **Required** |
+| 4 | VS Code / Antigravity | `winget install Microsoft.VisualStudioCode` | **Required** |
+| 5 | WSL | `wsl --install --no-distribution` | When Docker is needed |
+| 6 | Docker Desktop | `winget install Docker.DockerDesktop` | When module is needed |
+| 7 | Claude Code CLI | `irm https://claude.ai/install.ps1 \| iex` | **Required** |
+| 8 | bkit Plugin | `claude plugin marketplace add ...` | **Required** |
 
-### 테스트 대상 환경 유형
+### Target Test Environment Types
 
-- **일반 가정용 PC**: Windows 11 Home, 보안 설정 기본값
-- **기업 환경 (AD 관리)**: Group Policy, 프록시, 방화벽
-- **교육기관**: 제한된 사용자 권한, 필터링
-- **구버전 Windows**: Windows 10 1809~21H2
-- **특수 에디션**: Windows 11 S Mode, LTSC, Server
+- **General Home PC**: Windows 11 Home, default security settings
+- **Enterprise Environment (AD-managed)**: Group Policy, proxy, firewall
+- **Educational Institution**: Restricted user permissions, filtering
+- **Older Windows**: Windows 10 1809~21H2
+- **Special Editions**: Windows 11 S Mode, LTSC, Server
 
 ---
 
 ## 2. winget (Step 1)
 
-> 현재 코드: winget 없으면 에러 throw하고 종료
+> Current code: If winget is not found, throw error and exit
 
-### 에러 케이스
+### Error Cases
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| W1 | Windows 10 1709 이하 | `winget not found` | winget은 1809+ 필요 | Windows 업데이트 또는 수동 설치 안내 |
-| W2 | Windows LTSC (2019/2021) | `winget not found` | LTSC에는 Microsoft Store 없음 → App Installer 미포함 | GitHub에서 `.msixbundle` 수동 설치 |
-| W3 | Windows Server 2019/2022 | `winget not found` | Server에 기본 미포함 | Server 2025부터 기본 포함. 이전 버전은 수동 설치 |
-| W4 | Windows 11 S Mode | `winget not found` 또는 설치 차단 | S Mode는 Store 앱만 허용 | S Mode 해제 필요 (설정 > 활성화) |
-| W5 | 기업 환경 (MSIX sideload 차단) | App Installer 설치 불가 | Group Policy로 sideload 차단 | IT 관리자에게 요청 |
-| W6 | 손상된 App Installer | `winget` 명령 있으나 실행 안됨 | App Installer 패키지 손상 | `Add-AppxPackage -Register` 재등록 또는 Store에서 재설치 |
-| W7 | winget 소스 미동의 | `agreements not accepted` | 첫 실행 시 소스 동의 필요 | `--accept-source-agreements` 플래그 (이미 적용됨) |
+| W1 | Windows 10 1709 or below | `winget not found` | winget requires 1809+ | Windows update or manual installation guide |
+| W2 | Windows LTSC (2019/2021) | `winget not found` | LTSC does not include Microsoft Store → App Installer not included | Manual installation of `.msixbundle` from GitHub |
+| W3 | Windows Server 2019/2022 | `winget not found` | Not included by default on Server | Included by default from Server 2025. Manual installation for earlier versions |
+| W4 | Windows 11 S Mode | `winget not found` or installation blocked | S Mode only allows Store apps | S Mode must be disabled (Settings > Activation) |
+| W5 | Enterprise environment (MSIX sideload blocked) | Cannot install App Installer | Sideload blocked by Group Policy | Request from IT administrator |
+| W6 | Corrupted App Installer | `winget` command exists but fails to run | App Installer package corrupted | Re-register with `Add-AppxPackage -Register` or reinstall from Store |
+| W7 | winget source agreements not accepted | `agreements not accepted` | Source agreements required on first run | `--accept-source-agreements` flag (already applied) |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재: winget 없으면 throw → 설치 중단
-개선 필요:
-  - LTSC/Server 감지 시 수동 설치 가이드 표시
-  - App Installer Store 링크 제공 (이미 구현)
-  - GitHub releases 직접 다운로드 fallback 추가 고려
+Current: If winget missing, throw → installation aborted
+Improvements needed:
+  - Display manual installation guide when LTSC/Server detected
+  - Provide App Installer Store link (already implemented)
+  - Consider adding GitHub releases direct download fallback
 ```
 
 ---
 
 ## 3. Node.js (Step 2)
 
-> 현재 코드: `winget install OpenJS.NodeJS.LTS` → `Refresh-Path` → 확인
+> Current code: `winget install OpenJS.NodeJS.LTS` → `Refresh-Path` → verify
 
-### 에러 케이스
+### Error Cases
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| N1 | 관리자 권한 없음 | `Access denied` / 설치 실패 | winget이 관리자 권한 필요할 수 있음 | UAC 프롬프트 허용 또는 `--scope user` 사용 |
-| N2 | 기존 Node.js (nvm 설치) | 충돌 또는 PATH 우선순위 문제 | nvm-windows가 PATH를 관리하여 충돌 | nvm 존재 시 winget 설치 스킵 |
-| N3 | 기존 Node.js (직접 설치) | `A newer version already installed` | winget 버전 < 기존 설치 버전 | 무시해도 됨 (이미 설치됨) |
-| N4 | PATH 미반영 | `node not found` (설치 후) | winget 설치 완료 후 PATH 미갱신 | `Refresh-Path` (이미 구현) → 그래도 안되면 터미널 재시작 |
-| N5 | 프록시/방화벽 | winget 다운로드 실패 | 기업 프록시가 CDN 차단 | `winget settings` 에서 프록시 설정 또는 오프라인 설치 |
-| N6 | SSL 인증서 검사 (MITM) | `certificate verify failed` | 기업 보안 솔루션이 SSL 가로채기 | 기업 인증서 신뢰 저장소 추가 |
-| N7 | 디스크 공간 부족 | 설치 실패 | C: 드라이브 여유 공간 부족 | 공간 확보 후 재시도 |
-| N8 | 바이러스 백신 차단 | 설치 파일 격리 | Norton, Kaspersky 등이 msi를 의심 | 일시적 AV 비활성화 또는 예외 추가 |
-| N9 | ARM64 Windows | 호환성 문제 가능 | Node.js ARM64 빌드 확인 필요 | ARM64용 Node.js는 지원됨 (v18+) |
+| N1 | No administrator privileges | `Access denied` / installation failure | winget may require administrator privileges | Allow UAC prompt or use `--scope user` |
+| N2 | Existing Node.js (nvm installation) | Conflict or PATH priority issue | nvm-windows manages PATH, causing conflict | Skip winget installation if nvm exists |
+| N3 | Existing Node.js (direct installation) | `A newer version already installed` | winget version < existing installed version | Can be ignored (already installed) |
+| N4 | PATH not updated | `node not found` (after installation) | PATH not refreshed after winget installation | `Refresh-Path` (already implemented) → if still fails, restart terminal |
+| N5 | Proxy/firewall | winget download failure | Enterprise proxy blocking CDN | Configure proxy in `winget settings` or offline installation |
+| N6 | SSL certificate inspection (MITM) | `certificate verify failed` | Enterprise security solution intercepting SSL | Add enterprise certificate to trust store |
+| N7 | Insufficient disk space | Installation failure | Insufficient free space on C: drive | Free up space and retry |
+| N8 | Antivirus blocking | Installation file quarantined | Norton, Kaspersky, etc. flagging msi as suspicious | Temporarily disable AV or add exception |
+| N9 | ARM64 Windows | Possible compatibility issue | Need to verify Node.js ARM64 build | ARM64 Node.js is supported (v18+) |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재: 설치 → PATH 갱신 → 확인 → 실패 시 "restart terminal" 안내
-개선 필요:
-  - nvm 존재 여부 검사 추가
-  - `--scope user` fallback (관리자 권한 없을 때)
-  - 기존 설치 감지 시 스킵 로직 강화
+Current: Install → refresh PATH → verify → guide to "restart terminal" on failure
+Improvements needed:
+  - Add nvm existence check
+  - `--scope user` fallback (when no administrator privileges)
+  - Strengthen skip logic when existing installation detected
 ```
 
 ---
 
 ## 4. Git (Step 3)
 
-> 현재 코드: `winget install Git.Git` → `Refresh-Path` → 확인
+> Current code: `winget install Git.Git` → `Refresh-Path` → verify
 
-### 에러 케이스
+### Error Cases
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| G1 | PATH 미반영 | `git not found` (설치 후) | Git이 `C:\Program Files\Git\cmd`에 설치되나 PATH 미등록 | `Refresh-Path` + 수동 PATH 추가 |
-| G2 | 기존 Git (다른 방식 설치) | 버전 충돌 | Chocolatey/Scoop/수동 설치 Git과 충돌 | 기존 설치 감지 후 스킵 |
-| G3 | 기업 프록시 | Git clone/fetch 실패 (설치는 OK) | `https_proxy` 미설정 | `git config --global http.proxy` 설정 안내 |
-| G4 | SSL 인증서 (기업) | `SSL certificate problem: unable to get local issuer certificate` | 기업 MITM 프록시 | `git config --global http.sslCAInfo <cert-path>` |
-| G5 | 관리자 권한 없음 | 설치 실패 | Program Files에 쓰기 권한 없음 | `--scope user` 또는 portable Git 사용 |
-| G6 | 긴 경로 (260자 초과) | `Filename too long` | Windows 기본 MAX_PATH=260 | `git config --global core.longpaths true` |
-| G7 | 한글 파일명 | `UTF-8 encoding error` 또는 깨짐 | Git 기본 설정이 UTF-8 아닐 수 있음 | `git config --global core.quotepath false` |
-| G8 | 실행 정책 (설치 후 스크립트) | Git Bash 관련 스크립트 차단 | PowerShell 실행 정책 | `Set-ExecutionPolicy` 이미 상위에서 처리 |
+| G1 | PATH not updated | `git not found` (after installation) | Git installed to `C:\Program Files\Git\cmd` but PATH not registered | `Refresh-Path` + manual PATH addition |
+| G2 | Existing Git (installed via different method) | Version conflict | Conflict with Git installed via Chocolatey/Scoop/manual | Detect existing installation and skip |
+| G3 | Enterprise proxy | Git clone/fetch failure (installation OK) | `https_proxy` not set | Guide to set `git config --global http.proxy` |
+| G4 | SSL certificate (enterprise) | `SSL certificate problem: unable to get local issuer certificate` | Enterprise MITM proxy | `git config --global http.sslCAInfo <cert-path>` |
+| G5 | No administrator privileges | Installation failure | No write permission to Program Files | Use `--scope user` or portable Git |
+| G6 | Long path (exceeding 260 characters) | `Filename too long` | Windows default MAX_PATH=260 | `git config --global core.longpaths true` |
+| G7 | Korean filenames | `UTF-8 encoding error` or garbled text | Git default settings may not be UTF-8 | `git config --global core.quotepath false` |
+| G8 | Execution policy (post-installation scripts) | Git Bash related scripts blocked | PowerShell execution policy | `Set-ExecutionPolicy` already handled at parent level |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재: 설치 → PATH 갱신 → 확인 → 실패 시 "restart terminal" 안내
-개선 필요:
-  - 기업 환경 프록시/SSL 검사 안내 메시지
-  - longpaths 자동 설정 고려
-  - UTF-8 설정 자동 적용 고려
+Current: Install → refresh PATH → verify → guide to "restart terminal" on failure
+Improvements needed:
+  - Enterprise environment proxy/SSL check guidance message
+  - Consider automatic longpaths configuration
+  - Consider automatic UTF-8 settings application
 ```
 
 ---
 
 ## 5. VS Code / Antigravity (Step 4)
 
-> 현재 코드: 경로 직접 확인 → 없으면 winget 설치 → Claude 확장 설치
+> Current code: Direct path check → install via winget if missing → install Claude extension
 
-### 에러 케이스
+### Error Cases
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| V1 | VS Code Insiders 설치됨 | 감지 실패 (다른 경로) | Insiders 버전은 다른 경로에 설치 | Insiders 경로도 검사에 추가 |
-| V2 | VS Code Portable 버전 | 감지 실패 | 임의 경로에 압축 해제하여 사용 | `code` 명령어로도 검사 |
-| V3 | System 설치 vs User 설치 | 경로 불일치 | winget은 User 설치, 기존은 System 설치 | 두 경로 모두 검사 (이미 구현) |
-| V4 | 확장 설치 실패 (오프라인) | `code --install-extension` 실패 | 확장 마켓플레이스 접근 불가 | 오프라인 `.vsix` 설치 방법 안내 |
-| V5 | 기업 확장 제한 | 확장 설치 차단 | 기업 정책으로 특정 확장 차단 | IT 관리자에게 허용 요청 |
-| V6 | `code` 명령 미등록 | `code not found` (확장 설치 불가) | VS Code PATH 등록 안됨 | VS Code 설정 > "Add to PATH" 또는 수동 등록 |
-| V7 | 디스크 공간 부족 | 설치 실패 | VS Code + 확장 ~500MB 필요 | 공간 확보 후 재시도 |
-| V8 | Antigravity winget ID 미등록 | `No package found` | Antigravity가 winget 카탈로그에 없을 수 있음 | 직접 다운로드 fallback 추가 |
+| V1 | VS Code Insiders installed | Detection failure (different path) | Insiders version installs to a different path | Add Insiders path to detection checks |
+| V2 | VS Code Portable version | Detection failure | Extracted to arbitrary path for use | Also check via `code` command |
+| V3 | System install vs User install | Path mismatch | winget does User install, existing is System install | Check both paths (already implemented) |
+| V4 | Extension installation failure (offline) | `code --install-extension` failure | Extension marketplace inaccessible | Guide for offline `.vsix` installation |
+| V5 | Enterprise extension restriction | Extension installation blocked | Enterprise policy blocks specific extensions | Request permission from IT administrator |
+| V6 | `code` command not registered | `code not found` (cannot install extensions) | VS Code not registered in PATH | VS Code settings > "Add to PATH" or manual registration |
+| V7 | Insufficient disk space | Installation failure | VS Code + extensions need ~500MB | Free up space and retry |
+| V8 | Antigravity winget ID not registered | `No package found` | Antigravity may not be in winget catalog | Add direct download fallback |
 
-### 5-2. Antigravity IDE (Gemini 선택 시)
+### 5-2. Antigravity IDE (When Gemini is selected)
 
-> 현재 코드: `winget install Google.Antigravity` + 경로 직접 확인
-> **winget ID**: `Google.Antigravity` (확인됨)
-> **CLI 명령어**: `agy` (VS Code의 `code`에 해당)
-> **확장 마켓플레이스**: OpenVSX (VS Code Marketplace 아님)
+> Current code: `winget install Google.Antigravity` + direct path check
+> **winget ID**: `Google.Antigravity` (confirmed)
+> **CLI command**: `agy` (equivalent to VS Code's `code`)
+> **Extension marketplace**: OpenVSX (not VS Code Marketplace)
 
-#### 🚨 스크립트 버그 발견: 설치 경로 오류
+#### 🚨 Script Bug Found: Installation Path Error
 
-| 스크립트의 현재 경로 (틀림) | 실제 설치 경로 |
+| Current Path in Script (incorrect) | Actual Installation Path |
 |---------------------------|--------------|
-| `$env:LOCALAPPDATA\Programs\Antigravity\Antigravity.exe` | **존재하지 않음** |
-| `$env:ProgramFiles\Antigravity\Antigravity.exe` | **존재하지 않음** |
-| (없음) | `$env:ProgramFiles\Google\Antigravity\Antigravity.exe` (**실제 경로**) |
+| `$env:LOCALAPPDATA\Programs\Antigravity\Antigravity.exe` | **Does not exist** |
+| `$env:ProgramFiles\Antigravity\Antigravity.exe` | **Does not exist** |
+| (none) | `$env:ProgramFiles\Google\Antigravity\Antigravity.exe` (**actual path**) |
 
-→ **결과**: 이미 설치된 Antigravity를 감지하지 못하고 매번 재설치 시도
+→ **Result**: Fails to detect already-installed Antigravity and attempts reinstallation every time
 
-#### 에러 케이스
+#### Error Cases
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| AG1 | 경로 감지 버그 | (에러 없음 - 재설치 반복) | 스크립트 경로에 `Google\` 누락 | 경로를 `$env:ProgramFiles\Google\Antigravity\Antigravity.exe`로 수정 |
-| AG2 | 관리자 권한 없음 | `The installer failed with exit code: 1` | Inno Setup이 `C:\Program Files\`에 설치 → 관리자 필요 | 관리자로 실행 |
-| AG3 | winget 소스 미업데이트 | `No applicable installer found` | winget 소스가 오래됨 | `winget source update` 실행 |
-| AG4 | `agy` PATH 미등록 | `'agy' is not recognized` | 설치 후 PATH 미갱신 | 터미널 재시작 또는 `Refresh-Path` |
-| AG5 | SmartScreen 차단 | `Windows Defender SmartScreen prevented an unrecognized app` | 새 실행 파일 경고 | `-h` 플래그 사용 중이면 팝업이 차단될 수 있음 |
-| AG6 | Google Workspace 계정 차단 | `Your current account is not eligible for Antigravity` | 관리자가 "Experimental AI" 비활성화 | 개인 @gmail.com 사용 또는 관리자가 활성화 |
-| AG7 | 미지원 국가 (중국, 러시아 등) | `Your current account is not eligible` | 계정 국가가 미지원 지역 | Google 국가 연결 변경 (24-48시간 소요) |
-| AG8 | 18세 미만 계정 | `not eligible` | Google AI 기능은 18세+ 필요 | 18세 이상 계정 사용 |
-| AG9 | GitHub Copilot 확장 충돌 | Antigravity 로딩 화면에서 프리즈 | VS Code에서 가져온 Copilot 확장이 충돌 | Copilot 확장 비활성화 |
-| AG10 | 버전 강제 업데이트 | `This version is no longer supported. Please update` | 구버전 하드 디프리케이션 | 최신 버전 클린 재설치 |
-| AG11 | 확장 마켓플레이스 접근 | VS Code 확장 검색 안됨 | OpenVSX 사용, VS Code Marketplace 아님 | `agy --install-extension` 또는 수동 .vsix 설치 |
-| AG12 | ARM64 아키텍처 불일치 | `No applicable installer found for the machine architecture` | 자동 감지 실패 | `winget install Google.Antigravity --architecture arm64` |
-| AG13 | 무료 쿼타 초과 | `Model quota limit exceeded` | 무료 티어 한도 초과 | 쿼타 리셋 대기 (5시간) 또는 AI Pro 구독 |
-| AG14 | 인증 토큰 손상 | 로그인 반복 실패 | 로컬 인증 토큰 손상 | `%APPDATA%\Antigravity\auth-tokens` 삭제 후 재시작 |
+| AG1 | Path detection bug | (No error - repeated reinstallation) | `Google\` missing from script path | Fix path to `$env:ProgramFiles\Google\Antigravity\Antigravity.exe` |
+| AG2 | No administrator privileges | `The installer failed with exit code: 1` | Inno Setup installs to `C:\Program Files\` → requires administrator | Run as administrator |
+| AG3 | winget source not updated | `No applicable installer found` | winget source is outdated | Run `winget source update` |
+| AG4 | `agy` not in PATH | `'agy' is not recognized` | PATH not refreshed after installation | Restart terminal or `Refresh-Path` |
+| AG5 | SmartScreen blocking | `Windows Defender SmartScreen prevented an unrecognized app` | Warning for new executable file | Popup may be blocked when using `-h` flag |
+| AG6 | Google Workspace account blocked | `Your current account is not eligible for Antigravity` | Administrator disabled "Experimental AI" | Use personal @gmail.com or administrator enables it |
+| AG7 | Unsupported country (China, Russia, etc.) | `Your current account is not eligible` | Account country is in unsupported region | Change Google country association (takes 24-48 hours) |
+| AG8 | Account under 18 years old | `not eligible` | Google AI features require 18+ | Use an account aged 18 or older |
+| AG9 | GitHub Copilot extension conflict | Freeze on Antigravity loading screen | Copilot extension imported from VS Code causes conflict | Disable Copilot extension |
+| AG10 | Forced version update | `This version is no longer supported. Please update` | Old version hard deprecated | Clean reinstall of latest version |
+| AG11 | Extension marketplace access | VS Code extensions not found in search | Uses OpenVSX, not VS Code Marketplace | Use `agy --install-extension` or manual .vsix installation |
+| AG12 | ARM64 architecture mismatch | `No applicable installer found for the machine architecture` | Auto-detection failure | `winget install Google.Antigravity --architecture arm64` |
+| AG13 | Free quota exceeded | `Model quota limit exceeded` | Free tier limit exceeded | Wait for quota reset (5 hours) or subscribe to AI Pro |
+| AG14 | Auth token corrupted | Repeated login failures | Local auth token corrupted | Delete `%APPDATA%\Antigravity\auth-tokens` and restart |
 
-#### Gemini CLI 연동 에러
+#### Gemini CLI Integration Errors
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| GM-AG1 | Gemini CLI가 Antigravity 미감지 | `No installer is available for IDE` | `agy` 바이너리 PATH 미등록 | PATH에 Antigravity bin 디렉토리 추가 |
-| GM-AG2 | IDE Companion 확장 연결 실패 | `Failed to connect to IDE companion extension` | 환경 변수 미설정 | Antigravity에서 `/ide install` 실행 |
-| GM-AG3 | GEMINI.md 설정 충돌 | Antigravity + Gemini CLI가 같은 파일 덮어씀 | 두 도구가 `~/.gemini/GEMINI.md` 공유 | 수동 병합 관리 |
+| GM-AG1 | Gemini CLI does not detect Antigravity | `No installer is available for IDE` | `agy` binary not in PATH | Add Antigravity bin directory to PATH |
+| GM-AG2 | IDE Companion extension connection failure | `Failed to connect to IDE companion extension` | Environment variables not set | Run `/ide install` in Antigravity |
+| GM-AG3 | GEMINI.md configuration conflict | Antigravity + Gemini CLI overwrite same file | Both tools share `~/.gemini/GEMINI.md` | Manual merge management |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재:
-  VS Code: 경로 직접 확인 → winget 설치 → code 명령으로 확장 설치
-  Antigravity: 경로 직접 확인 → winget 설치 (경로 버그!)
+Current:
+  VS Code: Direct path check → winget install → install extensions via code command
+  Antigravity: Direct path check → winget install (path bug!)
 
-VS Code 개선 필요:
-  - `code` 명령 PATH 등록 여부 확인
-  - Insiders 버전 경로 추가
-  - 확장 설치 실패 시 에러 핸들링 (현재 2>$null로 무시)
+VS Code improvements needed:
+  - Check whether `code` command is registered in PATH
+  - Add Insiders version path
+  - Error handling for extension installation failure (currently suppressed with 2>$null)
 
-Antigravity 개선 필요 (Critical):
-  - 🚨 설치 경로 수정 필수: Google\ 하위 폴더
-  - `agy` CLI PATH 확인 추가
-  - 확장은 `agy --install-extension` 사용 (code와 다름)
-  - Google 계정/지역 제한 사전 안내
-  - Copilot 충돌 경고
+Antigravity improvements needed (Critical):
+  - Installation path fix required: Google\ subfolder
+  - Add `agy` CLI PATH verification
+  - Use `agy --install-extension` for extensions (different from code)
+  - Pre-installation guidance for Google account/region restrictions
+  - Copilot conflict warning
 ```
 
 ---
 
-## 6. VS Code 확장 설치 (Step 4 부속)
+## 6. VS Code Extension Installation (Step 4 Sub-step)
 
-> 현재 코드:
+> Current code:
 > - base: `code --install-extension anthropic.claude-code 2>$null`
-> - pencil 모듈: `code --install-extension highagency.pencildev 2>$null`
+> - pencil module: `code --install-extension highagency.pencildev 2>$null`
 
-### 6-1. `code` 명령어 문제
+### 6-1. `code` Command Issues
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| EX1 | VS Code 설치 시 "Add to PATH" 미체크 | `'code' is not recognized` (CMD) / `The term 'code' is not recognized` (PS) | VS Code `bin` 디렉토리가 PATH에 없음 | PATH에 수동 추가: `%LOCALAPPDATA%\Programs\Microsoft VS Code\bin` |
-| EX2 | Microsoft Store에서 VS Code 설치 | `code` 명령어 미등록 | Store 버전은 PATH 등록 옵션이 없음 | 공식 installer로 재설치 (PATH 체크) |
-| EX3 | VS Code Insiders만 설치됨 | `code` 없고 `code-insiders`만 있음 | Insiders는 별도 명령어 사용 | `code-insiders --install-extension` 사용 |
-| EX4 | Portable VS Code (ZIP 압축 해제) | `code` 명령어 없음 | Portable 모드는 시스템 등록 안함 | 전체 경로로 실행: `<설치경로>\bin\code.cmd` |
-| EX5 | System 설치 + User 설치 공존 | 잘못된 VS Code 버전에 확장 설치됨 | PATH 우선순위에 따라 다른 `code` 실행 | 하나 제거하거나 전체 경로 사용 |
-| EX6 | Cursor IDE 사용 | `code` 명령어가 Cursor와 무관 | Cursor는 별도 확장 디렉토리 (`~/.cursor/extensions/`) 사용 | `cursor --install-extension` 사용 또는 Cursor 내에서 수동 설치 |
+| EX1 | "Add to PATH" unchecked during VS Code installation | `'code' is not recognized` (CMD) / `The term 'code' is not recognized` (PS) | VS Code `bin` directory not in PATH | Manually add to PATH: `%LOCALAPPDATA%\Programs\Microsoft VS Code\bin` |
+| EX2 | VS Code installed from Microsoft Store | `code` command not registered | Store version has no PATH registration option | Reinstall with official installer (check PATH) |
+| EX3 | Only VS Code Insiders installed | `code` missing, only `code-insiders` available | Insiders uses a separate command | Use `code-insiders --install-extension` |
+| EX4 | Portable VS Code (ZIP extraction) | `code` command missing | Portable mode does not register with system | Run with full path: `<install-path>\bin\code.cmd` |
+| EX5 | System install + User install coexisting | Extensions installed to wrong VS Code version | Different `code` executed based on PATH priority | Remove one or use full path |
+| EX6 | Cursor IDE in use | `code` command unrelated to Cursor | Cursor uses separate extension directory (`~/.cursor/extensions/`) | Use `cursor --install-extension` or install manually within Cursor |
 
-### 6-2. 네트워크/다운로드 문제
+### 6-2. Network/Download Issues
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| EX7 | 기업 프록시 | `XHR failed` / CLI 타임아웃 | 프록시가 `marketplace.visualstudio.com` 차단 | `"http.proxy"` 설정 + 도메인 화이트리스트 |
-| EX8 | SSL MITM 검사 (zScaler 등) | `UNABLE_TO_GET_ISSUER_CERT_LOCALLY` / `SELF_SIGNED_CERT_IN_CHAIN` | VS Code는 자체 Node.js 인증서 스토어 사용 → 기업 CA 미인식 | `NODE_EXTRA_CA_CERTS` 환경변수 설정 또는 `"http.proxyStrictSSL": false` |
-| EX9 | 방화벽 차단 | `net::ERR_CONNECTION_TIMED_OUT` | 필수 도메인 접근 불가 | 아래 도메인 목록 화이트리스트 |
-| EX10 | 느린 네트워크 | `XHR timeout` / 설치 멈춤 | 대용량 확장 다운로드 타임아웃 | 재시도 또는 VSIX 수동 다운로드 |
-| EX11 | DNS 오류 | `getaddrinfo ENOTFOUND` | DNS가 마켓플레이스 도메인 해석 불가 | DNS 변경 (8.8.8.8 등) |
+| EX7 | Enterprise proxy | `XHR failed` / CLI timeout | Proxy blocking `marketplace.visualstudio.com` | Configure `"http.proxy"` + domain whitelist |
+| EX8 | SSL MITM inspection (zScaler, etc.) | `UNABLE_TO_GET_ISSUER_CERT_LOCALLY` / `SELF_SIGNED_CERT_IN_CHAIN` | VS Code uses its own Node.js certificate store → enterprise CA not recognized | Set `NODE_EXTRA_CA_CERTS` environment variable or `"http.proxyStrictSSL": false` |
+| EX9 | Firewall blocking | `net::ERR_CONNECTION_TIMED_OUT` | Required domains inaccessible | Whitelist domains listed below |
+| EX10 | Slow network | `XHR timeout` / installation stalls | Large extension download timeout | Retry or manually download VSIX |
+| EX11 | DNS error | `getaddrinfo ENOTFOUND` | DNS cannot resolve marketplace domains | Change DNS (8.8.8.8, etc.) |
 
-**확장 마켓플레이스 필수 도메인:**
+**Extension Marketplace Required Domains:**
 
-| 도메인 | 용도 |
+| Domain | Purpose |
 |--------|------|
-| `marketplace.visualstudio.com` | 마켓플레이스 API |
-| `*.gallery.vsassets.io` | 확장 다운로드 |
-| `*.gallerycdn.vsassets.io` | 확장 CDN |
-| `*.vscode-unpkg.net` | 웹 확장 로딩 |
+| `marketplace.visualstudio.com` | Marketplace API |
+| `*.gallery.vsassets.io` | Extension downloads |
+| `*.gallerycdn.vsassets.io` | Extension CDN |
+| `*.vscode-unpkg.net` | Web extension loading |
 | `*.vscode-cdn.net` | VS Code CDN |
-| `raw.githubusercontent.com` | 일부 확장이 GitHub 접근 |
+| `raw.githubusercontent.com` | Some extensions access GitHub |
 
-### 6-3. 확장 자체 문제
+### 6-3. Extension-Specific Issues
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| EX12 | 잘못된 확장 ID | `Extension 'xxx' not found` → `Failed Installing Extensions` | 오타 또는 확장 삭제됨 | 마켓플레이스에서 정확한 ID 확인 |
-| EX13 | VS Code 버전 호환성 | `Extension is not compatible with the current version` | 확장이 최신 VS Code API 버전 요구 | VS Code 업데이트 또는 구버전 확장 설치: `code --install-extension <id>@<version>` |
-| EX14 | 서명 검증 실패 | `Cannot verify extension signature` / `PackageIntegrityCheckFailed` | 다운로드 손상, 프록시 변조, OSS VS Code 빌드 | 재시도 또는 `"extensions.verifySignature": false` 설정 |
-| EX15 | 플랫폼별 확장 미지원 | 설치 실패 또는 무반응 | 확장이 특정 플랫폼(win32-x64)만 지원, ARM64 미제공 | 유니버설 VSIX 확인 또는 퍼블리셔에 요청 |
-| EX16 | 폐기(deprecated) 확장 | 설치 차단 (Install 비활성) | 마켓플레이스에서 deprecated 마킹됨 | 대체 확장 설치 |
-| EX17 | 이미 설치됨 | `already installed. Use '--force' to update.` | 정상 동작이지만 최신 아닐 수 있음 | `--force` 플래그로 최신 강제 설치 |
+| EX12 | Incorrect extension ID | `Extension 'xxx' not found` → `Failed Installing Extensions` | Typo or extension has been removed | Verify exact ID on marketplace |
+| EX13 | VS Code version compatibility | `Extension is not compatible with the current version` | Extension requires newer VS Code API version | Update VS Code or install older extension version: `code --install-extension <id>@<version>` |
+| EX14 | Signature verification failure | `Cannot verify extension signature` / `PackageIntegrityCheckFailed` | Download corruption, proxy tampering, OSS VS Code build | Retry or set `"extensions.verifySignature": false` |
+| EX15 | Platform-specific extension not supported | Installation failure or no response | Extension only supports specific platform (win32-x64), ARM64 not available | Check for universal VSIX or request from publisher |
+| EX16 | Deprecated extension | Installation blocked (Install button disabled) | Marked as deprecated on marketplace | Install alternative extension |
+| EX17 | Already installed | `already installed. Use '--force' to update.` | Normal behavior but may not be latest | Force install latest with `--force` flag |
 
-### 6-4. 권한/정책 문제
+### 6-4. Permission/Policy Issues
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| EX18 | 기업 Group Policy 확장 제한 | 설치 차단 또는 자동 비활성 | `AllowedExtensions` 정책으로 화이트리스트 관리 | IT 관리자에게 확장 허용 요청 |
-| EX19 | 확장 디렉토리 권한 | `EPERM: operation not permitted` | `~/.vscode/extensions/` 쓰기 권한 없음 (AV 잠금, OneDrive 동기화) | AV 예외 추가, OneDrive 동기화 제외 |
-| EX20 | 바이러스 백신이 확장 파일 격리 | `EPERM` 또는 파일 누락 | AV가 확장 DLL/바이너리를 의심 파일로 격리 | `~/.vscode/extensions/` AV 예외 추가 |
-| EX21 | OneDrive 동기화 충돌 | `EPERM` / 충돌 복사본 생성 | OneDrive가 확장 파일 동기화하며 잠금 | `.vscode/extensions/` OneDrive 제외 설정 |
-| EX22 | AppLocker 정책 | VS Code 자체 실행 차단 | Electron 앱 차단 또는 미승인 경로 | `"disable-chromium-sandbox": true` 또는 화이트리스트 추가 |
+| EX18 | Enterprise Group Policy extension restriction | Installation blocked or auto-disabled | Whitelist managed via `AllowedExtensions` policy | Request extension permission from IT administrator |
+| EX19 | Extension directory permissions | `EPERM: operation not permitted` | No write permission to `~/.vscode/extensions/` (AV lock, OneDrive sync) | Add AV exception, exclude from OneDrive sync |
+| EX20 | Antivirus quarantining extension files | `EPERM` or missing files | AV quarantines extension DLLs/binaries as suspicious | Add `~/.vscode/extensions/` to AV exceptions |
+| EX21 | OneDrive sync conflict | `EPERM` / conflict copies created | OneDrive syncing extension files and locking them | Exclude `.vscode/extensions/` from OneDrive settings |
+| EX22 | AppLocker policy | VS Code itself blocked from running | Electron app blocked or unapproved path | Set `"disable-chromium-sandbox": true` or add to whitelist |
 
-### 6-5. 사일런트 실패 (Silent Failures) ⚠️
+### 6-5. Silent Failures
 
-> **매우 중요**: 현재 코드가 `2>$null`로 에러를 숨기고 있어서 이 케이스들이 특히 위험
+> **Very Important**: These cases are particularly dangerous because the current code hides errors with `2>$null`
 
-| # | 환경/조건 | 증상 | 원인 | 해결 방법 |
+| # | Environment/Condition | Symptom | Cause | Solution |
 |---|----------|------|------|----------|
-| EX23 | 설치 실패인데 exit code 0 반환 | 스크립트는 성공으로 처리 | VS Code CLI 버그 — 실패해도 exit code 0 반환하는 경우 있음 | exit code 대신 stdout/stderr 텍스트 파싱 ("Failed" 문자열 검사) |
-| EX24 | `2>$null`이 에러 메시지 삼킴 | 어떤 에러인지 알 수 없음 | stderr로 에러 출력되는데 무시됨 | `$output = code --install-extension <id> 2>&1` 로 캡처 후 파싱 |
-| EX25 | 설치됐는데 활성화 안됨 | 확장 목록에 있지만 비활성 | 리로드 필요, 잘못된 프로필에 설치, 정책 비활성, workspace trust 미허용 | VS Code 재시작, 프로필 확인 |
-| EX26 | 구버전 캐시로 설치됨 | 최신이 아닌 구버전 설치 | CDN 전파 지연 또는 로컬 캐시 | `--force` 플래그 사용 |
+| EX23 | Installation fails but returns exit code 0 | Script treats it as success | VS Code CLI bug — sometimes returns exit code 0 even on failure | Parse stdout/stderr text instead of exit code (check for "Failed" string) |
+| EX24 | `2>$null` swallows error messages | Cannot determine what error occurred | Error output to stderr is suppressed | Capture with `$output = code --install-extension <id> 2>&1` and parse |
+| EX25 | Installed but not activated | Extension in list but disabled | Reload needed, installed to wrong profile, policy disabled, workspace trust not granted | Restart VS Code, check profile |
+| EX26 | Old version installed from cache | Older version installed instead of latest | CDN propagation delay or local cache | Use `--force` flag |
 
-### 6-6. `anthropic.claude-code` 확장 특이 에러
+### 6-6. `anthropic.claude-code` Extension-Specific Errors
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| CC1 | Claude CLI가 VSIX 자동 설치 시 | `ENOENT. Please restart your IDE` | Claude CLI v1.0.x가 번들 VSIX 경로 해석 실패 | 수동 설치: `code --install-extension ~/.local/lib/.../claude-code.vsix` |
-| CC2 | `code` 미등록 + Claude CLI 무한 재시도 | `The command "code" is either misspelled or could not be found` (무한 루프) | Claude CLI가 VS Code 확장 자동 설치 시도하며 루프 | PATH에 `code` 추가하거나 마켓플레이스에서 수동 설치 |
-| CC3 | VS Code 프로필 문제 | Default 프로필에만 설치되고 활성 프로필에는 없음 | 비기본 프로필 사용 시 CLI 설치가 기본 프로필에만 적용 | 활성 프로필의 Extensions 뷰에서 수동 설치 |
-| CC4 | Windows ARM64 | 확장 v2.0.46에서 멈춤, 업데이트 불가 | ARM64용 빌드 미제공 또는 배포 지연 | ARM64 지원 대기 또는 x64 에뮬레이션 사용 |
-| CC5 | Windows 11 크래시 | VS Code 확장 UI 로드 실패, CLI edit 동작 시 크래시 | Windows 특정 버전 호환성 이슈 | VS Code + 확장 모두 최신 업데이트 |
-| CC6 | git-bash 에러 | git-bash 관련 에러로 확장 스폰 실패 | bash 설치되어 있어도 VS Code가 git-bash 경로 잘못 인식 | VS Code 터미널 설정에서 셸 경로 확인 |
+| CC1 | Claude CLI auto-installs VSIX | `ENOENT. Please restart your IDE` | Claude CLI v1.0.x fails to resolve bundled VSIX path | Manual install: `code --install-extension ~/.local/lib/.../claude-code.vsix` |
+| CC2 | `code` not registered + Claude CLI infinite retry | `The command "code" is either misspelled or could not be found` (infinite loop) | Claude CLI loops trying to auto-install VS Code extension | Add `code` to PATH or install manually from marketplace |
+| CC3 | VS Code profile issue | Installed only to Default profile, not in active profile | CLI installation only applies to default profile when using non-default profile | Install manually from Extensions view in active profile |
+| CC4 | Windows ARM64 | Extension stuck at v2.0.46, cannot update | ARM64 build not available or distribution delayed | Wait for ARM64 support or use x64 emulation |
+| CC5 | Windows 11 crash | VS Code extension UI fails to load, crashes on CLI edit action | Windows version-specific compatibility issue | Update both VS Code and extension to latest |
+| CC6 | git-bash error | Extension spawn fails due to git-bash related error | VS Code incorrectly resolves git-bash path even when bash is installed | Check shell path in VS Code terminal settings |
 
-### 6-7. `highagency.pencildev` 확장 특이 에러
+### 6-7. `highagency.pencildev` Extension-Specific Errors
 
-| # | 환경/조건 | 에러 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error | Cause | Solution |
 |---|----------|------|------|----------|
-| PC1 | Claude Code 미인증 상태 | Pencil 확장 기능 제한 | Pencil이 Claude Code 인증 의존 | Claude Code 먼저 로그인 |
-| PC2 | Cursor IDE에서 설치 | VS Code 마켓플레이스 접근 제한 가능 | Cursor는 Open VSX 사용, MS 마켓플레이스 ToS 제한 | Open VSX에서 설치 (등록되어 있음) |
+| PC1 | Claude Code not authenticated | Pencil extension functionality limited | Pencil depends on Claude Code authentication | Log in to Claude Code first |
+| PC2 | Installing on Cursor IDE | VS Code marketplace access may be restricted | Cursor uses Open VSX, MS marketplace ToS restrictions | Install from Open VSX (registered there) |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재:
+Current:
   - `code --install-extension anthropic.claude-code 2>$null`
-  - 에러 완전 무시, 성공 메시지만 출력
-  - `code` 명령 존재 여부만 사전 체크 (Test-CommandExists "code")
+  - Errors completely suppressed, only success message displayed
+  - Only pre-checks whether `code` command exists (Test-CommandExists "code")
 
-심각한 문제:
-  1. 2>$null이 모든 에러를 숨김 → 사용자가 실패를 알 수 없음
-  2. exit code 0 반환 버그와 결합되면 완전한 사일런트 실패
-  3. code 명령은 있지만 네트워크/정책 문제로 실패하는 경우 미대응
-  4. 이미 설치된 경우 최신인지 확인 안함
+Serious issues:
+  1. 2>$null hides all errors → user cannot know about failures
+  2. Combined with exit code 0 return bug, results in complete silent failure
+  3. No handling when code command exists but fails due to network/policy issues
+  4. Does not verify if already-installed version is up to date
 
-개선 필요:
-  - 출력 캡처 후 "Failed" 문자열 검사
-  - 실패 시 구체적 원인 안내
-  - --force 사용으로 항상 최신 보장
-  - 기업 환경 감지 시 마켓플레이스 접근 가능 여부 사전 체크
-  - Cursor/Insiders 사용자 대응
+Improvements needed:
+  - Capture output and check for "Failed" string
+  - Provide specific cause guidance on failure
+  - Use --force to always ensure latest version
+  - Pre-check marketplace accessibility when enterprise environment detected
+  - Handle Cursor/Insiders users
 ```
 
 ---
 
 ## 7. WSL (Step 5)
 
-> 현재 코드: Docker 필요 시만 → `wsl --install --no-distribution`
+> Current code: Only when Docker is needed → `wsl --install --no-distribution`
 
-### 에러 케이스
+### Error Cases
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| L1 | 관리자 권한 없음 | `wsl --install` 실패 | WSL 설치에 관리자 권한 필수 | 스크립트를 관리자로 실행 |
-| L2 | 가상화 비활성 (BIOS) | `Please enable Virtual Machine Platform` | Intel VT-x / AMD-V 꺼져있음 | BIOS에서 가상화 활성화 |
-| L3 | Hyper-V 비활성 | WSL2 실행 불가 | Windows Home은 Hyper-V 없음 (WSL2는 별도) | `Virtual Machine Platform` 기능 활성화 |
-| L4 | Windows 10 1903 이전 | `wsl --install` 명령 미지원 | WSL2는 1903+ 필요, `--install`은 2004+ | Windows 업데이트 필요 |
-| L5 | Windows 10 Home (구버전) | WSL1만 지원 | WSL2 기능 미포함 | Windows 업데이트 또는 WSL1 사용 |
-| L6 | 기업 Hyper-V 비활성 GPO | 가상화 기능 차단 | Group Policy로 Hyper-V 관련 기능 차단 | IT 관리자에게 요청 |
-| L7 | 재부팅 미수행 | WSL 사용 불가 | 설치 후 재부팅 필수 | 재부팅 안내 (이미 구현) |
-| L8 | 기존 WSL1 → WSL2 전환 | 전환 실패 | 커널 업데이트 필요 | `wsl --update` 실행 (이미 구현) |
-| L9 | VPN 소프트웨어 충돌 | WSL 네트워크 오류 | Cisco AnyConnect, GlobalProtect 등 | VPN 클라이언트 업데이트 또는 WSL 네트워크 설정 변경 |
-| L10 | 안티바이러스 차단 | WSL 프로세스 차단 | Symantec, McAfee 등이 WSL 프로세스 차단 | AV 예외 추가 |
-| L11 | ARM64 기기 | 호환성 문제 | Surface Pro X 등 ARM 기기 | WSL2는 ARM64 지원, 일부 배포판 미지원 |
-| L12 | Windows Sandbox/하이퍼바이저 충돌 | 가상화 리소스 충돌 | VMware/VirtualBox 구버전과 충돌 | VMware 15.5.5+, VirtualBox 6+ 사용 |
+| L1 | No administrator privileges | `wsl --install` failure | WSL installation requires administrator privileges | Run script as administrator |
+| L2 | Virtualization disabled (BIOS) | `Please enable Virtual Machine Platform` | Intel VT-x / AMD-V is turned off | Enable virtualization in BIOS |
+| L3 | Hyper-V disabled | Cannot run WSL2 | Windows Home does not have Hyper-V (WSL2 is separate) | Enable `Virtual Machine Platform` feature |
+| L4 | Windows 10 before 1903 | `wsl --install` command not supported | WSL2 requires 1903+, `--install` requires 2004+ | Windows update required |
+| L5 | Windows 10 Home (old version) | Only WSL1 supported | WSL2 feature not included | Windows update or use WSL1 |
+| L6 | Enterprise Hyper-V disabled by GPO | Virtualization feature blocked | Hyper-V related features blocked by Group Policy | Request from IT administrator |
+| L7 | Reboot not performed | Cannot use WSL | Reboot required after installation | Reboot guidance (already implemented) |
+| L8 | Existing WSL1 → WSL2 conversion | Conversion failure | Kernel update required | Run `wsl --update` (already implemented) |
+| L9 | VPN software conflict | WSL network error | Cisco AnyConnect, GlobalProtect, etc. | Update VPN client or change WSL network settings |
+| L10 | Antivirus blocking | WSL process blocked | Symantec, McAfee, etc. blocking WSL processes | Add AV exception |
+| L11 | ARM64 device | Compatibility issue | Surface Pro X and other ARM devices | WSL2 supports ARM64, some distributions not supported |
+| L12 | Windows Sandbox/hypervisor conflict | Virtualization resource conflict | Conflict with older VMware/VirtualBox | Use VMware 15.5.5+, VirtualBox 6+ |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재: wsl --version 확인 → 설치/업데이트 → 재부팅 안내
-개선 필요:
-  - 가상화 활성화 여부 사전 검사 (필수)
-  - 관리자 권한 확인
-  - VPN/AV 충돌 안내 메시지
-  - Windows 버전 사전 검사
+Current: Check wsl --version → install/update → reboot guidance
+Improvements needed:
+  - Pre-check virtualization enablement (required)
+  - Administrator privileges verification
+  - VPN/AV conflict guidance messages
+  - Pre-check Windows version
 ```
 
 ---
 
 ## 8. Docker Desktop (Step 6)
 
-> 현재 코드: Docker 필요 시만 → `winget install Docker.DockerDesktop`
+> Current code: Only when Docker is needed → `winget install Docker.DockerDesktop`
 
-### 에러 케이스
+### Error Cases
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| D1 | BIOS 가상화 미활성 | `Hardware assisted virtualization and data execution protection must be enabled` | VT-x/AMD-V 비활성 | BIOS에서 활성화 |
-| D2 | WSL2 미설치/미작동 | `WSL 2 installation is incomplete` | Docker WSL2 backend 사용 시 WSL2 필수 | WSL2 먼저 설치 (Step 5 의존) |
-| D3 | Hyper-V 충돌 | Docker + VMware/VirtualBox 동시 사용 불가 | Hyper-V와 타 가상화 충돌 | Docker WSL2 backend 사용 권장 |
-| D4 | Windows Home (구버전) | Hyper-V backend 사용 불가 | Home에는 Hyper-V 없음 | WSL2 backend 사용 (기본값) |
-| D5 | 라이선스 (기업 250인+) | Docker Desktop 유료 | 250인 이상 기업은 유료 구독 필요 | Docker Desktop 라이선스 확인 또는 대안 사용 |
-| D6 | 관리자 권한 없음 | 설치 실패 | Docker Desktop 설치에 관리자 권한 필요 | 관리자로 실행 |
-| D7 | 재부팅 미수행 | Docker 실행 불가 | 첫 설치 후 재부팅 필요 | 재부팅 안내 (이미 구현) |
-| D8 | Docker daemon 미시작 | `Cannot connect to the Docker daemon` | Docker Desktop 미실행 상태 | Docker Desktop 시작 후 대기 |
-| D9 | 네트워크 모드 충돌 | `docker network` 오류 | VPN/방화벽이 Docker 네트워크 차단 | Docker 네트워크 설정 변경 |
-| D10 | 디스크 공간 부족 | 설치 실패 | Docker Desktop 설치에 ~2GB, 이미지에 추가 공간 필요 | 공간 확보 |
-| D11 | 기존 Docker 충돌 | `docker already installed` | Docker Toolbox 또는 다른 Docker 버전 존재 | 기존 버전 제거 후 재설치 |
-| D12 | 방화벽에서 Docker Hub 차단 | `docker pull` 실패 | 기업 방화벽이 Docker Hub 차단 | 미러 레지스트리 설정 또는 방화벽 예외 |
-| D13 | 그룹 정책 차단 | 서비스 설치 불가 | GPO로 서비스 설치 차단 | IT 관리자에게 요청 |
+| D1 | BIOS virtualization not enabled | `Hardware assisted virtualization and data execution protection must be enabled` | VT-x/AMD-V disabled | Enable in BIOS |
+| D2 | WSL2 not installed/not working | `WSL 2 installation is incomplete` | WSL2 required when using Docker WSL2 backend | Install WSL2 first (depends on Step 5) |
+| D3 | Hyper-V conflict | Docker + VMware/VirtualBox cannot run simultaneously | Hyper-V conflicts with other virtualization | Recommend using Docker WSL2 backend |
+| D4 | Windows Home (old version) | Hyper-V backend unavailable | Home does not have Hyper-V | Use WSL2 backend (default) |
+| D5 | License (enterprise 250+ employees) | Docker Desktop paid | Enterprises with 250+ employees require paid subscription | Verify Docker Desktop license or use alternative |
+| D6 | No administrator privileges | Installation failure | Docker Desktop installation requires administrator privileges | Run as administrator |
+| D7 | Reboot not performed | Cannot run Docker | Reboot required after first installation | Reboot guidance (already implemented) |
+| D8 | Docker daemon not started | `Cannot connect to the Docker daemon` | Docker Desktop not running | Start Docker Desktop and wait |
+| D9 | Network mode conflict | `docker network` error | VPN/firewall blocking Docker network | Change Docker network settings |
+| D10 | Insufficient disk space | Installation failure | Docker Desktop installation needs ~2GB, images need additional space | Free up space |
+| D11 | Existing Docker conflict | `docker already installed` | Docker Toolbox or another Docker version exists | Remove existing version and reinstall |
+| D12 | Firewall blocking Docker Hub | `docker pull` failure | Enterprise firewall blocking Docker Hub | Configure mirror registry or firewall exception |
+| D13 | Group Policy blocking | Cannot install service | Service installation blocked by GPO | Request from IT administrator |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재: docker 명령 확인 → 없으면 winget 설치 → 재부팅 안내
-개선 필요:
-  - BIOS 가상화 사전 검사 (WSL과 공통)
-  - Docker Desktop 라이선스 경고 (기업 환경)
-  - 기존 Docker Toolbox 감지
-  - Docker daemon 시작 대기 로직
+Current: Check docker command → install via winget if missing → reboot guidance
+Improvements needed:
+  - BIOS virtualization pre-check (shared with WSL)
+  - Docker Desktop license warning (enterprise environment)
+  - Detect existing Docker Toolbox
+  - Docker daemon startup wait logic
 ```
 
 ---
@@ -404,247 +404,247 @@ Antigravity 개선 필요 (Critical):
 
 ### 9-1. Claude Code CLI
 
-> 현재 코드: `irm https://claude.ai/install.ps1 | iex` → PATH 수동 추가
+> Current code: `irm https://claude.ai/install.ps1 | iex` → manual PATH addition
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| C1 | PowerShell 실행 정책 | `scripts is disabled on this system` | `Restricted` 실행 정책 | `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
-| C2 | 인터넷 차단 | `irm` 다운로드 실패 | 방화벽/프록시가 `claude.ai` 차단 | 프록시 설정 또는 오프라인 설치 |
-| C3 | SSL 검사 (기업) | `certificate error` | MITM 프록시가 SSL 가로채기 | 기업 인증서 추가 |
-| C4 | PATH 미등록 | `claude not found` | `~/.local/bin`이 PATH에 없음 | 수동 PATH 추가 (이미 구현) |
-| C5 | 이전 버전 충돌 | 설치 실패 또는 버전 혼동 | npm 글로벌 설치 Claude CLI와 충돌 | 기존 npm 글로벌 버전 제거 |
-| C6 | `~/.local/bin` 권한 문제 | 파일 쓰기 실패 | OneDrive 동기화 폴더 내에 있을 때 | OneDrive 동기화 제외 또는 설치 경로 변경 |
-| C7 | Node.js 미설치 상태 | npm 관련 에러 (설치 스크립트 내부) | Claude CLI 설치 스크립트가 내부적으로 npm 사용 가능 | Node.js 먼저 설치 (Step 2 의존) |
-| C8 | 프록시 인증 필요 | 407 Proxy Authentication Required | 기업 프록시가 인증 요구 | 프록시 인증 설정 |
+| C1 | PowerShell execution policy | `scripts is disabled on this system` | `Restricted` execution policy | `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
+| C2 | Internet blocked | `irm` download failure | Firewall/proxy blocking `claude.ai` | Configure proxy or offline installation |
+| C3 | SSL inspection (enterprise) | `certificate error` | MITM proxy intercepting SSL | Add enterprise certificate |
+| C4 | PATH not registered | `claude not found` | `~/.local/bin` not in PATH | Manual PATH addition (already implemented) |
+| C5 | Previous version conflict | Installation failure or version confusion | Conflict with npm globally installed Claude CLI | Remove existing npm global version |
+| C6 | `~/.local/bin` permission issue | File write failure | Located within OneDrive sync folder | Exclude from OneDrive sync or change installation path |
+| C7 | Node.js not installed | npm related error (inside installation script) | Claude CLI installation script may use npm internally | Install Node.js first (depends on Step 2) |
+| C8 | Proxy authentication required | 407 Proxy Authentication Required | Enterprise proxy requires authentication | Configure proxy authentication |
 
 ### 9-2. Gemini CLI
 
-> 현재 코드: `npm install -g @google/gemini-cli`
+> Current code: `npm install -g @google/gemini-cli`
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| GM1 | npm 권한 문제 | `EACCES` / `permission denied` | 글로벌 설치 시 권한 부족 | `npm config set prefix` 사용자 디렉토리 설정 |
-| GM2 | Node.js 미설치 | `npm not found` | Step 2 실패 시 | Node.js 먼저 설치 |
-| GM3 | npm 레지스트리 차단 | `ETIMEDOUT` / `ECONNREFUSED` | 기업 방화벽이 `registry.npmjs.org` 차단 | npm 프록시 설정 또는 사내 레지스트리 |
-| GM4 | 기존 설치 충돌 | 버전 문제 | 이전 글로벌 설치 존재 | `npm update -g @google/gemini-cli` |
-| GM5 | Node.js 버전 호환성 | 설치 실패 | 너무 낮은 Node.js 버전 | Node.js LTS 업데이트 |
+| GM1 | npm permission issue | `EACCES` / `permission denied` | Insufficient permissions for global installation | Set `npm config set prefix` to user directory |
+| GM2 | Node.js not installed | `npm not found` | When Step 2 failed | Install Node.js first |
+| GM3 | npm registry blocked | `ETIMEDOUT` / `ECONNREFUSED` | Enterprise firewall blocking `registry.npmjs.org` | Configure npm proxy or use internal registry |
+| GM4 | Existing installation conflict | Version issue | Previous global installation exists | `npm update -g @google/gemini-cli` |
+| GM5 | Node.js version compatibility | Installation failure | Node.js version too old | Update Node.js LTS |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재:
-  - Claude: irm 설치 → PATH 수동 추가 → 확인
-  - Gemini: npm -g 설치 → PATH 갱신 → 확인
-개선 필요:
-  - 실행 정책 사전 검사
-  - 기존 npm 글로벌 Claude CLI 감지
-  - 프록시 환경 감지 및 안내
-  - Node.js 의존성 확인 (Step 2 결과 참조)
+Current:
+  - Claude: irm install → manual PATH addition → verify
+  - Gemini: npm -g install → refresh PATH → verify
+Improvements needed:
+  - Pre-check execution policy
+  - Detect existing npm global Claude CLI
+  - Detect proxy environment and provide guidance
+  - Verify Node.js dependency (reference Step 2 result)
 ```
 
 ---
 
 ## 10. bkit Plugin (Step 8)
 
-> 현재 코드: `claude plugin marketplace add` → `claude plugin install` → 확인
+> Current code: `claude plugin marketplace add` → `claude plugin install` → verify
 
-### 에러 케이스
+### Error Cases
 
-| # | 환경/조건 | 에러 메시지 | 원인 | 해결 방법 |
+| # | Environment/Condition | Error Message | Cause | Solution |
 |---|----------|-----------|------|----------|
-| B1 | Claude CLI 미설치 | `claude not found` | Step 7 실패 시 | Claude CLI 먼저 설치 |
-| B2 | Claude CLI 미로그인 | 인증 오류 | 플러그인 설치에 로그인 필요할 수 있음 | `claude login` 먼저 실행 |
-| B3 | 네트워크 차단 | 마켓플레이스 접근 불가 | 방화벽이 GitHub/마켓플레이스 차단 | 네트워크 예외 추가 |
-| B4 | 플러그인 API 변경 | 명령어 구문 변경 | Claude CLI 업데이트로 플러그인 명령어 변경 | CLI 문서 확인 후 명령어 갱신 |
-| B5 | Gemini 확장 설치 실패 | `extensions install` 실패 | Gemini CLI 확장 시스템 미성숙 | Gemini CLI 업데이트 후 재시도 |
+| B1 | Claude CLI not installed | `claude not found` | When Step 7 failed | Install Claude CLI first |
+| B2 | Claude CLI not logged in | Authentication error | Plugin installation may require login | Run `claude login` first |
+| B3 | Network blocked | Marketplace inaccessible | Firewall blocking GitHub/marketplace | Add network exception |
+| B4 | Plugin API changed | Command syntax changed | Plugin commands changed due to Claude CLI update | Check CLI documentation and update commands |
+| B5 | Gemini extension installation failure | `extensions install` failure | Gemini CLI extension system immature | Retry after updating Gemini CLI |
 
-### 현재 코드의 대응 수준
+### Current Code Response Level
 
 ```
-현재: 에러 무시 (SilentlyContinue) → 설치 확인 → "verify" 안내
-개선 필요:
-  - Claude CLI 존재 여부 사전 확인
-  - 설치 실패 시 구체적 안내 (로그인 필요 등)
+Current: Suppress errors (SilentlyContinue) → verify installation → "verify" guidance
+Improvements needed:
+  - Pre-check Claude CLI existence
+  - Specific guidance on installation failure (login required, etc.)
 ```
 
 ---
 
-## 11. 공통 에러 (Cross-cutting)
+## 11. Common Errors (Cross-cutting)
 
-모든 설치 단계에 영향을 미치는 공통 문제들:
+Common issues that affect all installation steps:
 
-### 11-1. PowerShell 관련
+### 11-1. PowerShell Related
 
-| # | 문제 | 영향 | 해결 |
+| # | Issue | Impact | Solution |
 |---|------|------|------|
-| PS1 | 실행 정책 `Restricted` | 스크립트 자체 실행 불가 | `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
-| PS2 | PowerShell 5.1 (구버전) | 일부 cmdlet 동작 차이 | PowerShell 7+ 사용 권장 |
-| PS3 | Constrained Language Mode | `Add-Member` 등 제한 | 기업 AppLocker 정책 해제 필요 |
-| PS4 | `$ErrorActionPreference` | 예상치 못한 에러 전파 | 각 섹션별 에러 처리 격리 |
+| PS1 | Execution policy `Restricted` | Cannot run scripts at all | `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
+| PS2 | PowerShell 5.1 (old version) | Some cmdlet behavior differences | Recommend using PowerShell 7+ |
+| PS3 | Constrained Language Mode | `Add-Member` etc. restricted | Enterprise AppLocker policy must be removed |
+| PS4 | `$ErrorActionPreference` | Unexpected error propagation | Isolate error handling per section |
 
-### 11-2. 네트워크 관련
+### 11-2. Network Related
 
-| # | 문제 | 영향 | 해결 |
+| # | Issue | Impact | Solution |
 |---|------|------|------|
-| NET1 | 기업 프록시 | 모든 다운로드 실패 | 시스템 프록시 자동 감지 또는 수동 설정 |
-| NET2 | SSL/TLS MITM 검사 | 인증서 오류 | 기업 루트 인증서 설치 |
-| NET3 | 방화벽 포트 차단 | HTTPS(443) 차단 | 방화벽 예외 추가 |
-| NET4 | DNS 차단 | 특정 도메인 접근 불가 | DNS 설정 변경 또는 호스트 파일 |
-| NET5 | 오프라인 환경 | 모든 온라인 설치 불가 | 오프라인 설치 패키지 사전 준비 |
+| NET1 | Enterprise proxy | All downloads fail | Auto-detect system proxy or manual configuration |
+| NET2 | SSL/TLS MITM inspection | Certificate errors | Install enterprise root certificate |
+| NET3 | Firewall port blocking | HTTPS(443) blocked | Add firewall exception |
+| NET4 | DNS blocking | Specific domains inaccessible | Change DNS settings or use hosts file |
+| NET5 | Offline environment | All online installations impossible | Pre-prepare offline installation packages |
 
-### 11-3. 권한 관련
+### 11-3. Permission Related
 
-| # | 문제 | 영향 | 해결 |
+| # | Issue | Impact | Solution |
 |---|------|------|------|
-| AUTH1 | 비관리자 계정 | WSL, Docker 설치 불가 | 관리자로 실행 안내 |
-| AUTH2 | UAC 프롬프트 차단 | 자동 설치 중단 | UAC 승인 필요 안내 |
-| AUTH3 | Group Policy 제한 | 소프트웨어 설치 차단 | IT 관리자 승인 필요 |
-| AUTH4 | AppLocker 정책 | 실행 차단 | 화이트리스트 추가 요청 |
+| AUTH1 | Non-administrator account | Cannot install WSL, Docker | Guide to run as administrator |
+| AUTH2 | UAC prompt blocked | Automated installation interrupted | Guide that UAC approval is needed |
+| AUTH3 | Group Policy restriction | Software installation blocked | IT administrator approval needed |
+| AUTH4 | AppLocker policy | Execution blocked | Request whitelist addition |
 
-### 11-4. PATH 관련
+### 11-4. PATH Related
 
-| # | 문제 | 영향 | 해결 |
+| # | Issue | Impact | Solution |
 |---|------|------|------|
-| PATH1 | Refresh-Path 후에도 미반영 | 명령어 not found | 터미널 재시작 안내 |
-| PATH2 | PATH 길이 초과 (Windows 제한) | 새 항목 추가 불가 | 불필요한 PATH 항목 정리 |
-| PATH3 | User PATH vs System PATH 충돌 | 잘못된 버전 실행 | PATH 순서 확인 및 조정 |
+| PATH1 | Not applied even after Refresh-Path | Command not found | Guide to restart terminal |
+| PATH2 | PATH length exceeded (Windows limit) | Cannot add new entries | Clean up unnecessary PATH entries |
+| PATH3 | User PATH vs System PATH conflict | Wrong version executed | Check and adjust PATH order |
 
 ---
 
-## 12. Top 10 빈출 에러
+## 12. Top 10 Most Frequent Errors
 
-실제 여러 컴퓨터에서 테스트 시 가장 자주 만나는 에러 순위:
+Ranked by most frequently encountered errors when testing across multiple computers:
 
-| 순위 | 에러 | 빈도 | 영향 범위 | 현재 대응 |
+| Rank | Error | Frequency | Impact Scope | Current Response |
 |------|------|------|----------|----------|
-| **1** | PATH 미반영 (`Refresh-Path` 부족) | ★★★★★ | Node, Git, `code` 명령, Claude CLI, Gemini | 부분 대응 (Refresh-Path) |
-| **2** | 기업 프록시/방화벽 차단 | ★★★★☆ | 모든 다운로드 단계 + 확장 마켓플레이스 | **미대응** |
-| **3** | SSL MITM 검사 (기업 보안) | ★★★★☆ | winget, npm, irm, git, VS Code 확장 | **미대응** |
-| **4** | 비관리자 권한 | ★★★★☆ | WSL, Docker, 일부 winget | **미대응** |
-| **5** | VS Code 확장 사일런트 실패 | ★★★★☆ | Claude 확장, Pencil 확장 | **미대응** (`2>$null`로 에러 숨김) |
-| **6** | 기존 설치와 충돌 | ★★★☆☆ | Node(nvm), Git, Docker | **미대응** |
-| **7** | BIOS 가상화 미활성 | ★★★☆☆ | WSL, Docker | **미대응** |
-| **8** | 재부팅 필요 (WSL/Docker) | ★★★☆☆ | WSL, Docker | 대응 (안내) |
-| **9** | 바이러스 백신 차단 | ★★☆☆☆ | 설치 파일, WSL 프로세스, 확장 파일 | **미대응** |
-| **10** | Windows S Mode / LTSC | ★★☆☆☆ | winget 자체 사용 불가 | 부분 대응 (Store 링크) |
+| **1** | PATH not applied (`Refresh-Path` insufficient) | ★★★★★ | Node, Git, `code` command, Claude CLI, Gemini | Partially addressed (Refresh-Path) |
+| **2** | Enterprise proxy/firewall blocking | ★★★★☆ | All download steps + extension marketplace | **Not addressed** |
+| **3** | SSL MITM inspection (enterprise security) | ★★★★☆ | winget, npm, irm, git, VS Code extensions | **Not addressed** |
+| **4** | Non-administrator privileges | ★★★★☆ | WSL, Docker, some winget | **Not addressed** |
+| **5** | VS Code extension silent failure | ★★★★☆ | Claude extension, Pencil extension | **Not addressed** (errors hidden with `2>$null`) |
+| **6** | Conflict with existing installations | ★★★☆☆ | Node(nvm), Git, Docker | **Not addressed** |
+| **7** | BIOS virtualization not enabled | ★★★☆☆ | WSL, Docker | **Not addressed** |
+| **8** | Reboot required (WSL/Docker) | ★★★☆☆ | WSL, Docker | Addressed (guidance) |
+| **9** | Antivirus blocking | ★★☆☆☆ | Installation files, WSL processes, extension files | **Not addressed** |
+| **10** | Windows S Mode / LTSC | ★★☆☆☆ | Cannot use winget at all | Partially addressed (Store link) |
 
 ---
 
-## 13. 환경별 위험도 매트릭스
+## 13. Risk Matrix by Environment
 
-각 환경 유형별로 어떤 에러가 발생할 확률이 높은지:
+Probability of errors by environment type:
 
-| 환경 | winget | Node.js | Git | VS Code | Antigravity | **확장** | WSL | Docker | Claude CLI | bkit |
+| Environment | winget | Node.js | Git | VS Code | Antigravity | **Extensions** | WSL | Docker | Claude CLI | bkit |
 |------|--------|---------|-----|---------|-------------|---------|-----|--------|-----------|------|
-| **일반 가정 PC** | ✅ | ✅ | ✅ | ✅ | ⚠️ 계정/지역 | ✅ | ⚠️ BIOS | ⚠️ BIOS | ✅ | ✅ |
-| **기업 (AD)** | ⚠️ GPO | ⚠️ 프록시 | ⚠️ SSL | ⚠️ 정책 | ❌ Workspace 차단 | ❌ 정책+SSL | ❌ GPO | ❌ 라이선스+GPO | ⚠️ 프록시 | ⚠️ 네트워크 |
-| **교육기관** | ⚠️ 제한 | ⚠️ 권한 | ⚠️ 권한 | ✅ | ⚠️ 18세 제한 | ⚠️ 네트워크 | ❌ 권한 | ❌ 권한 | ⚠️ 권한 | ⚠️ |
-| **Windows 10 (구)** | ⚠️ 버전 | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ 버전 | ⚠️ | ✅ | ✅ |
-| **LTSC/Server** | ❌ 미포함 | ❌ | ❌ | ❌ | ❌ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
-| **S Mode** | ❌ 차단 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **ARM64 기기** | ✅ | ✅ | ✅ | ✅ | ✅ (지원) | ⚠️ 빌드 미제공 | ✅ | ⚠️ | ✅ | ✅ |
+| **General Home PC** | ✅ | ✅ | ✅ | ✅ | ⚠️ Account/region | ✅ | ⚠️ BIOS | ⚠️ BIOS | ✅ | ✅ |
+| **Enterprise (AD)** | ⚠️ GPO | ⚠️ Proxy | ⚠️ SSL | ⚠️ Policy | ❌ Workspace blocked | ❌ Policy+SSL | ❌ GPO | ❌ License+GPO | ⚠️ Proxy | ⚠️ Network |
+| **Educational Institution** | ⚠️ Restricted | ⚠️ Permissions | ⚠️ Permissions | ✅ | ⚠️ 18+ restriction | ⚠️ Network | ❌ Permissions | ❌ Permissions | ⚠️ Permissions | ⚠️ |
+| **Windows 10 (old)** | ⚠️ Version | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ Version | ⚠️ | ✅ | ✅ |
+| **LTSC/Server** | ❌ Not included | ❌ | ❌ | ❌ | ❌ | ❌ | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
+| **S Mode** | ❌ Blocked | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **ARM64 Device** | ✅ | ✅ | ✅ | ✅ | ✅ (supported) | ⚠️ Build not available | ✅ | ⚠️ | ✅ | ✅ |
 
-> ✅ = 정상 작동 예상 | ⚠️ = 문제 발생 가능 | ❌ = 높은 확률로 실패
+> ✅ = Expected to work normally | ⚠️ = Possible issues | ❌ = High probability of failure
 
 ---
 
-## 부록: 필요한 네트워크 접근 목록
+## Appendix: Required Network Access List
 
-스크립트가 정상 동작하려면 아래 도메인에 HTTPS(443) 접근이 가능해야 함:
+The following domains must be accessible via HTTPS(443) for the script to function properly:
 
-| 도메인 | 용도 | 단계 |
+| Domain | Purpose | Step |
 |--------|------|------|
-| `cdn.winget.microsoft.com` | winget 패키지 소스 | 전체 |
-| `winget.azureedge.net` | winget CDN | 전체 |
-| `nodejs.org` / CDN | Node.js 다운로드 | Step 2 |
+| `cdn.winget.microsoft.com` | winget package source | All |
+| `winget.azureedge.net` | winget CDN | All |
+| `nodejs.org` / CDN | Node.js download | Step 2 |
 | `github.com` | Git, gh CLI, bkit | Step 3, 8 |
-| `objects.githubusercontent.com` | GitHub releases | 다수 |
-| `update.code.visualstudio.com` | VS Code 다운로드 | Step 4 |
-| `marketplace.visualstudio.com` | VS Code 확장 | Step 4 |
+| `objects.githubusercontent.com` | GitHub releases | Multiple |
+| `update.code.visualstudio.com` | VS Code download | Step 4 |
+| `marketplace.visualstudio.com` | VS Code extensions | Step 4 |
 | `desktop.docker.com` | Docker Desktop | Step 6 |
-| `registry.npmjs.org` | npm 패키지 | Step 7 (Gemini) |
-| `claude.ai` | Claude CLI 설치 스크립트 | Step 7 |
+| `registry.npmjs.org` | npm packages | Step 7 (Gemini) |
+| `claude.ai` | Claude CLI installation script | Step 7 |
 
 ---
 
-## 14. 구현 계획
+## 14. Implementation Plan
 
-### 14-1. 파일 구조
+### 14-1. File Structure
 
 ```
 installer/modules/
 ├── shared/
-│   ├── preflight.ps1     ← 신규: 환경 사전 검사 (설치 전 진단)
-│   ├── preflight.sh      ← 신규: Mac/Linux용 환경 사전 검사
-│   └── oauth-helper.ps1  (기존)
+│   ├── preflight.ps1     ← New: Environment pre-check (pre-installation diagnostics)
+│   ├── preflight.sh      ← New: Mac/Linux environment pre-check
+│   └── oauth-helper.ps1  (existing)
 ├── base/
-│   ├── install.ps1       ← 수정: 에러 핸들링 강화
-│   ├── install.sh        ← 수정: 에러 핸들링 강화
-│   └── module.json       (변경 없음)
+│   ├── install.ps1       ← Modified: Enhanced error handling
+│   ├── install.sh        ← Modified: Enhanced error handling
+│   └── module.json       (unchanged)
 ```
 
-### 14-2. preflight.ps1 — 환경 사전 검사 (14개 검사)
+### 14-2. preflight.ps1 — Environment Pre-check (14 checks)
 
-> 목적: 설치 시작 전에 환경을 진단하고, 문제가 있으면 미리 경고/중단
-> 호출: `install.ps1`에서 base 모듈 실행 전에 `. .\modules\shared\preflight.ps1` 로 호출
-> 반환: `$preflight` 객체에 각 검사 결과 저장 → base/install.ps1에서 참조
+> Purpose: Diagnose the environment before starting installation, and pre-warn/abort if issues are found
+> Invocation: Called from `install.ps1` before running the base module via `. .\modules\shared\preflight.ps1`
+> Return: Each check result stored in `$preflight` object → referenced by base/install.ps1
 
-#### 검사 1: Windows 버전/에디션
+#### Check 1: Windows Version/Edition
 
 ```powershell
-# 감지 방법:
+# Detection method:
 $osInfo = Get-CimInstance Win32_OperatingSystem
 $buildNumber = [int]$osInfo.BuildNumber
-$productType = $osInfo.ProductType  # 1=워크스테이션, 2=DC, 3=서버
+$productType = $osInfo.ProductType  # 1=Workstation, 2=DC, 3=Server
 $edition = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").EditionID
 
-# S Mode 감지:
+# S Mode detection:
 $ciPolicy = Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy" -ErrorAction SilentlyContinue
 $isSMode = $ciPolicy -and $ciPolicy.SkuPolicyRequired -eq 1
 
-# LTSC 감지:
+# LTSC detection:
 $isLTSC = $edition -like "*LTSC*" -or $edition -like "*Server*"
 
-# 결과:
-# - S Mode → ❌ 중단: "Windows S Mode에서는 설치 불가. S Mode 해제 후 재시도하세요"
-# - LTSC/Server → ⚠️ 경고: "LTSC/Server에서는 winget이 기본 미포함. 수동 설치 필요할 수 있습니다"
-# - Build < 17763 (1809 미만) → ❌ 중단: "Windows 10 1809 이상 필요"
+# Result:
+# - S Mode → Abort: "Installation not possible in Windows S Mode. Disable S Mode and retry"
+# - LTSC/Server → Warning: "winget is not included by default on LTSC/Server. Manual installation may be required"
+# - Build < 17763 (below 1809) → Abort: "Windows 10 1809 or higher required"
 ```
 
-#### 검사 2: 관리자 권한
+#### Check 2: Administrator Privileges
 
 ```powershell
-# 감지 방법:
+# Detection method:
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
     [Security.Principal.WindowsBuiltInRole]::Administrator
 )
 
-# 결과:
-# - 비관리자 + Docker 필요 → ⚠️ 경고: "WSL/Docker 설치에 관리자 권한 필요. 관리자로 다시 실행 권장"
-# - 비관리자 + Docker 불필요 → ℹ️ 안내: "관리자 아님. 일부 프로그램은 --scope user로 설치됩니다"
+# Result:
+# - Non-admin + Docker needed → Warning: "Administrator privileges required for WSL/Docker installation. Recommend re-running as administrator"
+# - Non-admin + Docker not needed → Info: "Not administrator. Some programs will be installed with --scope user"
 ```
 
-#### 검사 3: PowerShell 실행 정책
+#### Check 3: PowerShell Execution Policy
 
 ```powershell
-# 감지 방법:
+# Detection method:
 $policy = Get-ExecutionPolicy -Scope CurrentUser
 
-# 결과:
-# - Restricted → 자동 수정 시도: Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-# - 자동 수정 실패 → ⚠️ 경고: "실행 정책 변경 필요. 관리자 PowerShell에서 실행하세요"
-# - Constrained Language Mode 감지:
+# Result:
+# - Restricted → Attempt auto-fix: Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+# - Auto-fix failed → Warning: "Execution policy change required. Run in administrator PowerShell"
+# - Constrained Language Mode detection:
 $isConstrained = $ExecutionContext.SessionState.LanguageMode -eq "ConstrainedLanguage"
-# → ❌ 중단: "Constrained Language Mode에서는 스크립트 실행 불가. IT 관리자에게 문의"
+# → Abort: "Script cannot run in Constrained Language Mode. Contact IT administrator"
 ```
 
-#### 검사 4: 인터넷 연결 (오프라인 감지)
+#### Check 4: Internet Connection (Offline Detection)
 
 ```powershell
-# 감지 방법:
+# Detection method:
 $testUrls = @(
     "cdn.winget.microsoft.com",      # winget
-    "marketplace.visualstudio.com",  # VS Code 확장
+    "marketplace.visualstudio.com",  # VS Code extensions
     "claude.ai"                       # Claude CLI
 )
 $online = $false
@@ -653,34 +653,34 @@ foreach ($url in $testUrls) {
     if ($result.TcpTestSucceeded) { $online = $true; break }
 }
 
-# 결과:
-# - 전부 실패 → ❌ 중단: "인터넷 연결 없음. 온라인 환경에서 실행하세요"
-# - 일부만 실패 → ⚠️ 경고: "일부 서버 접근 불가. 방화벽 설정 확인 필요" + 실패 도메인 목록 표시
+# Result:
+# - All failed → Abort: "No internet connection. Run in an online environment"
+# - Some failed → Warning: "Some servers inaccessible. Check firewall settings" + display list of failed domains
 ```
 
-#### 검사 5: 프록시/방화벽 감지
+#### Check 5: Proxy/Firewall Detection
 
 ```powershell
-# 감지 방법:
-# 1. 시스템 프록시 설정 확인
+# Detection method:
+# 1. Check system proxy settings
 $proxySettings = Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
 $hasProxy = $proxySettings.ProxyEnable -eq 1
 $proxyServer = $proxySettings.ProxyServer
 
-# 2. 환경변수 프록시 확인
+# 2. Check environment variable proxy
 $envProxy = $env:HTTP_PROXY -or $env:HTTPS_PROXY
 
-# 결과:
-# - 프록시 감지됨 → ⚠️ 경고: "프록시 감지됨 ($proxyServer). 설치 중 다운로드 실패 시 프록시 설정 확인"
-# - winget 프록시 설정 안내: "winget settings에서 프록시 설정 필요할 수 있음"
-# - npm 프록시 설정 안내: "npm config set proxy http://... 필요할 수 있음"
+# Result:
+# - Proxy detected → Warning: "Proxy detected ($proxyServer). Check proxy settings if downloads fail during installation"
+# - winget proxy guidance: "Proxy settings in winget settings may be required"
+# - npm proxy guidance: "npm config set proxy http://... may be required"
 ```
 
-#### 검사 6: SSL MITM 감지
+#### Check 6: SSL MITM Detection
 
 ```powershell
-# 감지 방법:
-# known 도메인의 인증서 발급자를 확인해서 기업 MITM 프록시 감지
+# Detection method:
+# Detect enterprise MITM proxy by checking certificate issuer of known domains
 try {
     $request = [System.Net.HttpWebRequest]::Create("https://claude.ai")
     $request.Timeout = 5000
@@ -689,71 +689,71 @@ try {
     $issuer = $cert.Issuer
     $response.Close()
 
-    # 잘 알려진 CA가 아니면 MITM 가능성
+    # If not a well-known CA, possible MITM
     $knownCAs = @("DigiCert", "Let's Encrypt", "Cloudflare", "Amazon", "Google Trust")
     $isMITM = -not ($knownCAs | Where-Object { $issuer -like "*$_*" })
 } catch {
-    $isMITM = $false  # 연결 자체가 안되면 검사 4에서 처리
+    $isMITM = $false  # If connection itself fails, handled in Check 4
 }
 
-# 결과:
-# - MITM 감지됨 → ⚠️ 경고:
-#   "기업 SSL 검사 감지됨 (발급자: $issuer)"
-#   "설치 중 인증서 오류 발생 시:"
-#   "  - git: git config --global http.sslVerify false (임시)"
-#   "  - npm: npm config set strict-ssl false (임시)"
-#   "  - VS Code: NODE_EXTRA_CA_CERTS 환경변수 설정"
-#   "  또는 IT 관리자에게 기업 인증서 설치 요청"
+# Result:
+# - MITM detected → Warning:
+#   "Enterprise SSL inspection detected (issuer: $issuer)"
+#   "If certificate errors occur during installation:"
+#   "  - git: git config --global http.sslVerify false (temporary)"
+#   "  - npm: npm config set strict-ssl false (temporary)"
+#   "  - VS Code: Set NODE_EXTRA_CA_CERTS environment variable"
+#   "  Or request enterprise certificate installation from IT administrator"
 ```
 
-#### 검사 7: BIOS 가상화 활성 여부
+#### Check 7: BIOS Virtualization Enablement
 
 ```powershell
-# 감지 방법:
-# WSL/Docker 필요할 때만 검사
+# Detection method:
+# Only check when WSL/Docker is needed
 if ($script:needsDocker) {
     $vmEnabled = $false
 
-    # 방법 1: Hyper-V 가상화 확인
+    # Method 1: Check Hyper-V virtualization
     $computerInfo = Get-CimInstance Win32_ComputerSystem
     $vmEnabled = $computerInfo.HypervisorPresent
 
-    # 방법 2: 프로세서 기능 확인 (fallback)
+    # Method 2: Check processor capabilities (fallback)
     if (-not $vmEnabled) {
         $proc = Get-CimInstance Win32_Processor
         $vmEnabled = $proc.VirtualizationFirmwareEnabled
     }
 }
 
-# 결과:
-# - 비활성 → ⚠️ 경고:
-#   "BIOS에서 가상화(VT-x/AMD-V)가 비활성화되어 있습니다"
-#   "WSL과 Docker Desktop에 필요합니다"
-#   "BIOS 설정에 들어가서 활성화하세요:"
-#   "  Intel: VT-x 또는 Intel Virtualization Technology"
-#   "  AMD: AMD-V 또는 SVM Mode"
+# Result:
+# - Disabled → Warning:
+#   "Virtualization (VT-x/AMD-V) is disabled in BIOS"
+#   "Required for WSL and Docker Desktop"
+#   "Enter BIOS settings and enable it:"
+#   "  Intel: VT-x or Intel Virtualization Technology"
+#   "  AMD: AMD-V or SVM Mode"
 ```
 
-#### 검사 8: 디스크 공간
+#### Check 8: Disk Space
 
 ```powershell
-# 감지 방법:
+# Detection method:
 $drive = (Get-Item $env:SystemDrive)
 $freeGB = [math]::Round((Get-PSDrive C).Free / 1GB, 1)
 
-# 필요 공간 추정:
-# Node.js ~100MB, Git ~300MB, VS Code ~500MB, Docker ~2GB, 기타 ~500MB
+# Estimated required space:
+# Node.js ~100MB, Git ~300MB, VS Code ~500MB, Docker ~2GB, other ~500MB
 $requiredGB = 1.5
 if ($script:needsDocker) { $requiredGB = 4.0 }
 
-# 결과:
-# - 부족 → ⚠️ 경고: "C: 드라이브 여유 공간 ${freeGB}GB. 최소 ${requiredGB}GB 권장. 공간 확보 후 진행하세요"
+# Result:
+# - Insufficient → Warning: "C: drive free space ${freeGB}GB. Minimum ${requiredGB}GB recommended. Free up space before proceeding"
 ```
 
-#### 검사 9: OneDrive 동기화 경로 충돌
+#### Check 9: OneDrive Sync Path Conflict
 
 ```powershell
-# 감지 방법:
+# Detection method:
 $userProfile = $env:USERPROFILE
 $oneDrivePath = $env:OneDrive -or $env:OneDriveConsumer -or $env:OneDriveCommercial
 $vscodeExtDir = "$userProfile\.vscode\extensions"
@@ -762,118 +762,118 @@ $isOneDriveSynced = $false
 if ($oneDrivePath -and $userProfile -like "*OneDrive*") {
     $isOneDriveSynced = $true
 }
-# 또는 .vscode가 OneDrive 경로 내에 있는지 확인
+# Or check if .vscode is within the OneDrive path
 if ($oneDrivePath -and (Test-Path $vscodeExtDir)) {
     $resolvedPath = (Resolve-Path $vscodeExtDir).Path
     if ($resolvedPath -like "*OneDrive*") { $isOneDriveSynced = $true }
 }
 
-# 결과:
-# - 감지됨 → ⚠️ 경고:
-#   "VS Code 확장 폴더가 OneDrive 동기화 경로 내에 있습니다"
-#   "확장 설치 시 EPERM 오류가 발생할 수 있습니다"
-#   "OneDrive 설정에서 .vscode 폴더를 동기화 제외하세요"
+# Result:
+# - Detected → Warning:
+#   "VS Code extensions folder is within the OneDrive sync path"
+#   "EPERM errors may occur when installing extensions"
+#   "Exclude the .vscode folder from OneDrive sync settings"
 ```
 
-#### 검사 10: 기존 설치 충돌 감지
+#### Check 10: Existing Installation Conflict Detection
 
 ```powershell
-# nvm 감지:
+# nvm detection:
 $hasNvm = Test-Path "$env:APPDATA\nvm\nvm.exe" -or (Test-CommandExists "nvm")
 
-# Docker Toolbox 감지:
+# Docker Toolbox detection:
 $hasDockerToolbox = Test-Path "$env:ProgramFiles\Docker Toolbox\docker.exe"
 
-# 기존 npm 글로벌 Claude CLI 감지:
+# Existing npm global Claude CLI detection:
 $hasNpmClaude = $false
 if (Test-CommandExists "npm") {
     $npmGlobal = npm list -g @anthropic-ai/claude-code 2>$null
     if ($npmGlobal -and $npmGlobal -notlike "*empty*") { $hasNpmClaude = $true }
 }
 
-# VS Code Insiders 감지 (code-insiders만 있고 code 없을 때):
+# VS Code Insiders detection (when only code-insiders exists, not code):
 $hasInsiders = Test-CommandExists "code-insiders"
 $hasCode = Test-CommandExists "code"
 
-# 결과:
-# - nvm 있음 → ℹ️ 안내: "nvm 감지됨. Node.js winget 설치를 스킵합니다 (nvm으로 관리)"
-# - Docker Toolbox → ⚠️ 경고: "Docker Toolbox 감지됨. Docker Desktop과 충돌할 수 있습니다. 먼저 제거 권장"
-# - npm Claude CLI → ⚠️ 경고: "npm 글로벌 Claude CLI 감지됨. 네이티브 설치와 충돌 가능. npm uninstall -g ... 권장"
-# - Insiders만 → ℹ️ 안내: "VS Code Insiders 감지됨. 확장은 code-insiders로 설치합니다"
+# Result:
+# - nvm found → Info: "nvm detected. Skipping Node.js winget installation (managed by nvm)"
+# - Docker Toolbox → Warning: "Docker Toolbox detected. May conflict with Docker Desktop. Recommend removing it first"
+# - npm Claude CLI → Warning: "npm global Claude CLI detected. May conflict with native installation. Recommend npm uninstall -g ..."
+# - Insiders only → Info: "VS Code Insiders detected. Extensions will be installed via code-insiders"
 ```
 
-#### 검사 11: AV 소프트웨어 감지
+#### Check 11: AV Software Detection
 
 ```powershell
-# 감지 방법:
+# Detection method:
 $avProducts = Get-CimInstance -Namespace "root\SecurityCenter2" -ClassName AntivirusProduct -ErrorAction SilentlyContinue
 $avNames = $avProducts | Select-Object -ExpandProperty displayName
 
-# 특히 문제 유발하는 AV 목록:
+# List of AV products known to cause issues:
 $problematicAVs = @("Norton", "Kaspersky", "McAfee", "Symantec", "Bitdefender", "Avast", "AVG")
 $detectedProblematic = $avNames | Where-Object { $name = $_; $problematicAVs | Where-Object { $name -like "*$_*" } }
 
-# 결과:
-# - 감지됨 → ⚠️ 경고:
-#   "바이러스 백신 감지: $($avNames -join ', ')"
-#   "설치 중 파일 격리/차단 발생 시:"
-#   "  - 일시적으로 실시간 보호 비활성화"
-#   "  - 또는 설치 경로를 AV 예외에 추가:"
+# Result:
+# - Detected → Warning:
+#   "Antivirus detected: $($avNames -join ', ')"
+#   "If file quarantine/blocking occurs during installation:"
+#   "  - Temporarily disable real-time protection"
+#   "  - Or add installation paths to AV exceptions:"
 #   "    %LOCALAPPDATA%\Programs\"
 #   "    %USERPROFILE%\.vscode\extensions\"
 #   "    %USERPROFILE%\.local\bin\"
 ```
 
-#### 검사 12: Group Policy / AppLocker 제한 감지
+#### Check 12: Group Policy / AppLocker Restriction Detection
 
 ```powershell
-# 감지 방법:
-# 1. 소프트웨어 설치 제한 정책 확인
+# Detection method:
+# 1. Check software installation restriction policy
 $gpRestriction = Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer" -ErrorAction SilentlyContinue
 $installRestricted = $gpRestriction -and $gpRestriction.DisableMSI
 
-# 2. AppLocker 정책 확인
+# 2. Check AppLocker policy
 $appLockerPolicy = Get-AppLockerPolicy -Effective -ErrorAction SilentlyContinue
 $hasAppLocker = $null -ne $appLockerPolicy -and ($appLockerPolicy.RuleCollections.Count -gt 0)
 
-# 3. VS Code 확장 정책 확인
+# 3. Check VS Code extension policy
 $vscodePolicies = Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Visual Studio Code" -ErrorAction SilentlyContinue
 $extensionRestricted = $vscodePolicies -and $vscodePolicies.AllowedExtensions
 
-# 결과:
-# - 설치 제한 → ⚠️ 경고: "Group Policy로 소프트웨어 설치가 제한되어 있습니다. IT 관리자에게 문의하세요"
-# - AppLocker → ⚠️ 경고: "AppLocker 정책 감지됨. 일부 프로그램 실행이 차단될 수 있습니다"
-# - 확장 제한 → ⚠️ 경고: "VS Code 확장 설치 정책 감지됨. IT 관리자에게 Claude/Pencil 확장 허용 요청 필요"
+# Result:
+# - Installation restricted → Warning: "Software installation is restricted by Group Policy. Contact IT administrator"
+# - AppLocker → Warning: "AppLocker policy detected. Some program execution may be blocked"
+# - Extension restricted → Warning: "VS Code extension installation policy detected. Request Claude/Pencil extension permission from IT administrator"
 ```
 
-#### 검사 13: Docker 라이선스 경고
+#### Check 13: Docker License Warning
 
 ```powershell
-# 감지 방법 (기업 규모 추정):
-# - 도메인 조인 여부로 기업 환경 판단
+# Detection method (enterprise size estimation):
+# - Determine enterprise environment by domain join status
 $isDomainJoined = (Get-CimInstance Win32_ComputerSystem).PartOfDomain
 
-# 결과:
-# - Docker 필요 + 도메인 조인됨 → ⚠️ 경고:
-#   "기업 환경 감지됨 (도메인: $((Get-CimInstance Win32_ComputerSystem).Domain))"
-#   "Docker Desktop은 250명 이상 기업에서 유료 구독 필요 (Docker Business)"
-#   "라이선스 확인: https://www.docker.com/pricing/"
+# Result:
+# - Docker needed + domain joined → Warning:
+#   "Enterprise environment detected (domain: $((Get-CimInstance Win32_ComputerSystem).Domain))"
+#   "Docker Desktop requires paid subscription for enterprises with 250+ employees (Docker Business)"
+#   "Check license: https://www.docker.com/pricing/"
 ```
 
-#### 검사 14: Google 계정/지역 제한 안내 (Antigravity)
+#### Check 14: Google Account/Region Restriction Notice (Antigravity)
 
 ```powershell
-# Gemini(Antigravity) 선택 시에만 표시
+# Only displayed when Gemini (Antigravity) is selected
 if ($env:CLI_TYPE -eq "gemini") {
-    # 감지 방법: 시스템 로케일/지역으로 추정
-    $region = (Get-WinSystemLocale).Name  # 예: "ko-KR", "zh-CN"
+    # Detection method: Estimate from system locale/region
+    $region = (Get-WinSystemLocale).Name  # e.g.: "ko-KR", "zh-CN"
     $restrictedRegions = @("zh-CN", "ru-RU", "fa-IR", "cu-*", "kp-*", "sy-*")
     $isRestricted = $restrictedRegions | Where-Object { $region -like $_ }
 
-    # 결과: (항상 안내 표시)
-    # ℹ️ 안내:
-    #   "Antigravity 사용 시 Google 계정 필요:"
-    #   "  - 개인 @gmail.com 계정 권장 (Workspace 계정은 차단될 수 있음)"
+    # Result: (always display notice)
+    # Info:
+    #   "Google account required to use Antigravity:"
+    #   "  - Personal @gmail.com account recommended (Workspace accounts may be blocked)"
     #   "  - 18세 이상 계정만 가능"
     #   "  - 일부 국가에서 접근 제한 (중국, 러시아, 이란 등)"
     # + 제한 지역 감지 시 추가 경고

@@ -1484,7 +1484,7 @@ calendar_create_event: {
 
     return {
       success: true,
-      message: `일정 "${title}"이 생성되었습니다.`, // Korean message
+      message: `Schedule "${title}" has been created.`, // English message
     };
   },
 },

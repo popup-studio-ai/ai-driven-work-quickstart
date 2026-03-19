@@ -246,7 +246,7 @@ echo -e "  ${GREEN}client_secret.json found${NC}"
 # Pull Docker image
 echo ""
 echo -e "${YELLOW}[Pull] Google MCP Docker image...${NC}"
-docker pull ghcr.io/popup-jacob/google-workspace-mcp:latest
+docker pull ghcr.io/popup-studio-ai/google-workspace-mcp:latest
 echo -e "  ${GREEN}OK${NC}"
 
 # OAuth authentication (always - installer runs once)
@@ -260,7 +260,7 @@ echo ""
 echo -e "${YELLOW}Opening browser for Google login...${NC}"
 
 # Stop any leftover Google MCP auth container
-OLD_CONTAINER=$(docker ps -q --filter "ancestor=ghcr.io/popup-jacob/google-workspace-mcp:latest" 2>/dev/null)
+OLD_CONTAINER=$(docker ps -q --filter "ancestor=ghcr.io/popup-studio-ai/google-workspace-mcp:latest" 2>/dev/null)
 if [ -n "$OLD_CONTAINER" ]; then
     docker stop "$OLD_CONTAINER" > /dev/null 2>&1
     docker rm "$OLD_CONTAINER" > /dev/null 2>&1
@@ -271,7 +271,7 @@ AUTH_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("",0)); print(
 
 # Run auth container in background with dynamic port
 CONTAINER_ID=$(docker run -d -p "${AUTH_PORT}:${AUTH_PORT}" -e "OAUTH_PORT=$AUTH_PORT" -v "$CONFIG_DIR:/app/.google-workspace" \
-    ghcr.io/popup-jacob/google-workspace-mcp:latest \
+    ghcr.io/popup-studio-ai/google-workspace-mcp:latest \
     node -e "require('./dist/auth/oauth.js').getAuthenticatedClient().then(() => { console.log('Authentication complete!'); process.exit(0); }).catch(e => { console.error(e); process.exit(1); })")
 
 if [ -z "$CONTAINER_ID" ]; then
@@ -333,7 +333,7 @@ fi
 echo ""
 echo -e "${YELLOW}[Config] Updating MCP config...${NC}"
 
-mcp_add_docker_server "google-workspace" "ghcr.io/popup-jacob/google-workspace-mcp:latest" "-v" "$CONFIG_DIR:/app/.google-workspace"
+mcp_add_docker_server "google-workspace" "ghcr.io/popup-studio-ai/google-workspace-mcp:latest" "-v" "$CONFIG_DIR:/app/.google-workspace"
 mcp_add_permission "mcp__google-workspace"
 
 # Remove google-workspace from disabledMcpjsonServers in all project settings

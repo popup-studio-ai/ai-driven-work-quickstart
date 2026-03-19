@@ -1,68 +1,68 @@
-# Google Workspace MCP 설정 가이드 (External 모드 - 관리자용)
+# Google Workspace MCP Setup Guide (External Mode - Admin)
 
-> Google Workspace가 없는 회사나 개인이 설정하는 방법입니다.
-
----
-
-## 이 가이드가 맞는 경우
-
-- [x] 회사가 Google Workspace를 사용하지 않습니다 (일반 Gmail 사용)
-- [x] 또는 개인적으로 사용하려고 합니다
-- [x] Google Cloud Console에 접근할 수 있습니다
+> This guide explains how to set things up for companies without Google Workspace or for personal use.
 
 ---
 
-## External 모드 특징
+## This Guide Is For You If
 
-| 항목 | External 모드 |
+- [x] Your company does not use Google Workspace (uses regular Gmail)
+- [x] Or you want to use it for personal purposes
+- [x] You have access to Google Cloud Console
+
+---
+
+## External Mode Characteristics
+
+| Item | External Mode |
 |------|---------------|
-| 사용자 수 | **최대 100명** |
-| 토큰 만료 | **7일마다 재로그인 필요** |
-| Google 검토 | 100명 초과시 필요 |
-| 경고 화면 | "확인되지 않은 앱" 경고 표시 |
+| Number of users | **Up to 100** |
+| Token expiration | **Re-login required every 7 days** |
+| Google review | Required if exceeding 100 users |
+| Warning screen | "Unverified app" warning displayed |
 
 ---
 
-## 자동 설정 (권장)
+## Automatic Setup (Recommended)
 
-installer의 google 모듈이 자동으로 설정을 안내합니다.
+The installer's Google module will automatically guide you through the setup.
 
-**Windows:** `Win + R` 후 실행
+**Windows:** Press `Win + R` and run
 ```powershell
-powershell -ep bypass -c "& ([scriptblock]::Create((irm https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.ps1))) -modules 'google'"
+powershell -ep bypass -c "& ([scriptblock]::Create((irm https://raw.githubusercontent.com/popup-studio-ai/ai-driven-work-quickstart/main/installer/install.ps1))) -modules 'google'"
 ```
 
-**Mac/Linux:** 터미널에서 실행
+**Mac/Linux:** Run in Terminal
 ```bash
-curl -fsSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.sh | MODULES="google" bash
+curl -fsSL https://raw.githubusercontent.com/popup-studio-ai/ai-driven-work-quickstart/main/installer/install.sh | MODULES="google" bash
 ```
 
-실행 후 "Admin" 선택 → "External" 선택 → 안내에 따라 설정 완료.
+After running, select "Admin" → Select "External" → Follow the on-screen instructions to complete setup.
 
-완료 후 OAuth 동의 화면에서 테스트 사용자 추가 (팀원 이메일)
+After completion, add test users in the OAuth consent screen (team members' emails).
 
-> 아래 수동 설정은 자동 설치가 안 되거나 참고가 필요한 경우에만 확인하세요.
+> The manual setup below is only needed if the automatic installer does not work or you need it for reference.
 
 ---
 
-## 수동 설정 (참고용)
+## Manual Setup (Reference)
 
-### 1단계: Google Cloud Console 설정
+### Step 1: Google Cloud Console Setup
 
-### 1-1. 프로젝트 생성
+### 1-1. Create a Project
 
-1. [Google Cloud Console](https://console.cloud.google.com) 접속
-2. 상단의 프로젝트 선택 → **새 프로젝트**
-3. 프로젝트 이름: `Google Workspace MCP`
-4. **만들기** 클릭
+1. Go to [Google Cloud Console](https://console.cloud.google.com)
+2. Click the project selector at the top → **New Project**
+3. Project name: `Google Workspace MCP`
+4. Click **Create**
 
-### 1-2. API 활성화
+### 1-2. Enable APIs
 
-1. 왼쪽 메뉴 **APIs & Services** → **Enable APIs and Services**
-2. 아래 6개 API를 각각 검색해서 **사용** 클릭:
+1. Left menu **APIs & Services** → **Enable APIs and Services**
+2. Search for and click **Enable** for each of the following 6 APIs:
 
-| API | 검색어 |
-|-----|--------|
+| API | Search Term |
+|-----|-------------|
 | Gmail API | gmail |
 | Google Calendar API | calendar |
 | Google Drive API | drive |
@@ -70,31 +70,31 @@ curl -fsSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/ins
 | Google Sheets API | sheets |
 | Google Slides API | slides |
 
-### 1-3. OAuth 동의 화면 설정
+### 1-3. Configure OAuth Consent Screen
 
-1. 왼쪽 메뉴 **OAuth consent screen**
-2. 왼쪽 메뉴에서 **대상** 클릭
-3. **시작하기** 클릭
+1. Left menu **OAuth consent screen**
+2. Click **Audience** in the left menu
+3. Click **Get Started**
 
-#### 앱 정보 입력
+#### Enter App Information
 
-| 항목 | 입력 값 |
-|------|---------|
-| 앱 이름 | `Google Workspace MCP` |
-| 사용자 지원 이메일 | 본인 이메일 |
-| **대상** | **외부 (External)** |
-| 연락처 정보 | 본인 이메일 |
+| Item | Value |
+|------|-------|
+| App name | `Google Workspace MCP` |
+| User support email | Your email |
+| **Audience** | **External** |
+| Contact information | Your email |
 
-**저장** 클릭
+Click **Save**
 
-### 1-4. 데이터 액세스 (Scopes) 설정
+### 1-4. Data Access (Scopes) Configuration
 
-1. 왼쪽 메뉴 **데이터 액세스**
-2. **범위 추가** 클릭
-3. 아래 7개 범위 선택:
+1. Left menu **Data Access**
+2. Click **Add Scope**
+3. Select the following 7 scopes:
 
-| API | 범위 (검색) |
-|-----|-------------|
+| API | Scope (Search) |
+|-----|-----------------|
 | Gmail API | `gmail.modify` |
 | Gmail API | `gmail.send` |
 | Calendar API | `calendar` |
@@ -103,90 +103,90 @@ curl -fsSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/ins
 | Sheets API | `spreadsheets` |
 | Slides API | `presentations` |
 
-4. **저장** 클릭
+4. Click **Save**
 
-### 1-5. 테스트 사용자 추가 (중요!)
+### 1-5. Add Test Users (Important!)
 
-1. 왼쪽 메뉴 **대상**
-2. **테스트 사용자** 섹션
-3. **사용자 추가** 클릭
-4. 사용할 팀원들의 Gmail 주소 입력 (최대 100명)
-5. **저장** 클릭
+1. Left menu **Audience**
+2. **Test Users** section
+3. Click **Add Users**
+4. Enter the Gmail addresses of team members who will use the tool (up to 100)
+5. Click **Save**
 
-> 여기에 등록된 사람만 사용 가능!
+> Only people registered here can use the app!
 
-### 1-6. OAuth 클라이언트 ID 생성
+### 1-6. Create OAuth Client ID
 
-1. 왼쪽 메뉴 **클라이언트**
-2. **+ OAuth 클라이언트 만들기**
-3. 설정:
+1. Left menu **Clients**
+2. Click **+ Create OAuth Client**
+3. Configuration:
 
-| 항목 | 값 |
-|------|-----|
-| 애플리케이션 유형 | **데스크톱 앱** |
-| 이름 | `MCP Client` |
+| Item | Value |
+|------|-------|
+| Application type | **Desktop app** |
+| Name | `MCP Client` |
 
-4. **만들기** 클릭
-5. **JSON 다운로드** 아이콘 클릭
-6. 파일 이름을 `client_secret.json`으로 변경
+4. Click **Create**
+5. Click the **Download JSON** icon
+6. Rename the file to `client_secret.json`
 
 ---
 
-## 2단계: 팀원 배포 준비
+## Step 2: Prepare for Team Deployment
 
-### 팀원에게 전달할 파일
+### Files to distribute to team members
 
-`client_secret.json` 파일만 전달하면 됩니다.
+You only need to distribute the `client_secret.json` file.
 
-### 팀원 안내 메시지 예시
+### Sample message for team members
 
 ```
-안녕하세요, Google MCP 설정 안내입니다.
+Hello, here are the Google MCP setup instructions.
 
-1. 첨부된 client_secret.json 파일을 저장하세요
+1. Save the attached client_secret.json file
 
-2. 아래 설치 명령어를 실행하세요:
+2. Run the installation command below:
 
-   Windows: Win+R 누르고 아래 명령어 실행
-   powershell -ep bypass -c "& ([scriptblock]::Create((irm https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.ps1))) -modules 'google'"
+   Windows: Press Win+R and run the following command
+   powershell -ep bypass -c "& ([scriptblock]::Create((irm https://raw.githubusercontent.com/popup-studio-ai/ai-driven-work-quickstart/main/installer/install.ps1))) -modules 'google'"
 
-   Mac: 터미널에서 아래 명령어 실행
-   curl -fsSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.sh | MODULES="google" bash
+   Mac: Run the following command in Terminal
+   curl -fsSL https://raw.githubusercontent.com/popup-studio-ai/ai-driven-work-quickstart/main/installer/install.sh | MODULES="google" bash
 
-3. Google MCP 설정에서 "Employee" 선택
-4. client_secret.json 파일 위치로 복사
-5. Google 계정으로 로그인
+3. Select "Employee" in the Google MCP setup
+4. Copy the client_secret.json file to the specified location
+5. Log in with your Google account
 
-※ 7일마다 재로그인이 필요합니다 (External 모드 제한)
+Note: Re-login is required every 7 days (External mode limitation)
 
-문의: 관리자
+Contact: Admin
 ```
 
 ---
 
-## 100명 초과 사용하려면
+## Using More Than 100 Users
 
-| 방법 | 설명 |
-|------|------|
-| Google 검토 신청 | 개인정보처리방침, 데모영상 필요. 몇 주 소요 |
-| Google Workspace 전환 | 회사 도메인 이메일 사용. Internal 모드로 무제한 |
-
----
-
-## 보안 주의사항
-
-**외부 공개 금지:**
-- `client_secret.json` - 팀 내부에서만 공유
-- 팀 외부 사람에게 절대 전달하지 마세요
+| Method | Description |
+|--------|-------------|
+| Apply for Google review | Requires privacy policy and demo video. Takes several weeks |
+| Switch to Google Workspace | Use company domain email. Unlimited users with Internal mode |
 
 ---
 
-## 다음 단계
+## Security Notes
 
-- 팀원들에게 위의 "팀원 안내 메시지 예시"를 공유하세요
-- 다른 모듈도 함께 설치할 수 있습니다:
-  - Atlassian: `-modules 'google,atlassian'` (Docker 필요)
+**Do not share externally:**
+- `client_secret.json` - Share only within the team
+- Never distribute to anyone outside the team
+
+---
+
+## Next Steps
+
+- Share the "Sample message for team members" above with your team
+- You can also install other modules together:
+  - Atlassian: `-modules 'google,atlassian'` (Docker required)
   - Notion: `-modules 'google,notion'`
   - GitHub: `-modules 'google,github'`
   - Figma: `-modules 'google,figma'`
-  - 전체: `-all`
+  - All modules: `-all`

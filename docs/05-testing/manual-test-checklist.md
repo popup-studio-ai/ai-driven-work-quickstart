@@ -3,129 +3,129 @@
 > **Version**: 1.1
 > **Date**: 2026-02-20
 > **Target**: installer (macOS / Windows / Linux)
-> **Automated Tests**: 226 unit tests (97.46% coverage) — 이 문서는 자동화 불가한 수동 테스트만 다룸
-> **Note**: Google Workspace MCP 관련 테스트는 자동 테스트로 커버됨 (수동 테스트 제외)
+> **Automated Tests**: 226 unit tests (97.46% coverage) — This document covers only manual tests that cannot be automated
+> **Note**: Google Workspace MCP related tests are covered by automated tests (excluded from manual testing)
 
 ---
 
 ## How to Use
 
-- [ ] 각 시나리오를 순서대로 실행
-- [ ] Pass/Fail 체크 후 비고란에 이슈 기록
-- [ ] 실패 시 GitHub Issue 생성
+- [ ] Execute each scenario in order
+- [ ] Check Pass/Fail and record issues in the notes column
+- [ ] Create a GitHub Issue on failure
 
-**범례**: P0 = 반드시 통과, P1 = 중요, P2 = 권장
+**Legend**: P0 = Must pass, P1 = Important, P2 = Recommended
 
 ---
 
 ## 1. Installer — macOS
 
-### TC-INS-MAC-01: 클린 설치 (P0)
+### TC-INS-MAC-01: Clean Install (P0)
 
-**사전 조건**: macOS 12+, 인터넷 연결, 터미널
-
-| Step | Action | Expected Result | Pass/Fail |
-|------|--------|----------------|-----------|
-| 1 | `curl -fsSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.sh \| bash` | 스크립트 다운로드 및 실행 시작 | |
-| 2 | 시스템 요구사항 체크 출력 확인 | RAM >= 8GB, CPU >= 4, Disk >= 10GB 표시 | |
-| 3 | 모듈 목록 표시 확인 | 7개 모듈 (base + 6 optional) 목록 표시 | |
-| 4 | base 모듈만 선택하여 설치 | Node.js, Git, VS Code, Docker, Claude CLI, bkit 설치 완료 | |
-| 5 | `node --version` | v18+ 출력 | |
-| 6 | `git --version` | 버전 출력 | |
-| 7 | `docker --version` | 버전 출력 | |
-| 8 | `claude --version` | Claude CLI 버전 출력 | |
-
-**비고**: _______________________________________________
-
-### TC-INS-MAC-02: 전체 모듈 설치 (P1)
+**Prerequisites**: macOS 12+, internet connection, terminal
 
 | Step | Action | Expected Result | Pass/Fail |
 |------|--------|----------------|-----------|
-| 1 | `./install.sh --all` | 7개 모듈 순차 설치 시작 | |
-| 2 | Notion 모듈 설치 | MCP 설정에 notion 서버 추가 확인 | |
-| 3 | GitHub 모듈 설치 | `gh --version` 정상 출력 | |
-| 4 | Figma 모듈 설치 | Figma 토큰 입력 프롬프트 표시 | |
-| 5 | Pencil 모듈 설치 | VS Code extension 설치 메시지 | |
-| 6 | Atlassian 모듈 설치 | Jira/Confluence URL + API 토큰 입력 프롬프트 | |
-| 7 | Claude Code MCP 설정 확인 | `~/.claude/claude_desktop_config.json`에 서버 등록 확인 | |
+| 1 | `curl -fsSL https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.sh \| bash` | Script download and execution starts | |
+| 2 | Verify system requirements check output | RAM >= 8GB, CPU >= 4, Disk >= 10GB displayed | |
+| 3 | Verify module list display | List of 7 modules (base + 6 optional) displayed | |
+| 4 | Select and install base module only | Node.js, Git, VS Code, Docker, Claude CLI, bkit installation complete | |
+| 5 | `node --version` | v18+ output | |
+| 6 | `git --version` | Version output | |
+| 7 | `docker --version` | Version output | |
+| 8 | `claude --version` | Claude CLI version output | |
 
-**비고**: _______________________________________________
+**Notes**: _______________________________________________
 
-### TC-INS-MAC-03: Homebrew 없는 환경 (P1)
+### TC-INS-MAC-02: Full Module Install (P1)
 
 | Step | Action | Expected Result | Pass/Fail |
 |------|--------|----------------|-----------|
-| 1 | Homebrew 미설치 상태에서 install.sh 실행 | Homebrew 자동 설치 시도 | |
-| 2 | sudo 비밀번호 프롬프트 | 비밀번호 입력 창 표시 (curl\|bash 모드에서도) | |
-| 3 | Homebrew 설치 완료 후 계속 진행 | base 모듈 설치 정상 진행 | |
+| 1 | `./install.sh --all` | Sequential installation of 7 modules starts | |
+| 2 | Notion module install | Verify notion server added to MCP config | |
+| 3 | GitHub module install | `gh --version` outputs normally | |
+| 4 | Figma module install | Figma token input prompt displayed | |
+| 5 | Pencil module install | VS Code extension installation message | |
+| 6 | Atlassian module install | Jira/Confluence URL + API token input prompt | |
+| 7 | Check Claude Code MCP config | Verify server registration in `~/.claude/claude_desktop_config.json` | |
 
-**비고**: _______________________________________________
+**Notes**: _______________________________________________
+
+### TC-INS-MAC-03: Environment Without Homebrew (P1)
+
+| Step | Action | Expected Result | Pass/Fail |
+|------|--------|----------------|-----------|
+| 1 | Run install.sh without Homebrew installed | Automatic Homebrew installation attempt | |
+| 2 | sudo password prompt | Password input dialog displayed (even in curl\|bash mode) | |
+| 3 | Continue after Homebrew installation completes | Base module installation proceeds normally | |
+
+**Notes**: _______________________________________________
 
 ---
 
 ## 2. Installer — Windows
 
-### TC-INS-WIN-01: PowerShell 클린 설치 (P0)
+### TC-INS-WIN-01: PowerShell Clean Install (P0)
 
-**사전 조건**: Windows 10/11, PowerShell 5.1+, 관리자 권한
-
-| Step | Action | Expected Result | Pass/Fail |
-|------|--------|----------------|-----------|
-| 1 | PowerShell(관리자)에서 `irm https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.ps1 \| iex` | 스크립트 다운로드 및 실행 | |
-| 2 | 시스템 요구사항 체크 | RAM, CPU, Disk 체크 결과 표시 | |
-| 3 | base 모듈 설치 | Node.js, Git, VS Code, Docker Desktop 설치 | |
-| 4 | `node --version` (새 터미널) | v18+ 출력 | |
-| 5 | `docker --version` | Docker Desktop 버전 출력 | |
-| 6 | `claude --version` | Claude CLI 버전 출력 | |
-
-**비고**: _______________________________________________
-
-### TC-INS-WIN-02: 모듈별 선택 설치 (P1)
+**Prerequisites**: Windows 10/11, PowerShell 5.1+, administrator privileges
 
 | Step | Action | Expected Result | Pass/Fail |
 |------|--------|----------------|-----------|
-| 1 | `.\install.ps1 -Modules "github,notion"` | github + notion 모듈만 설치 | |
-| 2 | GitHub CLI 확인 | `gh auth status` 정상 | |
-| 3 | Notion MCP 확인 | MCP 설정에 notion 서버 등록 | |
+| 1 | In PowerShell (Administrator): `irm https://raw.githubusercontent.com/popup-jacob/popup-claude/master/installer/install.ps1 \| iex` | Script download and execution | |
+| 2 | System requirements check | RAM, CPU, Disk check results displayed | |
+| 3 | Base module install | Node.js, Git, VS Code, Docker Desktop installation | |
+| 4 | `node --version` (new terminal) | v18+ output | |
+| 5 | `docker --version` | Docker Desktop version output | |
+| 6 | `claude --version` | Claude CLI version output | |
 
-**비고**: _______________________________________________
+**Notes**: _______________________________________________
+
+### TC-INS-WIN-02: Per-Module Selective Install (P1)
+
+| Step | Action | Expected Result | Pass/Fail |
+|------|--------|----------------|-----------|
+| 1 | `.\install.ps1 -Modules "github,notion"` | Only github + notion modules installed | |
+| 2 | GitHub CLI check | `gh auth status` normal | |
+| 3 | Notion MCP check | Notion server registered in MCP config | |
+
+**Notes**: _______________________________________________
 
 ---
 
 ## 3. Installer — Linux
 
-### TC-INS-LNX-01: Ubuntu/Debian 설치 (P1)
+### TC-INS-LNX-01: Ubuntu/Debian Install (P1)
 
-**사전 조건**: Ubuntu 22.04+, sudo 권한
-
-| Step | Action | Expected Result | Pass/Fail |
-|------|--------|----------------|-----------|
-| 1 | `curl -fsSL .../install.sh \| bash` | apt 패키지매니저 자동 감지 | |
-| 2 | base 모듈 설치 | `apt install` 으로 Node.js, Git, Docker 설치 | |
-| 3 | 설치 완료 확인 | 모든 CLI 도구 버전 확인 가능 | |
-
-### TC-INS-LNX-02: Fedora/RHEL 설치 (P2)
+**Prerequisites**: Ubuntu 22.04+, sudo privileges
 
 | Step | Action | Expected Result | Pass/Fail |
 |------|--------|----------------|-----------|
-| 1 | `curl -fsSL .../install.sh \| bash` | dnf 패키지매니저 자동 감지 | |
-| 2 | base 모듈 설치 | `dnf install`으로 설치 진행 | |
+| 1 | `curl -fsSL .../install.sh \| bash` | apt package manager auto-detected | |
+| 2 | Base module install | Node.js, Git, Docker installed via `apt install` | |
+| 3 | Verify installation complete | All CLI tool versions can be confirmed | |
 
-**비고**: _______________________________________________
+### TC-INS-LNX-02: Fedora/RHEL Install (P2)
+
+| Step | Action | Expected Result | Pass/Fail |
+|------|--------|----------------|-----------|
+| 1 | `curl -fsSL .../install.sh \| bash` | dnf package manager auto-detected | |
+| 2 | Base module install | Installation proceeds via `dnf install` | |
+
+**Notes**: _______________________________________________
 
 ---
 
 ## 4. Security Verification
 
-### TC-SEC-01: Checksum 검증 (P1)
+### TC-SEC-01: Checksum Verification (P1)
 
 | Step | Action | Expected Result | Pass/Fail |
 |------|--------|----------------|-----------|
-| 1 | 원격 설치 시 checksums.json 다운로드 | 체크섬 파일 정상 다운로드 | |
-| 2 | 모듈 파일 무결성 검증 | SHA-256 해시 일치 확인 | |
-| 3 | 모듈 파일 변조 후 설치 시도 | 체크섬 불일치 경고 + 설치 중단 | |
+| 1 | checksums.json download during remote install | Checksum file downloads successfully | |
+| 2 | Module file integrity verification | SHA-256 hash match confirmed | |
+| 3 | Attempt install after tampering with module file | Checksum mismatch warning + installation aborted | |
 
-**비고**: _______________________________________________
+**Notes**: _______________________________________________
 
 ---
 

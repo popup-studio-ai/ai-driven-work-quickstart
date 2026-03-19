@@ -1,80 +1,80 @@
-# Google Workspace MCP - 직원용 설정 가이드
+# Google Workspace MCP - Employee Setup Guide
 
-> 관리자가 이미 설정을 완료한 상태에서, 직원들이 사용하기 위한 간단한 가이드입니다.
+> This is a simple guide for employees to get started, assuming an admin has already completed the initial setup.
 
 ---
 
-## 필요한 것
+## What You Need
 
-관리자에게 받을 파일:
-- [ ] `client_secret.json` 파일
-- [ ] `.mcp.json` 설정 파일 (또는 설정 내용)
+Files to receive from your admin:
+- [ ] `client_secret.json` file
+- [ ] `.mcp.json` configuration file (or the configuration content)
 
-설치할 프로그램:
+Software to install:
 - [ ] Docker Desktop
 
 ---
 
-## 설정 방법 (5분)
+## Setup Instructions (5 minutes)
 
-### 1단계: Docker Desktop 설치
+### Step 1: Install Docker Desktop
 
-이미 설치되어 있으면 건너뛰세요.
+Skip this step if already installed.
 
 **Windows:**
-1. https://www.docker.com/products/docker-desktop/ 접속
-2. **Download for Windows** 클릭
-3. 설치 후 **컴퓨터 재시작**
-4. Docker Desktop 실행
+1. Go to https://www.docker.com/products/docker-desktop/
+2. Click **Download for Windows**
+3. After installation, **restart your computer**
+4. Launch Docker Desktop
 
 **Mac:**
-1. https://www.docker.com/products/docker-desktop/ 접속
-2. **Download for Mac** 클릭
-3. 설치 후 Docker Desktop 실행
+1. Go to https://www.docker.com/products/docker-desktop/
+2. Click **Download for Mac**
+3. After installation, launch Docker Desktop
 
 ---
 
-### 2단계: 폴더 생성 및 파일 배치
+### Step 2: Create Folder and Place Files
 
 #### Windows
 
-1. 파일 탐색기 열기
-2. `C:\Users\{내이름}` 폴더로 이동
-3. `.google-workspace` 폴더 생성
-4. 관리자에게 받은 `client_secret.json` 파일을 그 폴더에 넣기
+1. Open File Explorer
+2. Navigate to `C:\Users\{YourName}`
+3. Create a `.google-workspace` folder
+4. Place the `client_secret.json` file received from your admin into that folder
 
 ```
-C:\Users\{내이름}\
+C:\Users\{YourName}\
 └── .google-workspace\
-    └── client_secret.json    ← 여기에 넣기
+    └── client_secret.json    ← Place it here
 ```
 
 #### Mac
 
-터미널에서:
+In Terminal:
 ```bash
 mkdir -p ~/.google-workspace
 ```
 
-관리자에게 받은 `client_secret.json` 파일을 `~/.google-workspace/` 폴더에 넣기
+Place the `client_secret.json` file received from your admin into the `~/.google-workspace/` folder
 
 ---
 
-### 3단계: Docker 이미지 받기
+### Step 3: Get the Docker Image
 
-관리자에게 Docker 이미지 받는 방법 확인하세요.
+Check with your admin on how to get the Docker image.
 
-**방법 A: 회사 레지스트리에서 받기**
+**Option A: Pull from company registry**
 ```bash
-docker pull {회사레지스트리}/google-workspace-mcp
+docker pull {company-registry}/google-workspace-mcp
 ```
 
-**방법 B: 파일로 받기**
+**Option B: Load from a file**
 ```bash
 docker load -i google-workspace-mcp.tar
 ```
 
-**방법 C: 직접 빌드**
+**Option C: Build it yourself**
 ```bash
 cd google-workspace-mcp
 docker build -t google-workspace-mcp .
@@ -82,11 +82,11 @@ docker build -t google-workspace-mcp .
 
 ---
 
-### 4단계: Claude 설정
+### Step 4: Configure Claude
 
-#### VS Code 사용하는 경우
+#### If using VS Code
 
-프로젝트 폴더에 `.mcp.json` 파일 생성 (관리자가 내용 공유):
+Create a `.mcp.json` file in your project folder (your admin will share the content):
 
 **Windows:**
 ```json
@@ -96,7 +96,7 @@ docker build -t google-workspace-mcp .
       "command": "docker",
       "args": [
         "run", "-i", "--rm",
-        "-v", "C:/Users/{내이름}/.google-workspace:/app/.google-workspace",
+        "-v", "C:/Users/{YourName}/.google-workspace:/app/.google-workspace",
         "google-workspace-mcp"
       ]
     }
@@ -112,7 +112,7 @@ docker build -t google-workspace-mcp .
       "command": "docker",
       "args": [
         "run", "-i", "--rm",
-        "-v", "/Users/{내이름}/.google-workspace:/app/.google-workspace",
+        "-v", "/Users/{YourName}/.google-workspace:/app/.google-workspace",
         "google-workspace-mcp"
       ]
     }
@@ -120,73 +120,73 @@ docker build -t google-workspace-mcp .
 }
 ```
 
-> **{내이름}** 부분을 본인 컴퓨터 사용자 이름으로 변경하세요.
+> Replace **{YourName}** with your computer username.
 
-#### Claude Desktop 사용하는 경우
+#### If using Claude Desktop
 
-설정 파일 위치:
+Configuration file location:
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 - Mac: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-위와 같은 내용으로 파일 생성/수정
+Create/edit the file with the same content as above.
 
 ---
 
-### 5단계: 최초 로그인
+### Step 5: Initial Login
 
-1. VS Code 또는 Claude Desktop 재시작
-2. Claude에게 아무 Google 관련 명령 입력:
+1. Restart VS Code or Claude Desktop
+2. Enter any Google-related command in Claude:
    ```
-   내 캘린더 일정 보여줘
+   Show my calendar events
    ```
-3. 브라우저가 열리면 **본인 회사 계정**으로 로그인
-4. 권한 허용
-5. 끝!
+3. When the browser opens, log in with **your company account**
+4. Grant permissions
+5. Done!
 
 ---
 
-## 사용 예시
+## Usage Examples
 
 ```
-"내 캘린더 일정 보여줘"
-"test@회사.com한테 메일 보내줘"
-"드라이브에서 기획서 찾아줘"
-"새 문서 만들어줘"
-"이번 주 빈 시간 찾아줘"
+"Show my calendar events"
+"Send an email to test@company.com"
+"Find the proposal on Drive"
+"Create a new document"
+"Find free time slots this week"
 ```
 
 ---
 
-## 문제 해결
+## Troubleshooting
 
-### "Docker를 찾을 수 없습니다" 오류
+### "Docker not found" error
 
-→ Docker Desktop이 실행 중인지 확인
-→ Docker Desktop 실행 후 다시 시도
+→ Make sure Docker Desktop is running
+→ Launch Docker Desktop and try again
 
-### "client_secret.json 파일이 없습니다" 오류
+### "client_secret.json file not found" error
 
-→ 파일 경로 확인
-→ `.google-workspace` 폴더에 파일이 있는지 확인
-→ `.mcp.json`의 경로가 맞는지 확인
+→ Check the file path
+→ Verify the file exists in the `.google-workspace` folder
+→ Make sure the path in `.mcp.json` is correct
 
-### 로그인 화면이 안 뜸
+### Login screen does not appear
 
-→ Docker Desktop이 실행 중인지 확인
-→ VS Code / Claude Desktop 재시작
+→ Make sure Docker Desktop is running
+→ Restart VS Code / Claude Desktop
 
-### "이 앱은 내부 사용자만 액세스할 수 있습니다" 오류
+### "Only internal users can access this app" error
 
-→ 회사 계정(@회사도메인.com)으로 로그인해야 함
-→ 개인 Gmail 계정으로는 로그인 불가
+→ You must log in with your company account (@yourdomain.com)
+→ You cannot log in with a personal Gmail account
 
 ---
 
-## 도움이 필요하면
+## Need Help?
 
-설정 중 문제가 있으면 관리자에게 문의하세요.
+If you encounter issues during setup, contact your admin.
 
-**전달할 정보:**
-- 어떤 단계에서 문제가 생겼는지
-- 에러 메시지 (있으면 화면 캡처)
-- Windows인지 Mac인지
+**Information to provide:**
+- Which step the issue occurred at
+- Error message (screenshot if available)
+- Whether you are on Windows or Mac

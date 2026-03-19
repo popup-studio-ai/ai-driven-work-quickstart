@@ -1,28 +1,28 @@
-# Google Workspace MCP - 회사용 설정 가이드
+# Google Workspace MCP - Company Setup Guide
 
-> Google Workspace를 사용하는 회사에서 직원들이 사용할 수 있도록 설정하는 방법입니다.
+> This guide explains how to set up Google Workspace MCP so that employees in a company using Google Workspace can use it.
 
-## 장점
+## Advantages
 
-| 항목 | 내용 |
-|------|------|
-| 사용자 한도 | 무제한 (회사 직원 전체) |
-| 토큰 만료 | 없음 (계속 사용 가능) |
-| 경고 화면 | 없음 |
-| 사용 가능 계정 | @회사도메인.com 만 |
-
----
-
-## 사전 요구사항
-
-- [ ] Google Workspace를 사용하는 회사 (예: @company.com 이메일)
-- [ ] Google Cloud Console 접근 권한 (회사 관리자 또는 본인 계정)
-- [ ] Docker Desktop 설치
-- [ ] Node.js 20 이상 설치
+| Item | Details |
+|------|---------|
+| User limit | Unlimited (all company employees) |
+| Token expiration | None (can be used indefinitely) |
+| Warning screen | None |
+| Eligible accounts | @yourdomain.com only |
 
 ---
 
-## 1단계: 코드 다운로드
+## Prerequisites
+
+- [ ] A company using Google Workspace (e.g., @company.com email)
+- [ ] Access to Google Cloud Console (company admin or your own account)
+- [ ] Docker Desktop installed
+- [ ] Node.js 20 or later installed
+
+---
+
+## Step 1: Download the Code
 
 ```bash
 git clone <repository-url>
@@ -31,22 +31,22 @@ cd google-workspace-mcp
 
 ---
 
-## 2단계: Google Cloud Console 설정
+## Step 2: Google Cloud Console Setup
 
-### 2-1. 프로젝트 생성
+### 2-1. Create a Project
 
-1. [Google Cloud Console](https://console.cloud.google.com) 접속
-2. 상단의 프로젝트 선택 → **새 프로젝트**
-3. 프로젝트 이름 입력 (예: `Google Workspace MCP`)
-4. **만들기** 클릭
+1. Go to [Google Cloud Console](https://console.cloud.google.com)
+2. Click the project selector at the top → **New Project**
+3. Enter a project name (e.g., `Google Workspace MCP`)
+4. Click **Create**
 
-### 2-2. API 활성화
+### 2-2. Enable APIs
 
-1. 왼쪽 메뉴 **APIs & Services** → **Enable APIs and Services**
-2. 아래 6개 API 검색해서 각각 **사용** 버튼 클릭:
+1. Left menu **APIs & Services** → **Enable APIs and Services**
+2. Search for and click **Enable** for each of the following 6 APIs:
 
-| API 이름 | 검색어 |
-|----------|--------|
+| API Name | Search Term |
+|----------|-------------|
 | Gmail API | gmail |
 | Google Calendar API | calendar |
 | Google Drive API | drive |
@@ -54,30 +54,30 @@ cd google-workspace-mcp
 | Google Sheets API | sheets |
 | Google Slides API | slides |
 
-### 2-3. OAuth 동의 화면 설정
+### 2-3. Configure OAuth Consent Screen
 
-1. 왼쪽 메뉴 **Google 인증 플랫폼** (또는 OAuth consent screen)
-2. **시작하기** 클릭
+1. Left menu **Google Auth Platform** (or OAuth consent screen)
+2. Click **Get Started**
 
-#### 앱 정보 입력
+#### Enter App Information
 
-| 항목 | 입력 값 |
-|------|---------|
-| 앱 이름 | `Google Workspace MCP` (원하는 이름) |
-| 사용자 지원 이메일 | 본인 이메일 선택 |
-| 대상 | **내부 (Internal)** ← 중요! |
-| 연락처 정보 | 본인 이메일 입력 |
+| Item | Value |
+|------|-------|
+| App name | `Google Workspace MCP` (or any name you prefer) |
+| User support email | Select your email |
+| Audience | **Internal** — Important! |
+| Contact information | Enter your email |
 
-**저장** 클릭
+Click **Save**
 
-### 2-4. 데이터 액세스 (Scopes) 설정
+### 2-4. Data Access (Scopes) Configuration
 
-1. 왼쪽 메뉴 **데이터 액세스** 클릭
-2. **범위 추가** 버튼 클릭
-3. 아래 7개 범위 검색해서 선택:
+1. Click **Data Access** in the left menu
+2. Click the **Add Scope** button
+3. Search for and select the following 7 scopes:
 
-| API | 범위 |
-|-----|------|
+| API | Scope |
+|-----|-------|
 | Gmail API | `.../auth/gmail.modify` |
 | Gmail API | `.../auth/gmail.send` |
 | Google Calendar API | `.../auth/calendar` |
@@ -86,42 +86,42 @@ cd google-workspace-mcp
 | Google Sheets API | `.../auth/spreadsheets` |
 | Google Slides API | `.../auth/presentations` |
 
-4. **저장** 클릭
+4. Click **Save**
 
-### 2-5. OAuth 클라이언트 ID 생성
+### 2-5. Create OAuth Client ID
 
-1. 왼쪽 메뉴 **클라이언트** 클릭
-2. **+ OAuth 클라이언트 만들기** 클릭
-3. 설정:
+1. Click **Clients** in the left menu
+2. Click **+ Create OAuth Client**
+3. Configuration:
 
-| 항목 | 선택/입력 값 |
-|------|-------------|
-| 애플리케이션 유형 | **데스크톱 앱** |
-| 이름 | `MCP Client` (원하는 이름) |
+| Item | Value |
+|------|-------|
+| Application type | **Desktop app** |
+| Name | `MCP Client` (or any name you prefer) |
 
-4. **만들기** 클릭
+4. Click **Create**
 
-### 2-6. JSON 다운로드
+### 2-6. Download JSON
 
-1. 생성된 클라이언트 옆의 **다운로드 아이콘(⬇️)** 클릭
-2. 다운로드된 파일 이름을 `client_secret.json`으로 변경
+1. Click the **download icon** next to the created client
+2. Rename the downloaded file to `client_secret.json`
 
 ---
 
-## 3단계: 파일 배치
+## Step 3: Place the File
 
-프로젝트 폴더에 `.google-workspace` 폴더 생성 후 JSON 파일 이동:
+Create a `.google-workspace` folder in the project directory and move the JSON file into it:
 
 ```bash
 mkdir .google-workspace
 mv ~/Downloads/client_secret.json .google-workspace/
 ```
 
-폴더 구조:
+Folder structure:
 ```
 google-workspace-mcp/
 ├── .google-workspace/
-│   └── client_secret.json    ← 여기에 배치
+│   └── client_secret.json    ← Place it here
 ├── src/
 ├── package.json
 └── ...
@@ -129,9 +129,9 @@ google-workspace-mcp/
 
 ---
 
-## 4단계: 빌드 및 테스트
+## Step 4: Build and Test
 
-### 로컬 테스트
+### Local Test
 
 ```bash
 npm install
@@ -139,17 +139,17 @@ npm run build
 npm start
 ```
 
-### Google 로그인 테스트
+### Google Login Test
 
 ```bash
 node -e "import('./dist/auth/oauth.js').then(m => m.getGoogleServices())"
 ```
 
-브라우저가 열리면 **회사 계정** (@회사도메인.com)으로 로그인하세요.
+When the browser opens, log in with your **company account** (@yourdomain.com).
 
 ---
 
-## 5단계: Docker 이미지 빌드
+## Step 5: Build Docker Image
 
 ```bash
 docker build -t google-workspace-mcp .
@@ -157,11 +157,11 @@ docker build -t google-workspace-mcp .
 
 ---
 
-## 6단계: Claude 연동 설정
+## Step 6: Claude Integration Setup
 
 ### VS Code (Claude Code)
 
-프로젝트 폴더에 `.mcp.json` 파일 생성:
+Create a `.mcp.json` file in the project folder:
 
 ```json
 {
@@ -170,7 +170,7 @@ docker build -t google-workspace-mcp .
       "command": "docker",
       "args": [
         "run", "-i", "--rm",
-        "-v", "경로/.google-workspace:/app/.google-workspace",
+        "-v", "path/.google-workspace:/app/.google-workspace",
         "google-workspace-mcp"
       ]
     }
@@ -178,11 +178,11 @@ docker build -t google-workspace-mcp .
 }
 ```
 
-**경로** 부분을 실제 경로로 변경하세요.
+Replace **path** with your actual path.
 
 ### Claude Desktop
 
-`%APPDATA%\Claude\claude_desktop_config.json` (Windows) 또는
+`%APPDATA%\Claude\claude_desktop_config.json` (Windows) or
 `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac):
 
 ```json
@@ -192,7 +192,7 @@ docker build -t google-workspace-mcp .
       "command": "docker",
       "args": [
         "run", "-i", "--rm",
-        "-v", "경로/.google-workspace:/app/.google-workspace",
+        "-v", "path/.google-workspace:/app/.google-workspace",
         "google-workspace-mcp"
       ]
     }
@@ -202,58 +202,58 @@ docker build -t google-workspace-mcp .
 
 ---
 
-## 7단계: 직원 배포
+## Step 7: Deploy to Employees
 
-### 각 직원이 해야 할 것
+### What each employee needs to do
 
-1. Docker Desktop 설치
-2. Docker 이미지 받기 (회사 레지스트리 또는 직접 빌드)
-3. `.mcp.json` 파일 복사
-4. **본인 회사 계정으로 로그인** (최초 1회)
+1. Install Docker Desktop
+2. Get the Docker image (from company registry or build it directly)
+3. Copy the `.mcp.json` file
+4. **Log in with their company account** (one-time setup)
 
-### 관리자가 해야 할 것
+### What the admin needs to do
 
-- Docker 이미지 배포 (회사 레지스트리에 push)
-- 설정 파일 공유
-- 사용 가이드 공유
+- Deploy the Docker image (push to company registry)
+- Share configuration files
+- Share the usage guide
 
 ---
 
-## 사용 예시
+## Usage Examples
 
-Claude에서:
+In Claude:
 
 ```
-"내 캘린더 일정 보여줘"
-"koyu@company.com한테 메일 보내줘"
-"드라이브에서 기획서 찾아줘"
-"새 문서 만들어줘"
+"Show my calendar events"
+"Send an email to koyu@company.com"
+"Find the proposal on Drive"
+"Create a new document"
 ```
 
 ---
 
-## 문제 해결
+## Troubleshooting
 
-### "내부 사용자만 앱에 액세스할 수 있습니다" 오류
+### "Only internal users can access this app" error
 
-→ Google Workspace가 아닌 계정(예: gmail.com)으로 로그인 시도함
-→ 회사 계정 (@회사도메인.com)으로 로그인하세요
+→ You attempted to log in with a non-Google Workspace account (e.g., gmail.com)
+→ Log in with your company account (@yourdomain.com)
 
-### Docker 이미지를 찾을 수 없음
+### Docker image not found
 
-→ Docker Desktop이 실행 중인지 확인
-→ `docker build -t google-workspace-mcp .` 다시 실행
+→ Make sure Docker Desktop is running
+→ Run `docker build -t google-workspace-mcp .` again
 
-### 토큰 오류
+### Token error
 
-→ `.google-workspace/token.json` 삭제 후 다시 로그인
+→ Delete `.google-workspace/token.json` and log in again
 
 ---
 
-## 보안 주의사항
+## Security Notes
 
-**절대 공유하면 안 되는 파일:**
-- `.google-workspace/client_secret.json` (회사 Client ID)
-- `.google-workspace/token.json` (개인 로그인 토큰)
+**Never share these files:**
+- `.google-workspace/client_secret.json` (company Client ID)
+- `.google-workspace/token.json` (personal login token)
 
-이 파일들은 `.gitignore`에 포함되어 있습니다.
+These files are included in `.gitignore`.

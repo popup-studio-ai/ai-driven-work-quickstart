@@ -250,7 +250,7 @@ Write-Host "  client_secret.json found" -ForegroundColor Green
 # Pull Docker image
 Write-Host ""
 Write-Host "[Pull] Google MCP Docker image..." -ForegroundColor Yellow
-docker pull ghcr.io/popup-jacob/google-workspace-mcp:latest
+docker pull ghcr.io/popup-studio-ai/google-workspace-mcp:latest
 Write-Host "  OK" -ForegroundColor Green
 
 # OAuth authentication (always - installer runs once)
@@ -267,7 +267,7 @@ $configDirUnix = $configDir -replace '\\', '/'
 $ErrorActionPreference = "Continue"
 
 # Stop any leftover Google MCP auth container
-$oldContainer = (docker ps -q --filter "ancestor=ghcr.io/popup-jacob/google-workspace-mcp:latest") 2>$null
+$oldContainer = (docker ps -q --filter "ancestor=ghcr.io/popup-studio-ai/google-workspace-mcp:latest") 2>$null
 if ($oldContainer) { docker stop $oldContainer 2>$null | Out-Null; docker rm $oldContainer 2>$null | Out-Null }
 
 # Find a free port for OAuth callback
@@ -277,7 +277,7 @@ $authPort = $listener.LocalEndpoint.Port
 $listener.Stop()
 
 # Run auth container in background with dynamic port
-$containerId = (docker run -d -p "${authPort}:${authPort}" -e "OAUTH_PORT=$authPort" -v "${configDirUnix}:/app/.google-workspace" ghcr.io/popup-jacob/google-workspace-mcp:latest node -e "require('./dist/auth/oauth.js').getAuthenticatedClient().then(() => { console.log('Authentication complete!'); process.exit(0); }).catch(e => { console.error(e); process.exit(1); })") 2>$null
+$containerId = (docker run -d -p "${authPort}:${authPort}" -e "OAUTH_PORT=$authPort" -v "${configDirUnix}:/app/.google-workspace" ghcr.io/popup-studio-ai/google-workspace-mcp:latest node -e "require('./dist/auth/oauth.js').getAuthenticatedClient().then(() => { console.log('Authentication complete!'); process.exit(0); }).catch(e => { console.error(e); process.exit(1); })") 2>$null
 if ($containerId) { $containerId = $containerId.Trim() }
 
 if (-not $containerId) {
@@ -351,7 +351,7 @@ if (Test-Path $mcpConfigPath) {
 # Add google-workspace
 $mcpConfig.mcpServers["google-workspace"] = @{
     command = "docker"
-    args = @("run", "-i", "--rm", "-v", "${configDirUnix}:/app/.google-workspace", "ghcr.io/popup-jacob/google-workspace-mcp:latest")
+    args = @("run", "-i", "--rm", "-v", "${configDirUnix}:/app/.google-workspace", "ghcr.io/popup-studio-ai/google-workspace-mcp:latest")
 }
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
