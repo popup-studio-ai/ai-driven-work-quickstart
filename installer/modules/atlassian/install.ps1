@@ -117,8 +117,15 @@ if ($useDocker) {
     docker pull ghcr.io/sooperset/mcp-atlassian:latest 2>$null
     Write-Host "  OK" -ForegroundColor Green
 
-    # Source shared MCP utilities
-    . "$PSScriptRoot\..\shared\mcp-config.ps1"
+    # Source shared MCP utilities (works both local and remote)
+    if (-not (Get-Command Add-McpDockerServer -ErrorAction SilentlyContinue)) {
+        $mcpConfigLocal = "$PSScriptRoot\..\shared\mcp-config.ps1"
+        if ($PSScriptRoot -and (Test-Path $mcpConfigLocal)) {
+            . $mcpConfigLocal
+        } else {
+            irm "https://raw.githubusercontent.com/popup-studio-ai/ai-driven-work-quickstart/main/installer/modules/shared/mcp-config.ps1" | iex
+        }
+    }
 
     # Update MCP config via CLI
     Write-Host ""
@@ -157,7 +164,12 @@ if ($useDocker) {
 Write-Host ""
 Write-Host "[Fix] Removing project-level blocks..." -ForegroundColor Yellow
 if (-not (Get-Command Remove-McpProjectBlock -ErrorAction SilentlyContinue)) {
-    . "$PSScriptRoot\..\shared\mcp-config.ps1"
+    $mcpConfigLocal = "$PSScriptRoot\..\shared\mcp-config.ps1"
+    if ($PSScriptRoot -and (Test-Path $mcpConfigLocal)) {
+        . $mcpConfigLocal
+    } else {
+        irm "https://raw.githubusercontent.com/popup-studio-ai/ai-driven-work-quickstart/main/installer/modules/shared/mcp-config.ps1" | iex
+    }
 }
 Remove-McpProjectBlock "atlassian"
 

@@ -322,8 +322,15 @@ if (Test-Path $tokenPath) {
     Write-Host "  Login may have failed. Try again later." -ForegroundColor Yellow
 }
 
-# Source shared MCP utilities
-. "$PSScriptRoot\..\shared\mcp-config.ps1"
+# Source shared MCP utilities (works both local and remote)
+if (-not (Get-Command Add-McpDockerServer -ErrorAction SilentlyContinue)) {
+    $mcpConfigLocal = "$PSScriptRoot\..\shared\mcp-config.ps1"
+    if ($PSScriptRoot -and (Test-Path $mcpConfigLocal)) {
+        . $mcpConfigLocal
+    } else {
+        irm "https://raw.githubusercontent.com/popup-studio-ai/ai-driven-work-quickstart/main/installer/modules/shared/mcp-config.ps1" | iex
+    }
+}
 
 # Update MCP config via CLI
 Write-Host ""
