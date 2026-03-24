@@ -322,46 +322,24 @@ if (Test-Path $tokenPath) {
     Write-Host "  Login may have failed. Try again later." -ForegroundColor Yellow
 }
 
-# Update MCP config
+# Update MCP config via CLI
 Write-Host ""
 Write-Host "[Config] Updating MCP config..." -ForegroundColor Yellow
-if ($env:CLI_TYPE -eq "gemini") {
-    $mcpConfigPath = "$env:USERPROFILE\.gemini\settings.json"
-    if (-not (Test-Path "$env:USERPROFILE\.gemini")) { New-Item -ItemType Directory -Path "$env:USERPROFILE\.gemini" -Force | Out-Null }
-} else {
-    $mcpConfigPath = "$env:USERPROFILE\.claude\mcp.json"
-    if (-not (Test-Path "$env:USERPROFILE\.claude")) { New-Item -ItemType Directory -Path "$env:USERPROFILE\.claude" -Force | Out-Null }
-}
 $configDirUnix = $configDir -replace '\\', '/'
+$cliCmd = if ($env:CLI_TYPE -eq "gemini") { "gemini" } else { "claude" }
 
-# Read existing or create new
-$mcpConfig = @{ mcpServers = @{} }
-if (Test-Path $mcpConfigPath) {
-    $existingJson = Get-Content $mcpConfigPath -Raw | ConvertFrom-Json
-    if ($existingJson.mcpServers) {
-        $existingJson.mcpServers.PSObject.Properties | ForEach-Object {
-            $mcpConfig.mcpServers[$_.Name] = @{
-                command = $_.Value.command
-                args = @($_.Value.args)
-            }
-        }
-    }
+& $cliCmd mcp add google-workspace -s user -- docker run -i --rm -v "${configDirUnix}:/app/.google-workspace" ghcr.io/popup-studio-ai/google-workspace-mcp:latest 2>$null
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "  OK" -ForegroundColor Green
+} else {
+    Write-Host "  Failed to add MCP server" -ForegroundColor Red
 }
-
-# Add google-workspace
-$mcpConfig.mcpServers["google-workspace"] = @{
-    command = "docker"
-    args = @("run", "-i", "--rm", "-v", "${configDirUnix}:/app/.google-workspace", "ghcr.io/popup-studio-ai/google-workspace-mcp:latest")
-}
-
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText($mcpConfigPath, ($mcpConfig | ConvertTo-Json -Depth 10), $utf8NoBom)
-Write-Host "  OK" -ForegroundColor Green
 
 # Update Claude settings.json permissions (Claude CLI only)
 if ($env:CLI_TYPE -ne "gemini") {
     $claudeSettingsPath = "$env:USERPROFILE\.claude\settings.json"
     $permissionToAdd = "mcp__google-workspace"
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 
     $claudeSettings = [PSCustomObject]@{ permissions = [PSCustomObject]@{ allow = @() } }
     if (Test-Path $claudeSettingsPath) {

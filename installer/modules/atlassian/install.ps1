@@ -117,52 +117,23 @@ if ($useDocker) {
     docker pull ghcr.io/sooperset/mcp-atlassian:latest 2>$null
     Write-Host "  OK" -ForegroundColor Green
 
-    # Update MCP config
+    # Update MCP config via CLI
     Write-Host ""
     Write-Host "[Config] Updating MCP config..." -ForegroundColor Yellow
-    if ($env:CLI_TYPE -eq "gemini") {
-        $mcpConfigPath = "$env:USERPROFILE\.gemini\settings.json"
-        if (-not (Test-Path "$env:USERPROFILE\.gemini")) { New-Item -ItemType Directory -Path "$env:USERPROFILE\.gemini" -Force | Out-Null }
+    $cliCmd = if ($env:CLI_TYPE -eq "gemini") { "gemini" } else { "claude" }
+
+    & $cliCmd mcp add atlassian -s user -- docker run -i --rm -e "CONFLUENCE_URL=$confluenceUrl" -e "CONFLUENCE_USERNAME=$email" -e "CONFLUENCE_API_TOKEN=$apiToken" -e "JIRA_URL=$jiraUrl" -e "JIRA_USERNAME=$email" -e "JIRA_API_TOKEN=$apiToken" ghcr.io/sooperset/mcp-atlassian:latest --transport stdio 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  OK" -ForegroundColor Green
     } else {
-        $mcpConfigPath = "$env:USERPROFILE\.claude\mcp.json"
-        if (-not (Test-Path "$env:USERPROFILE\.claude")) { New-Item -ItemType Directory -Path "$env:USERPROFILE\.claude" -Force | Out-Null }
+        Write-Host "  Failed to add MCP server" -ForegroundColor Red
     }
-
-    $mcpConfig = @{ mcpServers = @{} }
-    if (Test-Path $mcpConfigPath) {
-        $existingJson = Get-Content $mcpConfigPath -Raw | ConvertFrom-Json
-        if ($existingJson.mcpServers) {
-            $existingJson.mcpServers.PSObject.Properties | ForEach-Object {
-                $mcpConfig.mcpServers[$_.Name] = @{
-                    command = $_.Value.command
-                    args = @($_.Value.args)
-                }
-            }
-        }
-    }
-
-    $mcpConfig.mcpServers["atlassian"] = @{
-        command = "docker"
-        args = @(
-            "run", "-i", "--rm",
-            "-e", "CONFLUENCE_URL=$confluenceUrl",
-            "-e", "CONFLUENCE_USERNAME=$email",
-            "-e", "CONFLUENCE_API_TOKEN=$apiToken",
-            "-e", "JIRA_URL=$jiraUrl",
-            "-e", "JIRA_USERNAME=$email",
-            "-e", "JIRA_API_TOKEN=$apiToken",
-            "ghcr.io/sooperset/mcp-atlassian:latest"
-        )
-    }
-
-    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-    [System.IO.File]::WriteAllText($mcpConfigPath, ($mcpConfig | ConvertTo-Json -Depth 10), $utf8NoBom)
-    Write-Host "  OK" -ForegroundColor Green
 
     # Update Claude settings.json permissions (Claude CLI only)
     if ($env:CLI_TYPE -ne "gemini") {
         $claudeSettingsPath = "$env:USERPROFILE\.claude\settings.json"
         $permissionToAdd = "mcp__atlassian"
+        $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 
         $claudeSettings = [PSCustomObject]@{ permissions = [PSCustomObject]@{ allow = @() } }
         if (Test-Path $claudeSettingsPath) {
