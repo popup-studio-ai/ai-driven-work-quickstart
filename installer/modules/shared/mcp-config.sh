@@ -2,7 +2,8 @@
 # ============================================
 # Shared MCP Configuration Utilities
 # FR-S3-05a: Eliminate 4x duplicate MCP config logic
-# FR-S2-03: Unified config path (~/.claude/mcp.json)
+# Uses `claude mcp add` CLI for correct config path (~/.claude.json)
+# Uses `gemini mcp add` CLI for Gemini CLI (~/.gemini/settings.json)
 # ============================================
 
 # Source colors if not already loaded
@@ -11,34 +12,13 @@ if [ -z "$NC" ]; then
     source "${SHARED_DIR:-$SCRIPT_DIR_MCP}/colors.sh"
 fi
 
-# Get the MCP config file path (unified across platforms)
-# Branches on CLI_TYPE: claude -> ~/.claude/mcp.json, gemini -> ~/.gemini/settings.json
-mcp_get_config_path() {
-    local config_path
+# Determine CLI command based on CLI_TYPE
+_mcp_cli() {
     if [ "$CLI_TYPE" = "gemini" ]; then
-        config_path="$HOME/.gemini/settings.json"
+        echo "gemini"
     else
-        config_path="$HOME/.claude/mcp.json"
+        echo "${CLI_TYPE:-claude}"
     fi
-    local legacy_path="$HOME/.mcp.json"
-
-    # Migrate legacy config if needed (claude only)
-    if [ "$CLI_TYPE" != "gemini" ] && [ -f "$legacy_path" ] && [ ! -f "$config_path" ]; then
-        mkdir -p "$(dirname "$config_path")"
-        cp "$legacy_path" "$config_path"
-        echo -e "  ${YELLOW}Migrated MCP config from $legacy_path to $config_path${NC}"
-    fi
-
-    echo "$config_path"
-}
-
-# Check if Node.js is available (required for MCP config manipulation)
-mcp_check_node() {
-    if ! command -v node > /dev/null 2>&1; then
-        echo -e "  ${RED}Node.js is required for MCP configuration${NC}"
-        return 1
-    fi
-    return 0
 }
 
 # Add a Docker-based MCP server to config
@@ -49,38 +29,23 @@ mcp_add_docker_server() {
     shift 2
     local extra_args=("$@")
 
-    local config_path
-    config_path=$(mcp_get_config_path)
+    local cli
+    cli=$(_mcp_cli)
 
-    MCP_CONFIG_PATH="$config_path" \
-    SERVER_NAME="$server_name" \
-    IMAGE_NAME="$image_name" \
-    EXTRA_ARGS="${extra_args[*]}" \
-    node -e "
-const fs = require('fs');
-const path = require('path');
-const configPath = process.env.MCP_CONFIG_PATH;
-const serverName = process.env.SERVER_NAME;
-const imageName = process.env.IMAGE_NAME;
-const extraArgs = process.env.EXTRA_ARGS ? process.env.EXTRA_ARGS.split(' ').filter(Boolean) : [];
+    # Build docker command args
+    local docker_args="docker run -i --rm"
+    for arg in "${extra_args[@]}"; do
+        docker_args="$docker_args $arg"
+    done
+    docker_args="$docker_args $image_name"
 
-const dir = path.dirname(configPath);
-if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-let config = { mcpServers: {} };
-if (fs.existsSync(configPath)) {
-    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    if (!config.mcpServers) config.mcpServers = {};
-}
-
-config.mcpServers[serverName] = {
-    command: 'docker',
-    args: ['run', '-i', '--rm', ...extraArgs, imageName]
-};
-
-fs.writeFileSync(configPath, JSON.stringify(config, null, 2), { mode: 0o600 });
-"
-    echo -e "  ${GREEN}[OK] MCP server '$server_name' configured${NC}"
+    $cli mcp add "$server_name" -s user -- $docker_args 2>/dev/null
+    if [ $? -eq 0 ]; then
+        echo -e "  ${GREEN}[OK] MCP server '$server_name' configured${NC}"
+    else
+        echo -e "  ${RED}[FAIL] Failed to add MCP server '$server_name'${NC}"
+        return 1
+    fi
 }
 
 # Add a stdio-based MCP server to config
@@ -91,63 +56,25 @@ mcp_add_stdio_server() {
     shift 2
     local cmd_args=("$@")
 
-    local config_path
-    config_path=$(mcp_get_config_path)
+    local cli
+    cli=$(_mcp_cli)
 
-    MCP_CONFIG_PATH="$config_path" \
-    SERVER_NAME="$server_name" \
-    CMD="$cmd" \
-    CMD_ARGS="${cmd_args[*]}" \
-    node -e "
-const fs = require('fs');
-const path = require('path');
-const configPath = process.env.MCP_CONFIG_PATH;
-const serverName = process.env.SERVER_NAME;
-const cmd = process.env.CMD;
-const cmdArgs = process.env.CMD_ARGS ? process.env.CMD_ARGS.split(' ').filter(Boolean) : [];
-
-const dir = path.dirname(configPath);
-if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-let config = { mcpServers: {} };
-if (fs.existsSync(configPath)) {
-    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    if (!config.mcpServers) config.mcpServers = {};
-}
-
-config.mcpServers[serverName] = {
-    command: cmd,
-    args: cmdArgs
-};
-
-fs.writeFileSync(configPath, JSON.stringify(config, null, 2), { mode: 0o600 });
-"
-    echo -e "  ${GREEN}[OK] MCP server '$server_name' configured${NC}"
+    $cli mcp add "$server_name" -s user -- "$cmd" "${cmd_args[@]}" 2>/dev/null
+    if [ $? -eq 0 ]; then
+        echo -e "  ${GREEN}[OK] MCP server '$server_name' configured${NC}"
+    else
+        echo -e "  ${RED}[FAIL] Failed to add MCP server '$server_name'${NC}"
+        return 1
+    fi
 }
 
 # Remove an MCP server from config
 mcp_remove_server() {
     local server_name="$1"
-    local config_path
-    config_path=$(mcp_get_config_path)
+    local cli
+    cli=$(_mcp_cli)
 
-    if [ ! -f "$config_path" ]; then
-        return 0
-    fi
-
-    MCP_CONFIG_PATH="$config_path" \
-    SERVER_NAME="$server_name" \
-    node -e "
-const fs = require('fs');
-const configPath = process.env.MCP_CONFIG_PATH;
-const serverName = process.env.SERVER_NAME;
-
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-if (config.mcpServers) {
-    delete config.mcpServers[serverName];
-}
-fs.writeFileSync(configPath, JSON.stringify(config, null, 2), { mode: 0o600 });
-"
+    $cli mcp remove "$server_name" 2>/dev/null
 }
 
 # Add MCP server permission to ~/.claude/settings.json
@@ -162,7 +89,8 @@ mcp_add_permission() {
 
     local settings_path="$HOME/.claude/settings.json"
 
-    if ! mcp_check_node; then
+    if ! command -v node > /dev/null 2>&1; then
+        echo -e "  ${RED}Node.js is required for permission configuration${NC}"
         return 1
     fi
 
@@ -195,18 +123,8 @@ if (!settings.permissions.allow.includes(permission)) {
 # Check if an MCP server exists in config
 mcp_server_exists() {
     local server_name="$1"
-    local config_path
-    config_path=$(mcp_get_config_path)
+    local cli
+    cli=$(_mcp_cli)
 
-    if [ ! -f "$config_path" ]; then
-        return 1
-    fi
-
-    MCP_CONFIG_PATH="$config_path" \
-    SERVER_NAME="$server_name" \
-    node -e "
-const fs = require('fs');
-const config = JSON.parse(fs.readFileSync(process.env.MCP_CONFIG_PATH, 'utf8'));
-process.exit(config.mcpServers && config.mcpServers[process.env.SERVER_NAME] ? 0 : 1);
-"
+    $cli mcp list 2>/dev/null | grep -q "$server_name"
 }
