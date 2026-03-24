@@ -22,12 +22,27 @@ _mcp_cli() {
 }
 
 # Add a Docker-based MCP server to config
-# Usage: mcp_add_docker_server "server_name" "image_name" [extra_args...]
+# Usage: mcp_add_docker_server "server_name" "image_name" [extra_args...] [-- post_image_args...]
 mcp_add_docker_server() {
     local server_name="$1"
     local image_name="$2"
     shift 2
-    local extra_args=("$@")
+
+    local extra_args=()
+    local post_args=()
+    local found_separator=false
+
+    for arg in "$@"; do
+        if [ "$arg" = "--" ]; then
+            found_separator=true
+            continue
+        fi
+        if [ "$found_separator" = true ]; then
+            post_args+=("$arg")
+        else
+            extra_args+=("$arg")
+        fi
+    done
 
     local cli
     cli=$(_mcp_cli)
@@ -38,6 +53,9 @@ mcp_add_docker_server() {
         docker_args="$docker_args $arg"
     done
     docker_args="$docker_args $image_name"
+    for arg in "${post_args[@]}"; do
+        docker_args="$docker_args $arg"
+    done
 
     $cli mcp add "$server_name" -s user -- $docker_args 2>/dev/null
     if [ $? -eq 0 ]; then

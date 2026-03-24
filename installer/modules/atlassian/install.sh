@@ -157,7 +157,7 @@ ENVEOF
     echo ""
     echo -e "${YELLOW}[Config] Updating MCP config...${NC}"
 
-    mcp_add_docker_server "atlassian" "ghcr.io/sooperset/mcp-atlassian:latest" "--env-file" "$ENV_FILE"
+    mcp_add_docker_server "atlassian" "ghcr.io/sooperset/mcp-atlassian:latest" "--env-file" "$ENV_FILE" -- "--transport" "stdio"
     mcp_add_permission "mcp__atlassian"
 
 else

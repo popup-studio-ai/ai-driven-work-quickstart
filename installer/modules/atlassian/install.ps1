@@ -117,50 +117,21 @@ if ($useDocker) {
     docker pull ghcr.io/sooperset/mcp-atlassian:latest 2>$null
     Write-Host "  OK" -ForegroundColor Green
 
+    # Source shared MCP utilities
+    . "$PSScriptRoot\..\shared\mcp-config.ps1"
+
     # Update MCP config via CLI
     Write-Host ""
     Write-Host "[Config] Updating MCP config..." -ForegroundColor Yellow
-    $cliCmd = if ($env:CLI_TYPE -eq "gemini") { "gemini" } else { "claude" }
-
-    & $cliCmd mcp add atlassian -s user -- docker run -i --rm -e "CONFLUENCE_URL=$confluenceUrl" -e "CONFLUENCE_USERNAME=$email" -e "CONFLUENCE_API_TOKEN=$apiToken" -e "JIRA_URL=$jiraUrl" -e "JIRA_USERNAME=$email" -e "JIRA_API_TOKEN=$apiToken" ghcr.io/sooperset/mcp-atlassian:latest --transport stdio 2>$null
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "  OK" -ForegroundColor Green
-    } else {
-        Write-Host "  Failed to add MCP server" -ForegroundColor Red
-    }
-
-    # Update Claude settings.json permissions (Claude CLI only)
-    if ($env:CLI_TYPE -ne "gemini") {
-        $claudeSettingsPath = "$env:USERPROFILE\.claude\settings.json"
-        $permissionToAdd = "mcp__atlassian"
-        $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-
-        $claudeSettings = [PSCustomObject]@{ permissions = [PSCustomObject]@{ allow = @() } }
-        if (Test-Path $claudeSettingsPath) {
-            try {
-                $raw = [System.IO.File]::ReadAllText($claudeSettingsPath).TrimStart([char]0xFEFF)
-                $claudeSettings = $raw | ConvertFrom-Json
-            } catch {}
-        }
-
-        $allowList = @()
-        if ($claudeSettings.permissions -and $claudeSettings.permissions.allow) {
-            $allowList = @($claudeSettings.permissions.allow)
-        }
-
-        if ($allowList -notcontains $permissionToAdd) {
-            $allowList += $permissionToAdd
-            if (-not $claudeSettings.PSObject.Properties['permissions']) {
-                $claudeSettings | Add-Member -NotePropertyName 'permissions' -NotePropertyValue ([PSCustomObject]@{ allow = $allowList })
-            } else {
-                $claudeSettings.permissions.allow = $allowList
-            }
-            [System.IO.File]::WriteAllText($claudeSettingsPath, ($claudeSettings | ConvertTo-Json -Depth 10), $utf8NoBom)
-            Write-Host "  Added Claude permission: $permissionToAdd" -ForegroundColor Green
-        } else {
-            Write-Host "  Claude permission already set" -ForegroundColor Green
-        }
-    }
+    Add-McpDockerServer "atlassian" "ghcr.io/sooperset/mcp-atlassian:latest" @(
+        "-e", "CONFLUENCE_URL=$confluenceUrl",
+        "-e", "CONFLUENCE_USERNAME=$email",
+        "-e", "CONFLUENCE_API_TOKEN=$apiToken",
+        "-e", "JIRA_URL=$jiraUrl",
+        "-e", "JIRA_USERNAME=$email",
+        "-e", "JIRA_API_TOKEN=$apiToken"
+    ) @("--transport", "stdio")
+    Add-McpPermission "mcp__atlassian"
 
 } else {
     # ========================================
@@ -182,29 +153,13 @@ if ($useDocker) {
     Write-Host "Guide: https://support.atlassian.com/atlassian-rovo-mcp-server/" -ForegroundColor Gray
 }
 
-# Remove atlassian from disabledMcpjsonServers in all project settings
+# Remove project-level blocks
 Write-Host ""
 Write-Host "[Fix] Removing project-level blocks..." -ForegroundColor Yellow
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-$localSettingsFiles = Get-ChildItem -Path $env:USERPROFILE -Recurse -Filter "settings.local.json" -ErrorAction SilentlyContinue |
-    Where-Object { $_.DirectoryName -like "*\.claude" }
-$fixedCount = 0
-foreach ($file in $localSettingsFiles) {
-    try {
-        $raw = [System.IO.File]::ReadAllText($file.FullName)
-        $json = $raw | ConvertFrom-Json
-        if ($json.disabledMcpjsonServers -and ($json.disabledMcpjsonServers -contains "atlassian")) {
-            $json.disabledMcpjsonServers = @($json.disabledMcpjsonServers | Where-Object { $_ -ne "atlassian" })
-            [System.IO.File]::WriteAllText($file.FullName, ($json | ConvertTo-Json -Depth 10), $utf8NoBom)
-            $fixedCount++
-        }
-    } catch {}
+if (-not (Get-Command Remove-McpProjectBlock -ErrorAction SilentlyContinue)) {
+    . "$PSScriptRoot\..\shared\mcp-config.ps1"
 }
-if ($fixedCount -gt 0) {
-    Write-Host "  Fixed $fixedCount project(s)" -ForegroundColor Green
-} else {
-    Write-Host "  OK (no blocks found)" -ForegroundColor Green
-}
+Remove-McpProjectBlock "atlassian"
 
 Write-Host ""
 Write-Host "----------------------------------------" -ForegroundColor DarkGray

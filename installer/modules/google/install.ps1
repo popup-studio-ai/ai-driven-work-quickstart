@@ -322,74 +322,20 @@ if (Test-Path $tokenPath) {
     Write-Host "  Login may have failed. Try again later." -ForegroundColor Yellow
 }
 
+# Source shared MCP utilities
+. "$PSScriptRoot\..\shared\mcp-config.ps1"
+
 # Update MCP config via CLI
 Write-Host ""
 Write-Host "[Config] Updating MCP config..." -ForegroundColor Yellow
 $configDirUnix = $configDir -replace '\\', '/'
-$cliCmd = if ($env:CLI_TYPE -eq "gemini") { "gemini" } else { "claude" }
+Add-McpDockerServer "google-workspace" "ghcr.io/popup-studio-ai/google-workspace-mcp:latest" @("-v", "${configDirUnix}:/app/.google-workspace")
+Add-McpPermission "mcp__google-workspace"
 
-& $cliCmd mcp add google-workspace -s user -- docker run -i --rm -v "${configDirUnix}:/app/.google-workspace" ghcr.io/popup-studio-ai/google-workspace-mcp:latest 2>$null
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "  OK" -ForegroundColor Green
-} else {
-    Write-Host "  Failed to add MCP server" -ForegroundColor Red
-}
-
-# Update Claude settings.json permissions (Claude CLI only)
-if ($env:CLI_TYPE -ne "gemini") {
-    $claudeSettingsPath = "$env:USERPROFILE\.claude\settings.json"
-    $permissionToAdd = "mcp__google-workspace"
-    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-
-    $claudeSettings = [PSCustomObject]@{ permissions = [PSCustomObject]@{ allow = @() } }
-    if (Test-Path $claudeSettingsPath) {
-        try {
-            $raw = [System.IO.File]::ReadAllText($claudeSettingsPath).TrimStart([char]0xFEFF)
-            $claudeSettings = $raw | ConvertFrom-Json
-        } catch {}
-    }
-
-    $allowList = @()
-    if ($claudeSettings.permissions -and $claudeSettings.permissions.allow) {
-        $allowList = @($claudeSettings.permissions.allow)
-    }
-
-    if ($allowList -notcontains $permissionToAdd) {
-        $allowList += $permissionToAdd
-        if (-not $claudeSettings.PSObject.Properties['permissions']) {
-            $claudeSettings | Add-Member -NotePropertyName 'permissions' -NotePropertyValue ([PSCustomObject]@{ allow = $allowList })
-        } else {
-            $claudeSettings.permissions.allow = $allowList
-        }
-        [System.IO.File]::WriteAllText($claudeSettingsPath, ($claudeSettings | ConvertTo-Json -Depth 10), $utf8NoBom)
-        Write-Host "  Added Claude permission: $permissionToAdd" -ForegroundColor Green
-    } else {
-        Write-Host "  Claude permission already set" -ForegroundColor Green
-    }
-}
-
-# Remove google-workspace from disabledMcpjsonServers in all project settings
+# Remove project-level blocks
 Write-Host ""
 Write-Host "[Fix] Removing project-level blocks..." -ForegroundColor Yellow
-$localSettingsFiles = Get-ChildItem -Path $env:USERPROFILE -Recurse -Filter "settings.local.json" -ErrorAction SilentlyContinue |
-    Where-Object { $_.DirectoryName -like "*\.claude" }
-$fixedCount = 0
-foreach ($file in $localSettingsFiles) {
-    try {
-        $raw = [System.IO.File]::ReadAllText($file.FullName)
-        $json = $raw | ConvertFrom-Json
-        if ($json.disabledMcpjsonServers -and ($json.disabledMcpjsonServers -contains "google-workspace")) {
-            $json.disabledMcpjsonServers = @($json.disabledMcpjsonServers | Where-Object { $_ -ne "google-workspace" })
-            [System.IO.File]::WriteAllText($file.FullName, ($json | ConvertTo-Json -Depth 10), $utf8NoBom)
-            $fixedCount++
-        }
-    } catch {}
-}
-if ($fixedCount -gt 0) {
-    Write-Host "  Fixed $fixedCount project(s)" -ForegroundColor Green
-} else {
-    Write-Host "  OK (no blocks found)" -ForegroundColor Green
-}
+Remove-McpProjectBlock "google-workspace"
 
 Write-Host ""
 Write-Host "----------------------------------------" -ForegroundColor DarkGray
